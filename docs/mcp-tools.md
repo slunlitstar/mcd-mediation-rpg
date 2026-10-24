@@ -19,7 +19,8 @@
 
 `tools/call` 返回三个字段：`content`、`structuredContent`、`isError`。
 
-- **`structuredContent` 是给程序用的**：统一信封 `{ success, code, message, traceId, data }`。App 应该只读这里。
+- **`structuredContent` 是给程序用的**：统一信封 `{ success, code, message, datetime, traceId, data }`（**`datetime` 是实测新增，文档未写**）。App 应该只读这里。
+- **失败时没有 `data` 键**，且 MCP 层 `isError` 恒为 `false` —— 业务失败只看 `code !== 200` 或 `success === false`。详见 [`mcp-data-shapes.md`](./mcp-data-shapes.md)。
 - **`content[0].text` 是给模型看的**：`# API Response Information ...` 开头的 Markdown，含字段说明 + 数据，单次 1200+ 字符。塞进前端会浪费上下文。
 - 工具描述里夹带大量 agent 指令（如 `draw-lottery` 写着"必须展示 nextConsumption 并得到明确确认"）。**不要在 UI 里原样展示 `description`**。
 - 所有工具的 `title` 字段为空，展示名需要自己维护 i18n 映射。
@@ -171,9 +172,11 @@
 | 错误映射 | ✅ [`errors.ts`](../apps/server/src/mcp/errors.ts)：401/403/429/超时/网络/解析失败 → 稳定 `kind` |
 | 配置校验 | ✅ [`config/env.ts`](../apps/server/src/config/env.ts)：缺变量给可执行提示，并拦截 `VITE_*TOKEN` 泄漏 |
 | 工具清单固化 | ✅ 本文 + `mcp-tools.snapshot.json`（可用 `npm run mcp:probe -w @mcd/server` 重新生成） |
+| `data` 形状固化 | ✅ [`mcp-data-shapes.md`](./mcp-data-shapes.md) + `mcp-data-shapes.json`（`npm run mcp:shapes -w @mcd/server` 重新生成；8 个 MVP 只读工具实跑，脱敏后入库） |
 | HTTP 路由对接前端 | ⬜ 未做（按 CONTRIBUTING，需先定接口契约再实现） |
 
 ## 8. 仍未确认
 
-- 工具表之外的**参数级**能力未逐一实测：`modification`（特调 `selectedKey`/`unselectedKey` 规则）、`withOrder` 随单购、`needTableware`、`remark`（≤50 字，仅外送）。
-- 各工具 `structuredContent.data` 的具体形状未全量抓取；建议下一步对 MVP 的 8 个只读工具各跑一次真实请求，把 `data` 结构一并存入 snapshot。
+- **已解决（2026-10-25 02:00 实跑）**：8 个 MVP 只读工具的 `data` 形状已全部抓取，见 [`mcp-data-shapes.md`](./mcp-data-shapes.md)。顺带纠正三处口径：`modification` 在 `rounds[].choices[]` 内、`takeWayList` 由 `calculate-price` 返回、金额在 `calculate-price` 是「分」而 `query-meals` 是「元字符串」。
+- **仍未验证**：`query-store-coupons` 的元素形状（该账号所有门店均为 0 券，只确认 `data: []`）；`withOrder` 随单购；外送/团餐版 `calculate-price`（需真实 `addressId`）；`needTableware`、`remark`（≤50 字，仅外送）。
+- 本次取样在凌晨，门店全部 `businessStatus=false`，菜单/价格均走 `reservationDate` 预约链路；营业时段需复跑一次校准即时价。
