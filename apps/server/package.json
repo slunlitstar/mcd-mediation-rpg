@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "mcp:probe": "tsx --env-file-if-exists=../../.env src/mcp/probe.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "start": "node --env-file-if-exists=../../.env dist/index.js"
