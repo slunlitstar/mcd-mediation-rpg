@@ -145,6 +145,8 @@
 
 `create-order` 只返回支付链接，钱由用户在支付页完成；但订单已创建，属实质副作用。
 
+实测补充（2026-10-25 02:50，1 单 ¥5 空跑）：未支付订单 `createTime + 15 分钟` 自动过期（`expirePayTime`）；`cancel-order` 成功看 `data.cancelResult` 布尔而非 `code`；状态判定用 `status` 字符串码（`10` 待支付 / `60` 已取消），`orderStatus` 只是中文文案。详见 [`mcp-order-shapes.md`](./mcp-order-shapes.md)。
+
 ## 6. 对本项目的最小工具集
 
 「麦门饭局调解所」的核心是**多人协商**：几个人口味/预算/热量诉求不同，系统要算出一单大家都能接受的组合，并把差价讲清楚。协商阶段本质是反复试算，`calculate-price` 是唯一成本函数。
@@ -173,6 +175,7 @@
 | 配置校验 | ✅ [`config/env.ts`](../apps/server/src/config/env.ts)：缺变量给可执行提示，并拦截 `VITE_*TOKEN` 泄漏 |
 | 工具清单固化 | ✅ 本文 + `mcp-tools.snapshot.json`（可用 `npm run mcp:probe -w @mcd/server` 重新生成） |
 | `data` 形状固化 | ✅ [`mcp-data-shapes.md`](./mcp-data-shapes.md) + `mcp-data-shapes.json`（`npm run mcp:shapes -w @mcd/server` 重新生成；8 个 MVP 只读工具实跑，脱敏后入库） |
+| 写链路形状固化 | ✅ [`mcp-order-shapes.md`](./mcp-order-shapes.md) + `mcp-order-shapes.json`（`npm run mcp:order -w @mcd/server -- --confirm`：真建一单 ¥5 不付款→抓形状→立即取消，已验证 `status 10→60`） |
 | HTTP 路由对接前端 | ⬜ 未做（按 CONTRIBUTING，需先定接口契约再实现） |
 
 ## 8. 仍未确认
@@ -180,3 +183,4 @@
 - **已解决（2026-10-25 02:00 实跑）**：8 个 MVP 只读工具的 `data` 形状已全部抓取，见 [`mcp-data-shapes.md`](./mcp-data-shapes.md)。顺带纠正三处口径：`modification` 在 `rounds[].choices[]` 内、`takeWayList` 由 `calculate-price` 返回、金额在 `calculate-price` 是「分」而 `query-meals` 是「元字符串」。
 - **仍未验证**：`query-store-coupons` 的元素形状（该账号所有门店均为 0 券，只确认 `data: []`）；`withOrder` 随单购；外送/团餐版 `calculate-price`（需真实 `addressId`）；`needTableware`、`remark`（≤50 字，仅外送）。
 - 本次取样在凌晨，门店全部 `businessStatus=false`，菜单/价格均走 `reservationDate` 预约链路；营业时段需复跑一次校准即时价。
+- 写链路的**已支付**状态码（`20`/`30`/`40`…）、`pickupCode` 填充时机、支付链接有效期均未验证 —— 需要真付款一次，取样不值得花这个钱。

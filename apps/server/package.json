@@ -7,6 +7,7 @@
     "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
     "mcp:probe": "tsx --env-file-if-exists=../../.env src/mcp/probe.ts",
     "mcp:shapes": "tsx --env-file-if-exists=../../.env src/mcp/probe-data.ts",
+    "mcp:order": "tsx --env-file-if-exists=../../.env src/mcp/probe-order.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "start": "node --env-file-if-exists=../../.env dist/index.js"

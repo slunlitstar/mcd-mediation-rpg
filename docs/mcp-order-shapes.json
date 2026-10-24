@@ -1,0 +1,1268 @@
+{
+  "capturedAt": "2026-10-24T18:49:58.978Z",
+  "endpoint": "https://mcp.mcd.cn",
+  "redacted": true,
+  "purpose": "写链路空跑：建单不付款，抓 create-order / query-order / cancel-order 的真实形状后立即取消。",
+  "order": {
+    "storeCode": "1950059",
+    "storeName": "麦当劳北京新王府井餐厅",
+    "productCode": "515837",
+    "productName": "圆筒冰淇淋",
+    "quantity": 1,
+    "expectedPrice": 5,
+    "takeWayCode": "take-in-store",
+    "reservationDate": "2026-10-25 12:00"
+  },
+  "note": "orderId 已打码，payH5Url 一律不落盘；其余字段按与只读探针相同的规则脱敏。",
+  "summary": {
+    "created": true,
+    "orderId": "1030<masked>",
+    "queryOk": true,
+    "cancelOk": true,
+    "cancelConfirmed": true,
+    "driftEntries": 29
+  },
+  "steps": [
+    {
+      "tool": "calculate-price",
+      "args": {
+        "storeCode": "1950059",
+        "orderType": 1,
+        "beType": 1,
+        "reservationDate": "2026-10-25 12:00",
+        "items": [
+          {
+            "productCode": "515837",
+            "quantity": 1
+          }
+        ]
+      },
+      "ok": true,
+      "isError": false,
+      "durationMs": 341,
+      "contentChars": 2823,
+      "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
+      "envelope": {
+        "success": true,
+        "code": 200,
+        "message": "请求成功",
+        "datetime": "2026-10-25 02:49:58",
+        "traceId": "48883f2dc63400ad1d012375919518e3",
+        "data": {
+          "productOriginalPrice": 500,
+          "productPrice": 500,
+          "originalPrice": 500,
+          "discount": 0,
+          "price": 500,
+          "productList": [
+            {
+              "productCode": "515837",
+              "productName": "圆筒冰淇淋",
+              "quantity": 1,
+              "originalSubtotal": 500,
+              "subtotal": 500
+            }
+          ],
+          "takeWayList": [
+            {
+              "code": "eat-in",
+              "title": "堂食",
+              "subtitle": "店内用餐"
+            },
+            {
+              "code": "take-in-store",
+              "title": "外带",
+              "subtitle": "店内自提"
+            }
+          ]
+        }
+      },
+      "dataShape": {
+        "kind": "object",
+        "keys": {
+          "productOriginalPrice": {
+            "kind": "number"
+          },
+          "productPrice": {
+            "kind": "number"
+          },
+          "originalPrice": {
+            "kind": "number"
+          },
+          "discount": {
+            "kind": "number"
+          },
+          "price": {
+            "kind": "number"
+          },
+          "productList": {
+            "kind": "array",
+            "items": {
+              "kind": "object",
+              "keys": {
+                "productCode": {
+                  "kind": "string",
+                  "examples": [
+                    "515837"
+                  ]
+                },
+                "productName": {
+                  "kind": "string",
+                  "examples": [
+                    "圆筒冰淇淋"
+                  ]
+                },
+                "quantity": {
+                  "kind": "number"
+                },
+                "originalSubtotal": {
+                  "kind": "number"
+                },
+                "subtotal": {
+                  "kind": "number"
+                }
+              },
+              "counts": {
+                "productCode": 1,
+                "productName": 1,
+                "quantity": 1,
+                "originalSubtotal": 1,
+                "subtotal": 1
+              },
+              "samples": 1,
+              "optional": []
+            },
+            "lengths": [
+              1
+            ]
+          },
+          "takeWayList": {
+            "kind": "array",
+            "items": {
+              "kind": "object",
+              "keys": {
+                "code": {
+                  "kind": "string",
+                  "examples": [
+                    "eat-in",
+                    "take-in-store"
+                  ]
+                },
+                "title": {
+                  "kind": "string",
+                  "examples": [
+                    "堂食",
+                    "外带"
+                  ]
+                },
+                "subtitle": {
+                  "kind": "string",
+                  "examples": [
+                    "店内用餐",
+                    "店内自提"
+                  ]
+                }
+              },
+              "counts": {
+                "code": 2,
+                "title": 2,
+                "subtitle": 2
+              },
+              "samples": 2,
+              "optional": []
+            },
+            "lengths": [
+              2
+            ]
+          }
+        },
+        "counts": {
+          "productOriginalPrice": 1,
+          "productPrice": 1,
+          "originalPrice": 1,
+          "discount": 1,
+          "price": 1,
+          "productList": 1,
+          "takeWayList": 1
+        },
+        "samples": 1,
+        "optional": []
+      },
+      "diffs": [
+        {
+          "path": "data.deliveryOriginalPrice",
+          "kind": "declared-missing",
+          "detail": "declared number"
+        },
+        {
+          "path": "data.deliveryPrice",
+          "kind": "declared-missing",
+          "detail": "declared number"
+        },
+        {
+          "path": "data.enjoyable",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.enjoyed",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.mealAssistanceList",
+          "kind": "declared-missing",
+          "detail": "declared array"
+        },
+        {
+          "path": "data.packingOriginalPrice",
+          "kind": "declared-missing",
+          "detail": "declared number"
+        },
+        {
+          "path": "data.packingPrice",
+          "kind": "declared-missing",
+          "detail": "declared number"
+        },
+        {
+          "path": "data.tablewarePrice",
+          "kind": "declared-missing",
+          "detail": "declared number"
+        }
+      ],
+      "dataSample": {
+        "productOriginalPrice": 500,
+        "productPrice": 500,
+        "originalPrice": 500,
+        "discount": 0,
+        "price": 500,
+        "productList": [
+          {
+            "productCode": "515837",
+            "productName": "圆筒冰淇淋",
+            "quantity": 1,
+            "originalSubtotal": 500,
+            "subtotal": 500
+          }
+        ],
+        "takeWayList": [
+          {
+            "code": "eat-in",
+            "title": "堂食",
+            "subtitle": "店内用餐"
+          },
+          {
+            "code": "take-in-store",
+            "title": "外带",
+            "subtitle": "店内自提"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "create-order",
+      "args": {
+        "storeCode": "1950059",
+        "orderType": 1,
+        "beType": 1,
+        "reservationDate": "2026-10-25 12:00",
+        "takeWayCode": "eat-in",
+        "items": [
+          {
+            "productCode": "515837",
+            "quantity": 1
+          }
+        ]
+      },
+      "ok": true,
+      "isError": false,
+      "durationMs": 558,
+      "contentChars": 4684,
+      "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
+      "envelope": {
+        "success": true,
+        "code": 200,
+        "message": "请求成功",
+        "datetime": "2026-10-25 02:49:59",
+        "traceId": "4630d228080e2b719426753fe8ca211a",
+        "data": {
+          "orderId": "1030<masked>",
+          "payId": "1110<masked>",
+          "payH5Url": "<payment-url-hidden>",
+          "orderDetail": {
+            "orderId": "1030<masked>",
+            "orderStatus": "待支付",
+            "status": "10",
+            "storeName": "麦当劳北京新王府井餐厅",
+            "storeAddress": "王府井大街200号北京工艺美术世界",
+            "orderProductList": [
+              {
+                "productName": "圆筒冰淇淋",
+                "productImage": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png",
+                "quantity": 1,
+                "price": "5",
+                "comboItemList": []
+              }
+            ],
+            "totalAmount": "5",
+            "realTotalAmount": "5",
+            "totalDiscountAmount": "0",
+            "couponList": [],
+            "createTime": "2026-10-25 02:49:59",
+            "deliveryPrice": "0",
+            "realDeliveryPrice": "0",
+            "needTableware": false,
+            "productPrice": "5",
+            "takeWay": "堂食",
+            "pickupCode": "",
+            "expirePayTime": "2026-10-25 03:04:59",
+            "payId": "1110<masked>",
+            "remark": ""
+          }
+        }
+      },
+      "dataShape": {
+        "kind": "object",
+        "keys": {
+          "orderId": {
+            "kind": "string",
+            "examples": [
+              "1030<masked>"
+            ]
+          },
+          "payId": {
+            "kind": "string",
+            "examples": [
+              "1110<masked>"
+            ]
+          },
+          "payH5Url": {
+            "kind": "string",
+            "examples": [
+              "<payment-url-hidden>"
+            ]
+          },
+          "orderDetail": {
+            "kind": "object",
+            "keys": {
+              "orderId": {
+                "kind": "string",
+                "examples": [
+                  "1030<masked>"
+                ]
+              },
+              "orderStatus": {
+                "kind": "string",
+                "examples": [
+                  "待支付"
+                ]
+              },
+              "status": {
+                "kind": "string",
+                "examples": [
+                  "10"
+                ]
+              },
+              "storeName": {
+                "kind": "string",
+                "examples": [
+                  "麦当劳北京新王府井餐厅"
+                ]
+              },
+              "storeAddress": {
+                "kind": "string",
+                "examples": [
+                  "王府井大街200号北京工艺美术世界"
+                ]
+              },
+              "orderProductList": {
+                "kind": "array",
+                "items": {
+                  "kind": "object",
+                  "keys": {
+                    "productName": {
+                      "kind": "string",
+                      "examples": [
+                        "圆筒冰淇淋"
+                      ]
+                    },
+                    "productImage": {
+                      "kind": "string",
+                      "examples": [
+                        "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png"
+                      ]
+                    },
+                    "quantity": {
+                      "kind": "number"
+                    },
+                    "price": {
+                      "kind": "string",
+                      "examples": [
+                        "5"
+                      ]
+                    },
+                    "comboItemList": {
+                      "kind": "array",
+                      "lengths": [
+                        0
+                      ]
+                    }
+                  },
+                  "counts": {
+                    "productName": 1,
+                    "productImage": 1,
+                    "quantity": 1,
+                    "price": 1,
+                    "comboItemList": 1
+                  },
+                  "samples": 1,
+                  "optional": []
+                },
+                "lengths": [
+                  1
+                ]
+              },
+              "totalAmount": {
+                "kind": "string",
+                "examples": [
+                  "5"
+                ]
+              },
+              "realTotalAmount": {
+                "kind": "string",
+                "examples": [
+                  "5"
+                ]
+              },
+              "totalDiscountAmount": {
+                "kind": "string",
+                "examples": [
+                  "0"
+                ]
+              },
+              "couponList": {
+                "kind": "array",
+                "lengths": [
+                  0
+                ]
+              },
+              "createTime": {
+                "kind": "string",
+                "examples": [
+                  "2026-10-25 02:49:59"
+                ]
+              },
+              "deliveryPrice": {
+                "kind": "string",
+                "examples": [
+                  "0"
+                ]
+              },
+              "realDeliveryPrice": {
+                "kind": "string",
+                "examples": [
+                  "0"
+                ]
+              },
+              "needTableware": {
+                "kind": "boolean"
+              },
+              "productPrice": {
+                "kind": "string",
+                "examples": [
+                  "5"
+                ]
+              },
+              "takeWay": {
+                "kind": "string",
+                "examples": [
+                  "堂食"
+                ]
+              },
+              "pickupCode": {
+                "kind": "string",
+                "examples": [
+                  ""
+                ]
+              },
+              "expirePayTime": {
+                "kind": "string",
+                "examples": [
+                  "2026-10-25 03:04:59"
+                ]
+              },
+              "payId": {
+                "kind": "string",
+                "examples": [
+                  "1110<masked>"
+                ]
+              },
+              "remark": {
+                "kind": "string",
+                "examples": [
+                  ""
+                ]
+              }
+            },
+            "counts": {
+              "orderId": 1,
+              "orderStatus": 1,
+              "status": 1,
+              "storeName": 1,
+              "storeAddress": 1,
+              "orderProductList": 1,
+              "totalAmount": 1,
+              "realTotalAmount": 1,
+              "totalDiscountAmount": 1,
+              "couponList": 1,
+              "createTime": 1,
+              "deliveryPrice": 1,
+              "realDeliveryPrice": 1,
+              "needTableware": 1,
+              "productPrice": 1,
+              "takeWay": 1,
+              "pickupCode": 1,
+              "expirePayTime": 1,
+              "payId": 1,
+              "remark": 1
+            },
+            "samples": 1,
+            "optional": []
+          }
+        },
+        "counts": {
+          "orderId": 1,
+          "payId": 1,
+          "payH5Url": 1,
+          "orderDetail": 1
+        },
+        "samples": 1,
+        "optional": []
+      },
+      "diffs": [
+        {
+          "path": "data.orderDetail.needTableware",
+          "kind": "actual-extra",
+          "detail": "actual boolean"
+        },
+        {
+          "path": "data.orderDetail.deliveryInfo",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.orderDetail.lockerCode",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.orderDetail.lockerQrCode",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.orderDetail.mealAssistance",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.orderDetail.realPackingFeeTotalPrice",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.orderDetail.tablewarePrice",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        }
+      ],
+      "dataSample": {
+        "orderId": "1030<masked>",
+        "payId": "1110<masked>",
+        "payH5Url": "<payment-url-hidden>",
+        "orderDetail": {
+          "orderId": "1030<masked>",
+          "orderStatus": "待支付",
+          "status": "10",
+          "storeName": "麦当劳北京新王府井餐厅",
+          "storeAddress": "王府井大街200号北京工艺美术世界",
+          "orderProductList": [
+            {
+              "productName": "圆筒冰淇淋",
+              "productImage": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png",
+              "quantity": 1,
+              "price": "5",
+              "comboItemList": []
+            }
+          ],
+          "totalAmount": "5",
+          "realTotalAmount": "5",
+          "totalDiscountAmount": "0",
+          "couponList": [],
+          "createTime": "2026-10-25 02:49:59",
+          "deliveryPrice": "0",
+          "realDeliveryPrice": "0",
+          "needTableware": false,
+          "productPrice": "5",
+          "takeWay": "堂食",
+          "pickupCode": "",
+          "expirePayTime": "2026-10-25 03:04:59",
+          "payId": "1110<masked>",
+          "remark": ""
+        }
+      }
+    },
+    {
+      "tool": "query-order",
+      "args": {
+        "orderId": "1030<masked>"
+      },
+      "ok": true,
+      "isError": false,
+      "durationMs": 97,
+      "contentChars": 4023,
+      "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
+      "envelope": {
+        "success": true,
+        "code": 200,
+        "message": "请求成功",
+        "datetime": "2026-10-25 02:49:59",
+        "traceId": "cfb376fc7466baeb66f99ce3d1b2ee24",
+        "data": {
+          "orderId": "1030<masked>",
+          "orderStatus": "待支付",
+          "status": "10",
+          "storeName": "麦当劳北京新王府井餐厅",
+          "storeAddress": "王府井大街200号北京工艺美术世界",
+          "orderProductList": [
+            {
+              "productName": "圆筒冰淇淋",
+              "productImage": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png",
+              "quantity": 1,
+              "price": "5",
+              "comboItemList": []
+            }
+          ],
+          "totalAmount": "5",
+          "realTotalAmount": "5",
+          "totalDiscountAmount": "0",
+          "couponList": [],
+          "createTime": "2026-10-25 02:49:59",
+          "deliveryPrice": "0",
+          "realDeliveryPrice": "0",
+          "needTableware": false,
+          "productPrice": "5",
+          "takeWay": "堂食",
+          "pickupCode": "",
+          "expirePayTime": "2026-10-25 03:04:59",
+          "payId": "1110<masked>",
+          "remark": ""
+        }
+      },
+      "dataShape": {
+        "kind": "object",
+        "keys": {
+          "orderId": {
+            "kind": "string",
+            "examples": [
+              "1030<masked>"
+            ]
+          },
+          "orderStatus": {
+            "kind": "string",
+            "examples": [
+              "待支付"
+            ]
+          },
+          "status": {
+            "kind": "string",
+            "examples": [
+              "10"
+            ]
+          },
+          "storeName": {
+            "kind": "string",
+            "examples": [
+              "麦当劳北京新王府井餐厅"
+            ]
+          },
+          "storeAddress": {
+            "kind": "string",
+            "examples": [
+              "王府井大街200号北京工艺美术世界"
+            ]
+          },
+          "orderProductList": {
+            "kind": "array",
+            "items": {
+              "kind": "object",
+              "keys": {
+                "productName": {
+                  "kind": "string",
+                  "examples": [
+                    "圆筒冰淇淋"
+                  ]
+                },
+                "productImage": {
+                  "kind": "string",
+                  "examples": [
+                    "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png"
+                  ]
+                },
+                "quantity": {
+                  "kind": "number"
+                },
+                "price": {
+                  "kind": "string",
+                  "examples": [
+                    "5"
+                  ]
+                },
+                "comboItemList": {
+                  "kind": "array",
+                  "lengths": [
+                    0
+                  ]
+                }
+              },
+              "counts": {
+                "productName": 1,
+                "productImage": 1,
+                "quantity": 1,
+                "price": 1,
+                "comboItemList": 1
+              },
+              "samples": 1,
+              "optional": []
+            },
+            "lengths": [
+              1
+            ]
+          },
+          "totalAmount": {
+            "kind": "string",
+            "examples": [
+              "5"
+            ]
+          },
+          "realTotalAmount": {
+            "kind": "string",
+            "examples": [
+              "5"
+            ]
+          },
+          "totalDiscountAmount": {
+            "kind": "string",
+            "examples": [
+              "0"
+            ]
+          },
+          "couponList": {
+            "kind": "array",
+            "lengths": [
+              0
+            ]
+          },
+          "createTime": {
+            "kind": "string",
+            "examples": [
+              "2026-10-25 02:49:59"
+            ]
+          },
+          "deliveryPrice": {
+            "kind": "string",
+            "examples": [
+              "0"
+            ]
+          },
+          "realDeliveryPrice": {
+            "kind": "string",
+            "examples": [
+              "0"
+            ]
+          },
+          "needTableware": {
+            "kind": "boolean"
+          },
+          "productPrice": {
+            "kind": "string",
+            "examples": [
+              "5"
+            ]
+          },
+          "takeWay": {
+            "kind": "string",
+            "examples": [
+              "堂食"
+            ]
+          },
+          "pickupCode": {
+            "kind": "string",
+            "examples": [
+              ""
+            ]
+          },
+          "expirePayTime": {
+            "kind": "string",
+            "examples": [
+              "2026-10-25 03:04:59"
+            ]
+          },
+          "payId": {
+            "kind": "string",
+            "examples": [
+              "1110<masked>"
+            ]
+          },
+          "remark": {
+            "kind": "string",
+            "examples": [
+              ""
+            ]
+          }
+        },
+        "counts": {
+          "orderId": 1,
+          "orderStatus": 1,
+          "status": 1,
+          "storeName": 1,
+          "storeAddress": 1,
+          "orderProductList": 1,
+          "totalAmount": 1,
+          "realTotalAmount": 1,
+          "totalDiscountAmount": 1,
+          "couponList": 1,
+          "createTime": 1,
+          "deliveryPrice": 1,
+          "realDeliveryPrice": 1,
+          "needTableware": 1,
+          "productPrice": 1,
+          "takeWay": 1,
+          "pickupCode": 1,
+          "expirePayTime": 1,
+          "payId": 1,
+          "remark": 1
+        },
+        "samples": 1,
+        "optional": []
+      },
+      "diffs": [
+        {
+          "path": "data.needTableware",
+          "kind": "actual-extra",
+          "detail": "actual boolean"
+        },
+        {
+          "path": "data.deliveryInfo",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.lockerCode",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.lockerQrCode",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.mealAssistance",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.realPackingFeeTotalPrice",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.tablewarePrice",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        }
+      ],
+      "dataSample": {
+        "orderId": "1030<masked>",
+        "orderStatus": "待支付",
+        "status": "10",
+        "storeName": "麦当劳北京新王府井餐厅",
+        "storeAddress": "王府井大街200号北京工艺美术世界",
+        "orderProductList": [
+          {
+            "productName": "圆筒冰淇淋",
+            "productImage": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png",
+            "quantity": 1,
+            "price": "5",
+            "comboItemList": []
+          }
+        ],
+        "totalAmount": "5",
+        "realTotalAmount": "5",
+        "totalDiscountAmount": "0",
+        "couponList": [],
+        "createTime": "2026-10-25 02:49:59",
+        "deliveryPrice": "0",
+        "realDeliveryPrice": "0",
+        "needTableware": false,
+        "productPrice": "5",
+        "takeWay": "堂食",
+        "pickupCode": "",
+        "expirePayTime": "2026-10-25 03:04:59",
+        "payId": "1110<masked>",
+        "remark": ""
+      }
+    },
+    {
+      "tool": "cancel-order",
+      "args": {
+        "orderId": "1030<masked>",
+        "cancelReasonCode": "1"
+      },
+      "ok": true,
+      "isError": false,
+      "durationMs": 167,
+      "contentChars": 718,
+      "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
+      "envelope": {
+        "success": true,
+        "code": 200,
+        "message": "请求成功",
+        "datetime": "2026-10-25 02:49:59",
+        "traceId": "6c560682a898ca8871cb4cf7bb20ba99",
+        "data": {
+          "cancelResult": true,
+          "orderId": "1030<masked>"
+        }
+      },
+      "dataShape": {
+        "kind": "object",
+        "keys": {
+          "cancelResult": {
+            "kind": "boolean"
+          },
+          "orderId": {
+            "kind": "string",
+            "examples": [
+              "1030<masked>"
+            ]
+          }
+        },
+        "counts": {
+          "cancelResult": 1,
+          "orderId": 1
+        },
+        "samples": 1,
+        "optional": []
+      },
+      "diffs": [],
+      "dataSample": {
+        "cancelResult": true,
+        "orderId": "1030<masked>"
+      }
+    },
+    {
+      "tool": "query-order",
+      "args": {
+        "orderId": "1030<masked>"
+      },
+      "ok": true,
+      "isError": false,
+      "durationMs": 87,
+      "contentChars": 4025,
+      "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
+      "envelope": {
+        "success": true,
+        "code": 200,
+        "message": "请求成功",
+        "datetime": "2026-10-25 02:49:59",
+        "traceId": "03acf1d2617ac97f2187616900cb4a55",
+        "data": {
+          "orderId": "1030<masked>",
+          "orderStatus": "订单已取消",
+          "status": "60",
+          "storeName": "麦当劳北京新王府井餐厅",
+          "storeAddress": "王府井大街200号北京工艺美术世界",
+          "orderProductList": [
+            {
+              "productName": "圆筒冰淇淋",
+              "productImage": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png",
+              "quantity": 1,
+              "price": "5",
+              "comboItemList": []
+            }
+          ],
+          "totalAmount": "5",
+          "realTotalAmount": "5",
+          "totalDiscountAmount": "0",
+          "couponList": [],
+          "createTime": "2026-10-25 02:49:59",
+          "deliveryPrice": "0",
+          "realDeliveryPrice": "0",
+          "needTableware": false,
+          "productPrice": "5",
+          "takeWay": "堂食",
+          "pickupCode": "",
+          "expirePayTime": "2026-10-25 03:04:59",
+          "payId": "1110<masked>",
+          "remark": ""
+        }
+      },
+      "dataShape": {
+        "kind": "object",
+        "keys": {
+          "orderId": {
+            "kind": "string",
+            "examples": [
+              "1030<masked>"
+            ]
+          },
+          "orderStatus": {
+            "kind": "string",
+            "examples": [
+              "订单已取消"
+            ]
+          },
+          "status": {
+            "kind": "string",
+            "examples": [
+              "60"
+            ]
+          },
+          "storeName": {
+            "kind": "string",
+            "examples": [
+              "麦当劳北京新王府井餐厅"
+            ]
+          },
+          "storeAddress": {
+            "kind": "string",
+            "examples": [
+              "王府井大街200号北京工艺美术世界"
+            ]
+          },
+          "orderProductList": {
+            "kind": "array",
+            "items": {
+              "kind": "object",
+              "keys": {
+                "productName": {
+                  "kind": "string",
+                  "examples": [
+                    "圆筒冰淇淋"
+                  ]
+                },
+                "productImage": {
+                  "kind": "string",
+                  "examples": [
+                    "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png"
+                  ]
+                },
+                "quantity": {
+                  "kind": "number"
+                },
+                "price": {
+                  "kind": "string",
+                  "examples": [
+                    "5"
+                  ]
+                },
+                "comboItemList": {
+                  "kind": "array",
+                  "lengths": [
+                    0
+                  ]
+                }
+              },
+              "counts": {
+                "productName": 1,
+                "productImage": 1,
+                "quantity": 1,
+                "price": 1,
+                "comboItemList": 1
+              },
+              "samples": 1,
+              "optional": []
+            },
+            "lengths": [
+              1
+            ]
+          },
+          "totalAmount": {
+            "kind": "string",
+            "examples": [
+              "5"
+            ]
+          },
+          "realTotalAmount": {
+            "kind": "string",
+            "examples": [
+              "5"
+            ]
+          },
+          "totalDiscountAmount": {
+            "kind": "string",
+            "examples": [
+              "0"
+            ]
+          },
+          "couponList": {
+            "kind": "array",
+            "lengths": [
+              0
+            ]
+          },
+          "createTime": {
+            "kind": "string",
+            "examples": [
+              "2026-10-25 02:49:59"
+            ]
+          },
+          "deliveryPrice": {
+            "kind": "string",
+            "examples": [
+              "0"
+            ]
+          },
+          "realDeliveryPrice": {
+            "kind": "string",
+            "examples": [
+              "0"
+            ]
+          },
+          "needTableware": {
+            "kind": "boolean"
+          },
+          "productPrice": {
+            "kind": "string",
+            "examples": [
+              "5"
+            ]
+          },
+          "takeWay": {
+            "kind": "string",
+            "examples": [
+              "堂食"
+            ]
+          },
+          "pickupCode": {
+            "kind": "string",
+            "examples": [
+              ""
+            ]
+          },
+          "expirePayTime": {
+            "kind": "string",
+            "examples": [
+              "2026-10-25 03:04:59"
+            ]
+          },
+          "payId": {
+            "kind": "string",
+            "examples": [
+              "1110<masked>"
+            ]
+          },
+          "remark": {
+            "kind": "string",
+            "examples": [
+              ""
+            ]
+          }
+        },
+        "counts": {
+          "orderId": 1,
+          "orderStatus": 1,
+          "status": 1,
+          "storeName": 1,
+          "storeAddress": 1,
+          "orderProductList": 1,
+          "totalAmount": 1,
+          "realTotalAmount": 1,
+          "totalDiscountAmount": 1,
+          "couponList": 1,
+          "createTime": 1,
+          "deliveryPrice": 1,
+          "realDeliveryPrice": 1,
+          "needTableware": 1,
+          "productPrice": 1,
+          "takeWay": 1,
+          "pickupCode": 1,
+          "expirePayTime": 1,
+          "payId": 1,
+          "remark": 1
+        },
+        "samples": 1,
+        "optional": []
+      },
+      "diffs": [
+        {
+          "path": "data.needTableware",
+          "kind": "actual-extra",
+          "detail": "actual boolean"
+        },
+        {
+          "path": "data.deliveryInfo",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.lockerCode",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.lockerQrCode",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.mealAssistance",
+          "kind": "declared-missing",
+          "detail": "declared object"
+        },
+        {
+          "path": "data.realPackingFeeTotalPrice",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        },
+        {
+          "path": "data.tablewarePrice",
+          "kind": "declared-missing",
+          "detail": "declared string"
+        }
+      ],
+      "dataSample": {
+        "orderId": "1030<masked>",
+        "orderStatus": "订单已取消",
+        "status": "60",
+        "storeName": "麦当劳北京新王府井餐厅",
+        "storeAddress": "王府井大街200号北京工艺美术世界",
+        "orderProductList": [
+          {
+            "productName": "圆筒冰淇淋",
+            "productImage": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_515837_320.png",
+            "quantity": 1,
+            "price": "5",
+            "comboItemList": []
+          }
+        ],
+        "totalAmount": "5",
+        "realTotalAmount": "5",
+        "totalDiscountAmount": "0",
+        "couponList": [],
+        "createTime": "2026-10-25 02:49:59",
+        "deliveryPrice": "0",
+        "realDeliveryPrice": "0",
+        "needTableware": false,
+        "productPrice": "5",
+        "takeWay": "堂食",
+        "pickupCode": "",
+        "expirePayTime": "2026-10-25 03:04:59",
+        "payId": "1110<masked>",
+        "remark": ""
+      }
+    }
+  ]
+}

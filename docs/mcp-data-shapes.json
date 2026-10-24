@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-24T18:00:00.603Z",
+  "capturedAt": "2026-10-24T18:50:56.660Z",
   "endpoint": "https://mcp.mcd.cn",
   "protocolVersion": "2025-06-18",
   "serverInfo": {
@@ -27,7 +27,7 @@
       "args": {},
       "ok": true,
       "isError": false,
-      "durationMs": 111,
+      "durationMs": 112,
       "contentChars": 1216,
       "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
       "structuredKeys": [
@@ -42,12 +42,12 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 01:59:59",
-        "traceId": "235dcab367d6dca61e9237e626cf2ce4",
+        "datetime": "2026-10-25 02:50:55",
+        "traceId": "a9192e34ec6083b1cae31348d8d82dc6",
         "data": {
-          "timestamp": 1792864799217,
-          "datetime": "2026-10-25T01:59:59.217",
-          "formatted": "2026-10-25 01:59:59",
+          "timestamp": 1792867855006,
+          "datetime": "2026-10-25T02:50:55.006",
+          "formatted": "2026-10-25 02:50:55",
           "date": "2026-10-25",
           "year": 2026,
           "month": 10,
@@ -55,7 +55,7 @@
           "dayOfWeek": "SUNDAY",
           "timezone": "GMT+08:00",
           "offset": "+08:00",
-          "utc": "2026-10-24T17:59:59.217Z"
+          "utc": "2026-10-24T18:50:55.006Z"
         }
       },
       "dataShape": {
@@ -67,13 +67,13 @@
           "datetime": {
             "kind": "string",
             "examples": [
-              "2026-10-25T01:59:59.217"
+              "2026-10-25T02:50:55.006"
             ]
           },
           "formatted": {
             "kind": "string",
             "examples": [
-              "2026-10-25 01:59:59"
+              "2026-10-25 02:50:55"
             ]
           },
           "date": {
@@ -112,7 +112,7 @@
           "utc": {
             "kind": "string",
             "examples": [
-              "2026-10-24T17:59:59.217Z"
+              "2026-10-24T18:50:55.006Z"
             ]
           }
         },
@@ -174,9 +174,9 @@
       },
       "diffs": [],
       "dataSample": {
-        "timestamp": 1792864799217,
-        "datetime": "2026-10-25T01:59:59.217",
-        "formatted": "2026-10-25 01:59:59",
+        "timestamp": 1792867855006,
+        "datetime": "2026-10-25T02:50:55.006",
+        "formatted": "2026-10-25 02:50:55",
         "date": "2026-10-25",
         "year": 2026,
         "month": 10,
@@ -184,7 +184,7 @@
         "dayOfWeek": "SUNDAY",
         "timezone": "GMT+08:00",
         "offset": "+08:00",
-        "utc": "2026-10-24T17:59:59.217Z"
+        "utc": "2026-10-24T18:50:55.006Z"
       }
     },
     {
@@ -196,7 +196,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 85,
+      "durationMs": 107,
       "contentChars": 533,
       "contentHead": "每个门店的基本信息按单行展示： - **门店名称**: data[].storeName - **门店地址**: data[].address - **到店距离**:…",
       "structuredKeys": [
@@ -210,8 +210,8 @@
         "success": false,
         "code": 600050,
         "message": "收藏餐厅列表为空，请您提供城市+关键词进行搜索",
-        "datetime": "2026-10-25 01:59:59",
-        "traceId": "6d9be53ab83204db67d430073cb30768"
+        "datetime": "2026-10-25 02:50:55",
+        "traceId": "e2123311b9d05d840d51194cf48415ce"
       }
     },
     {
@@ -225,7 +225,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 415,
+      "durationMs": 513,
       "contentChars": 2808,
       "contentHead": "每个门店的基本信息按单行展示： - **门店名称**: data[].storeName - **门店地址**: data[].address - **到店距离**:…",
       "structuredKeys": [
@@ -240,8 +240,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 01:59:59",
-        "traceId": "66ca2ff71598ae5349cf323096eb21ce",
+        "datetime": "2026-10-25 02:50:55",
+        "traceId": "9814c560b26b0acc839f1ca45f55fc67",
         "data": [
           {
             "storeCode": "1950059",
@@ -598,7 +598,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 355,
+      "durationMs": 354,
       "contentChars": 25187,
       "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
       "structuredKeys": [
@@ -613,8 +613,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 01:59:59",
-        "traceId": "4894f5512fc668c986d0ba74067d58d8",
+        "datetime": "2026-10-25 02:50:55",
+        "traceId": "efb1c6983aab40b8fc9cab69b3cba281",
         "data": {
           "categories": [
             {
@@ -7111,7 +7111,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 179,
+      "durationMs": 142,
       "contentChars": 12742,
       "contentHead": "# 输出格式要求（严格遵守，不可省略） 展示餐品详情时，按以下格式输出： 示例（单品，supportModify=true时）： **巨无霸**【可特调】 ¥25.0…",
       "structuredKeys": [
@@ -7126,8 +7126,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "a67a6d2ead06e092508ece7643e6fd34",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "8ab15045ef1b2a9e46a05a72205908bb",
         "data": {
           "code": "9900016075",
           "name": "龙焰芝士棒鸡腿堡三件套",
@@ -8083,7 +8083,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 101,
+      "durationMs": 211,
       "contentChars": 772,
       "contentHead": "## Response Structure - **重要**: 同一券ID可对应多个券码，展示时按券ID分组 ## 字段说明 | 字段 | 数据源 | 展示规则 | …",
       "structuredKeys": [
@@ -8098,8 +8098,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "cc08425b69edfc0eda01859d8bf206e8",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "9d232f651b02f3afa1e4f419d1f69007",
         "data": []
       },
       "dataShape": {
@@ -8165,7 +8165,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 116,
+      "durationMs": 105,
       "contentChars": 772,
       "contentHead": "## Response Structure - **重要**: 同一券ID可对应多个券码，展示时按券ID分组 ## 字段说明 | 字段 | 数据源 | 展示规则 | …",
       "structuredKeys": [
@@ -8180,8 +8180,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "defd3fd77e8d05ee4c7efdb9289a77dd",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "482eb19ab9077362d45e9aa5c74a136f",
         "data": []
       },
       "dataShape": {
@@ -8248,7 +8248,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 125,
+      "durationMs": 98,
       "contentChars": 772,
       "contentHead": "## Response Structure - **重要**: 同一券ID可对应多个券码，展示时按券ID分组 ## 字段说明 | 字段 | 数据源 | 展示规则 | …",
       "structuredKeys": [
@@ -8263,8 +8263,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "c7ad4894b4ae164bc2a835994c058756",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "02cd78da28b28eeaeed1f1958833b44a",
         "data": []
       },
       "dataShape": {
@@ -8330,7 +8330,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 75,
+      "durationMs": 84,
       "contentChars": 772,
       "contentHead": "## Response Structure - **重要**: 同一券ID可对应多个券码，展示时按券ID分组 ## 字段说明 | 字段 | 数据源 | 展示规则 | …",
       "structuredKeys": [
@@ -8345,8 +8345,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "011c1e817f99d7e6a525f182d54b45c3",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "48970601bef258b9db15e47a466bc260",
         "data": []
       },
       "dataShape": {
@@ -8413,7 +8413,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 81,
+      "durationMs": 106,
       "contentChars": 772,
       "contentHead": "## Response Structure - **重要**: 同一券ID可对应多个券码，展示时按券ID分组 ## 字段说明 | 字段 | 数据源 | 展示规则 | …",
       "structuredKeys": [
@@ -8428,8 +8428,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "31cfd28caa672667616698270af8ff59",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "119529b55abf40607fbe4ceafb30a6a8",
         "data": []
       },
       "dataShape": {
@@ -8495,7 +8495,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 81,
+      "durationMs": 74,
       "contentChars": 772,
       "contentHead": "## Response Structure - **重要**: 同一券ID可对应多个券码，展示时按券ID分组 ## 字段说明 | 字段 | 数据源 | 展示规则 | …",
       "structuredKeys": [
@@ -8510,8 +8510,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "cd2c2a7895694aa9fad2143033306657",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "49c09cf81d85def6535eb6f4dd9f3dd7",
         "data": []
       },
       "dataShape": {
@@ -8573,7 +8573,7 @@
       "args": {},
       "ok": true,
       "isError": false,
-      "durationMs": 119,
+      "durationMs": 97,
       "contentChars": 6666,
       "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
       "structuredKeys": [
@@ -8588,8 +8588,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:00",
-        "traceId": "79b8730fbb15bfb3d88b9448d3e96a4d",
+        "datetime": "2026-10-25 02:50:56",
+        "traceId": "5cba007291848afe9e9b7e6688d8df7f",
         "data": "[160]{productName,nutritionDescription,energyKj,energyKcal,protein,fat,carbohydrate,sodium,calcium}:\n  猪柳麦满分,null,1288,308,16,16,24,781,213\n  猪柳蛋麦满分,null,1618,3…"
       },
       "dataFormat": "compact-table",
@@ -8663,7 +8663,7 @@
       "args": {},
       "ok": true,
       "isError": false,
-      "durationMs": 123,
+      "durationMs": 128,
       "contentChars": 656,
       "contentHead": "# 您的优惠券列表 共 1 张可用优惠券 | 第 1/1 页 | 每页 200 条 ## 麦辣鸡腿堡三件套 - **优惠**: ¥22.9 (用券价格) - **有效…",
       "structuredKeys": [
@@ -8678,8 +8678,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:01",
-        "traceId": "55213f91778ee2ffa571226ab5a14380",
+        "datetime": "2026-10-25 02:50:57",
+        "traceId": "0320e81243c2befa98faec17b28d5357",
         "data": {
           "coupons": [
             {
@@ -9838,7 +9838,7 @@
       "args": {},
       "ok": true,
       "isError": false,
-      "durationMs": 141,
+      "durationMs": 197,
       "contentChars": 1270,
       "contentHead": "### 麦麦省优惠券列表： - 优惠券标题：免费脆薯饼 \\ 状态：可领取 \\ 优惠券图片：\\ <img src=\"https://img.mcd.cn/cms/ima…",
       "structuredKeys": [
@@ -9853,8 +9853,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:01",
-        "traceId": "1f2a97b8ed10aed24f7ab1e9be658173",
+        "datetime": "2026-10-25 02:50:57",
+        "traceId": "d3f716c336cf2dcf286b11ceb419e93d",
         "data": [
           {
             "couponName": "免费脆薯饼",
@@ -9988,7 +9988,7 @@
       },
       "ok": true,
       "isError": false,
-      "durationMs": 154,
+      "durationMs": 155,
       "contentChars": 2839,
       "contentHead": "# API Response Information Below is the response from an API call. To help you unde…",
       "structuredKeys": [
@@ -10003,8 +10003,8 @@
         "success": true,
         "code": 200,
         "message": "请求成功",
-        "datetime": "2026-10-25 02:00:01",
-        "traceId": "fe080fe3826fea07196b4e2bd4a1f07a",
+        "datetime": "2026-10-25 02:50:57",
+        "traceId": "bbaed85767472801e91d3540701743ca",
         "data": {
           "productOriginalPrice": 2990,
           "productPrice": 2990,
