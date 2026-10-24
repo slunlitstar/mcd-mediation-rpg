@@ -1,0 +1,143 @@
+/* Third-page visual standard. Other pages keep the existing demo treatment. */
+.page-2 {
+  color: var(--ink);
+  background: var(--paper);
+}
+.page-2 .site-header { min-height: 62px; }
+.page-2 .brand-stamp { background: #ac634b; }
+.page-2 .demo-badge { background: #faf5e9; border-color: #dbceb5; color: #796a54; }
+.page-2 .chapter-nav { border-color: #dfd3bd; }
+.page-2 .chapter-nav li.current { color: #984b38; }
+.page-2 .chapter-nav li.current::before { background: #af7256; }
+.page-2 .character-page { padding-top: 22px; }
+.page-2 .page-heading { margin-bottom: 8px; }
+.page-2 .page-heading .eyebrow { color: #9b7953; font-size: 10px; letter-spacing: 1.2px; }
+.page-2 .page-heading h1 { font-size: 27px; font-weight: 800; letter-spacing: -.6px; margin: 7px 0; }
+.page-2 .page-heading p { font-size: 13px; color: #87765e; }
+.page-2 .member-tabs { margin: 0 0 14px; padding: 12px 0 10px; gap: 7px; border-color: #dfd4bf; box-shadow: 0 7px 10px -10px #6d503646; }
+.page-2 .member-tabs > button { min-height: 48px; padding: 8px 5px; background: #ede5d5; border: 1px solid transparent; border-radius: 10px; color: #7a6a52; gap: 5px; font-size: 14px; }
+.page-2 .member-tabs > button > span { width: 18px; height: 18px; line-height: 18px; font-size: 10px; background: transparent; color: #9b886a; }
+.page-2 .member-tabs > button.active { background: #faf4e8; border-color: #b98b68; box-shadow: 0 2px 0 #d6c0a0; color: #824b36; font-weight: 700; }
+.page-2 .member-tabs > button.active > span { background: #ab624a; color: #fff7eb; }
+.page-2 .member-progress { font-size: 11px; color: #978266; padding-top: 3px; }
+.page-2 .character-layout { gap: 15px; }
+.page-2 .role-card { padding: 13px 13px 10px; border: 1px solid #d8c8aa; border-radius: 15px; background: #f2e9d7; box-shadow: 0 4px 0 #e3d8c2; overflow: hidden; }
+.page-2 .role-card-heading { font-size: 11px; color: #9b8461; padding-inline: 3px; }
+.page-2 .role-card-heading b { font-family: Georgia, serif; font-weight: 500; font-size: 15px; color: #8b6240; margin-left: 4px; }
+.page-2 .role-card-heading > span:last-child { color: #8b6951; font-size: 11px; }
+.page-2 .role-card-content { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 7px; min-height: 176px; align-items: center; }
+.page-2 .role-art { min-width: 0; display: grid; place-items: center; height: auto; }
+.role-portrait { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 12px; }
+.role-portrait-image { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--portrait-position, center); mix-blend-mode: multiply; user-select: none; animation: role-arrive .3s ease-out; }
+.role-portrait--selected .role-portrait-image { animation: role-selected .4s ease-out; }
+.page-2 .role-copy { padding: 4px 3px 6px 0; text-align: left; min-width: 0; }
+.role-personality { display: block; color: #9a7d55; font-size: 10px; line-height: 1.7; margin-bottom: 4px; }
+.page-2 .role-copy h2 { font-size: 23px; color: #533b28; line-height: 1.35; letter-spacing: -.5px; }
+.page-2 .role-copy p { color: #8b7558; font-size: 12px; line-height: 1.8; margin: 8px 0 13px; }
+.page-2 .role-copy .role-select-button { min-height: 46px; width: 100%; border-radius: 9px; font-size: 13px; padding: 10px 9px; gap: 6px; background: #795a40; border: 1px solid #6e4e36; box-shadow: 0 2px 0 #63462f; color: #fff8eb; }
+.page-2 .role-copy .role-select-button:hover { background: #694b34; }
+.page-2 .role-copy .button-selected { background: #e7eadb; color: #657046; border-color: #bac09e; box-shadow: 0 2px 0 #d0d5bc; }
+.page-2 .role-copy .button-selected:hover { background: #e7eadb; }
+.page-2 .role-navigation { padding-top: 8px; border-color: #d4c4a5; }
+.page-2 .role-navigation .circle-button { width: 46px; height: 44px; border-radius: 8px; color: #8a6b49; border: 1px solid #c6af8b; background: #f9f3e7; }
+.page-2 .role-navigation .circle-button:hover { background: #fffbf2; }
+.page-2 .role-position { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.page-2 .role-position > span.role-navigation-hint { width: auto; height: auto; border-radius: 0; background: transparent; color: #9a8462; font-size: 10px; }
+.page-2 .role-position > div { display: flex; gap: 6px; }
+.page-2 .role-position > div > span { width: 5px; height: 5px; background: #ccb996; border-radius: 8px; }
+.page-2 .role-position > div > span.active { width: 18px; background: #ad7352; }
+.page-2 .role-help { padding: 9px 2px 0; font-size: 11px; color: #9a886b; }
+.page-2 .attribute-panel { padding: 20px 17px 5px; border: 1px solid #dfd3bd; border-radius: 14px; background: #fcf8ef; box-shadow: 0 3px 0 #eae1d0; }
+.page-2 .attribute-heading { margin-bottom: 20px; }
+.page-2 .attribute-heading .eyebrow { color: #a68c65; font-size: 9px; letter-spacing: 1.1px; }
+.page-2 .attribute-heading h2 { color: #644932; font-size: 19px; margin-top: 6px; }
+.page-2 .attribute-field { padding-bottom: 20px; margin-bottom: 20px; border-color: #e9dfce; }
+.page-2 .attribute-field > label, .page-2 .attribute-field legend, .page-2 .budget-title > label { color: #65503a; font-size: 15px; font-weight: 600; }
+.page-2 .attribute-field legend small { color: #a38e6e; font-size: 11px; }
+.page-2 .budget-input { border-bottom: 1px solid #c3a785; color: #a46a43; }
+.page-2 .budget-input input { color: #9e6440; font-size: 32px; width: 74px; }
+.page-2 .budget-range::-webkit-slider-runnable-track { height: 5px; background: #e7d6b5; }
+.page-2 .budget-range::-webkit-slider-thumb { background: #af7650; box-shadow: 0 0 0 1px #bd9870; margin-top: -11px; }
+.page-2 .budget-range::-moz-range-track { height: 5px; background: #e7d6b5; }
+.page-2 .budget-range::-moz-range-thumb { background: #af7650; box-shadow: 0 0 0 1px #bd9870; }
+.page-2 .range-labels { font-size: 11px; color: #a08b6b; }
+.budget-presets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
+.budget-presets button { min-height: 44px; border: 1px solid #e0d2ba; border-radius: 8px; background: #f6efe2; color: #937958; font-size: 14px; }
+.budget-presets button.selected { border-color: #b68a60; background: #ede0c5; color: #79502d; font-weight: 600; }
+.page-2 .hunger-picker { gap: 7px; }
+.page-2 .hunger-picker button { border-color: #e2d6bf; border-radius: 9px; background: #faf5ea; min-height: 86px; }
+.page-2 .hunger-picker button.selected { background: #eee1c8; border-color: #bda077; box-shadow: inset 0 0 0 1px #cbb28d55; }
+.page-2 .hunger-picker strong { font-size: 14px; font-weight: 600; color: #72563b; }
+.page-2 .hunger-picker small { font-size: 11px; color: #aa9170; }
+.page-2 .hunger-bars { color: #b98d4f; font-size: 16px; }
+.page-2 .hunger-bars i { color: #d9cdb7; }
+.page-2 .food-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.page-2 .food-chips button { min-height: 47px; border: 1px solid #e1d5bd; background: #f9f3e7; color: #8d7759; font-size: 14px; border-radius: 8px; gap: 5px; }
+.page-2 .food-chips button > span { display: none; }
+.page-2 .food-chips button.selected { background: #eee1c9; border-color: #bd9b70; color: #775231; }
+.page-2 .food-chips--dislike button.selected { background: #f0e2da; border-color: #bd9480; color: #956049; }
+.page-2 .food-chips i { color: currentColor; font-size: 12px; }
+.page-2 select, .page-2 .custom-requirement textarea { border-color: #d9cbb2; color: #72583d; background-color: #faf5e9; border-radius: 9px; font-size: 16px; }
+.page-2 .custom-requirement > label { color: #957d5d; font-size: 13px; }
+.page-2 .custom-counter { color: #a18a68; }
+.page-2 .field-hint { color: #a08b6c; font-size: 12px; }
+.page-2 .requirement-field { border-bottom: 0; margin-bottom: 0; }
+.page-2 .mobile-dock { background: #fbf6eaf5; border-top: 1px solid #d8c7a9; box-shadow: 0 -5px 22px #7754380b; }
+.page-2 .mobile-dock > .text-button { color: #9b7f5a; }
+.page-2 .mobile-dock .button-primary { background: #aa5a43; border: 1px solid #9a4f39; color: #fff8ec; box-shadow: 0 2px 0 #8d4732; min-height: 52px; font-size: 15px; }
+.page-2 .mobile-dock .button-primary:hover { background: #984d38; }
+.page-2 .mobile-dock .form-error { background: #fbebe1; color: #9a4f39; border-color: #dfb9a3; }
+.page-2 .site-footer { color: #a08d71; }
+
+@keyframes role-arrive { from { opacity: .65; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes role-selected { 45% { transform: translateY(-4px); } }
+
+@media (min-width: 380px) and (max-width: 959px) {
+  .page-2 .food-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .page-2 .food-chips button { padding-inline: 5px; font-size: 13px; }
+}
+@media (max-width: 359px) {
+  .page-2 .role-card { padding: 11px 10px 9px; }
+  .page-2 .role-card-content { grid-template-columns: minmax(0, 1fr) minmax(0, .98fr); min-height: 165px; gap: 5px; }
+  .page-2 .role-copy h2 { font-size: 21px; }
+  .page-2 .role-copy p { font-size: 12px; }
+  .page-2 .role-copy .role-select-button { font-size: 12px; padding-inline: 5px; gap: 4px; }
+  .page-2 .role-personality { font-size: 9px; }
+  .page-2 .attribute-panel { padding-inline: 14px; }
+  .page-2 .member-tabs { gap: 5px; }
+  .page-2 .member-tabs > button { font-size: 13px; gap: 3px; }
+  .page-2 .mobile-dock > .text-button { font-size: 13px; }
+}
+@media (min-width: 600px) and (max-width: 959px) {
+  .page-2 .role-card-content { min-height: 230px; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr); }
+  .page-2 .role-portrait { max-width: 230px; }
+  .page-2 .role-copy h2 { font-size: 28px; }
+  .page-2 .role-copy p { font-size: 14px; }
+}
+@media (min-width: 960px) {
+  .page-2 .site-header { min-height: 98px; }
+  .page-2 .character-page { padding-top: 36px; }
+  .page-2 .page-heading h1 { font-size: 37px; }
+  .page-2 .page-heading p { font-size: 14px; }
+  .page-2 .member-tabs { margin-bottom: 24px; padding-block: 16px; }
+  .page-2 .member-tabs > button { padding-inline: 16px; gap: 8px; }
+  .page-2 .member-tabs > button small { color: #a18b69; }
+  .page-2 .member-progress { font-size: 12px; }
+  .page-2 .character-layout { grid-template-columns: .9fr 1.1fr; gap: 32px; }
+  .page-2 .role-card { padding: 19px 20px 16px; }
+  .page-2 .role-card-content { grid-template-columns: 1fr; gap: 0; }
+  .page-2 .role-portrait { width: min(100%, 310px); }
+  .page-2 .role-copy { text-align: center; padding: 0 8px 21px; }
+  .page-2 .role-personality { font-size: 12px; margin-top: 4px; }
+  .page-2 .role-copy h2 { font-size: 29px; margin-top: 5px; }
+  .page-2 .role-copy p { font-size: 14px; margin: 10px 0 20px; }
+  .page-2 .role-copy .role-select-button { width: auto; min-width: 210px; font-size: 15px; }
+  .page-2 .role-help { text-align: center; font-size: 12px; }
+  .page-2 .attribute-panel { padding: 27px 27px 5px; }
+  .page-2 .food-chips { display: flex; flex-wrap: wrap; }
+  .page-2 .food-chips button { padding-inline: 14px; }
+  .page-2 .mobile-dock { background: transparent; box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-portrait-image { animation: none !important; }
+}

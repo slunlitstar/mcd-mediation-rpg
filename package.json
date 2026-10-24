@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "concurrently --kill-others --names web,server \"npm run dev:web\" \"npm run dev:server\"",
     "dev:web": "npm run dev --workspace=@mcd/web",
+    "dev:mobile": "npm run dev:mobile --workspace=@mcd/web",
     "dev:server": "npm run dev --workspace=@mcd/server",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",

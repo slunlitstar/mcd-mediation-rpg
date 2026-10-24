@@ -1,0 +1,397 @@
+/* Phone is the default layout. Wider screens progressively gain extra columns. */
+:root {
+  background: var(--paper);
+  color: var(--ink);
+}
+html { scroll-padding-top: 85px; }
+body { min-width: 320px; }
+.app-shell { width: 100%; max-width: 600px; padding: 0 18px; }
+main, .page, .panel, .role-section, .attribute-panel { min-width: 0; }
+.site-header { min-height: 66px; gap: 8px; }
+.brand { gap: 9px; font-size: 16px; letter-spacing: 0; min-height: 48px; }
+.brand-stamp { width: 35px; height: 35px; line-height: 35px; font-size: 23px; border-radius: 9px 9px 4px 9px; }
+.brand small { font-size: 7px; letter-spacing: .6px; margin-top: 4px; }
+.header-right { gap: 0; }
+.edition { display: none; }
+.demo-badge { padding: 6px 8px; font-size: 10px; gap: 5px; letter-spacing: 0; white-space: nowrap; }
+.demo-badge i { width: 5px; height: 5px; }
+.chapter-nav li { min-height: 46px; gap: 4px; flex-direction: column; font-size: 11px; }
+.chapter-nav li > span:first-child { font-size: 10px; line-height: 1; }
+.chapter-nav li.current::before { width: 38px; }
+.chapter-nav li:not(:last-child)::after { content: ''; }
+.page { padding: 21px 0 12px; }
+.page-heading { margin-bottom: 18px; }
+.page-heading .eyebrow { font-size: 10px; letter-spacing: .8px; }
+.page-heading h1 { font-size: 27px; margin: 6px 0 8px; letter-spacing: -.7px; line-height: 1.4; text-wrap: balance; }
+.page-heading p { font-size: 14px; line-height: 1.7; }
+.eyebrow { font-size: 10px; }
+.button { min-height: 52px; padding: 13px 18px; font-size: 15px; border-radius: 9px; gap: 14px; }
+.button-large { min-height: 54px; font-size: 16px; }
+.text-button { min-height: 48px; font-size: 14px; padding: 8px 3px; }
+.circle-button { width: 48px; height: 48px; flex-shrink: 0; }
+select, textarea { font-size: 16px; }
+select { min-height: 50px; padding: 12px 32px 12px 12px; }
+input, select, textarea, button { scroll-margin-block: 85px 130px; }
+button { touch-action: manipulation; }
+.panel { padding: 18px; border-radius: 12px; }
+.field-hint { font-size: 12px; line-height: 1.7; margin-top: 10px; }
+.form-error { font-size: 14px; }
+.asset-label { font-size: 11px; }
+
+/* Home: a short introduction, compact character scene and one wide main action. */
+.home-page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 15px; padding-top: 23px; }
+.hero-copy { display: contents; }
+.hero-copy > .eyebrow { grid-row: 1; font-size: 12px; letter-spacing: 1px; gap: 8px; }
+.hero-copy h1 { grid-row: 2; font-size: clamp(32px, 8.5vw, 44px); margin: -4px 0 0; line-height: 1.23; letter-spacing: -1px; }
+.hero-copy h1 br:first-of-type { display: none; }
+.hero-description { grid-row: 3; font-size: 14px; line-height: 1.75; }
+.hero-word::after { z-index: 0; opacity: .4; bottom: -2px; height: 4px; }
+.word-spark { font-size: 27px; right: -38px; top: 4px; }
+.hero-stage { grid-row: 4; min-height: 174px; width: 100%; border-radius: 17px; margin: 2px 0 0; background: #ffe5a2; padding: 12px; overflow: hidden; }
+.hero-stage::before { inset: 7px; border-radius: 11px; border-color: #e8ca7f; }
+.hero-stage > .character { --size: 138px; left: 16px; top: 4px; transform: rotate(-5deg); }
+.npc-halo { width: 142px; height: 142px; top: 5px; left: 10px; border-color: #d1b162; }
+.npc-nameplate { position: absolute; top: 36px; left: 163px; right: 12px; margin: 0; text-align: left; }
+.npc-nameplate > span { font-size: 10px; letter-spacing: .5px; }
+.npc-nameplate > strong { font-size: 22px; letter-spacing: 0; margin: 7px 0; }
+.npc-nameplate p { font-size: 12px; line-height: 1.7; }
+.hero-stage > .asset-label { display: none; }
+.speech--one { font-size: 11px; top: auto; bottom: 14px; left: 11px; padding: 8px 11px; border-radius: 8px; box-shadow: 0 2px 0 #d7ba75; }
+.speech--two, .stage-corner, .stage-star { display: none; }
+.hero-actions { grid-row: 5; display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px; margin: 3px 0 0; }
+.hero-actions .button { width: 100%; justify-content: center; gap: 22px; }
+.hero-actions .text-button { border: 0; justify-self: center; min-height: 44px; }
+.hero-footnote { grid-row: 6; flex-wrap: wrap; justify-content: center; font-size: 11px; line-height: 1.6; gap: 8px; margin: 0; }
+.home-bottom { grid-row: 7; flex-wrap: wrap; gap: 12px; padding: 20px 0 5px; margin-top: 6px; }
+.bottom-label { font-size: 10px; width: 100%; margin-bottom: 3px; }
+.home-bottom > div { font-size: 11px; gap: 6px; }
+.home-bottom b { font-size: 17px; }
+.bottom-arrow { display: none; }
+.site-footer { flex-direction: column; align-items: flex-start; padding: 20px 0; gap: 8px; margin-top: 18px; font-size: 11px; line-height: 1.7; }
+.site-footer > span:first-child { font-size: 12px; }
+
+/* Shared action dock: fixed to the phone viewport with space reserved below content. */
+.page-1 main, .page-2 main, .page-4 main { padding-bottom: 100px; }
+.mobile-dock { position: fixed; z-index: 20; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; margin: 0; padding: 12px 18px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid #d9cdb6; background: #fffaf0f5; box-shadow: 0 -5px 18px #4b2c2108; backdrop-filter: blur(12px); display: flex; align-items: center; gap: 12px; }
+.mobile-dock > .button, .mobile-dock > .action-end { flex: 1; min-width: 0; }
+.mobile-dock > .text-button { flex-shrink: 0; font-size: 13px; }
+.mobile-dock .action-end { display: flex; }
+.mobile-dock .action-end > .button { width: 100%; justify-content: center; }
+.mobile-dock .form-error { position: absolute; bottom: 100%; left: 0; right: 0; max-width: none; padding: 11px 18px; margin: 0; background: #fff0e9; border-top: 1px solid #e5b5a5; font-size: 13px; }
+.is-keyboard-open .mobile-dock { display: none; }
+
+/* Team setup: selection rows remain full width and the main action stays reachable. */
+.setup-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.setup-fields { gap: 18px; }
+.field-heading { gap: 9px; margin-bottom: 17px; }
+.field-heading h2 { font-size: 17px; }
+.field-heading > span:last-child { font-size: 12px; }
+.field-number { font-size: 11px; }
+.count-picker { gap: 9px; }
+.count-picker button { min-height: 111px; }
+.count-picker strong { font-size: 34px; }
+.count-picker strong small, .count-picker button > span:last-child { font-size: 12px; }
+.people-dots { font-size: 8px; }
+.store-option { min-height: 76px; padding: 13px 11px; gap: 10px; }
+.store-text { min-width: 0; }
+.store-text strong { font-size: 15px; }
+.store-text small { font-size: 12px; line-height: 1.6; }
+.store-icon { width: 34px; height: 38px; }
+.store-meta { display: none; }
+.radio-mark { width: 19px; height: 19px; }
+.order-illustration { display: none; }
+.setup-aside { padding: 0 4px; }
+.setup-aside h3 { font-size: 19px; }
+.setup-aside > p { font-size: 14px; line-height: 1.8; }
+.mini-member-row { gap: 8px; margin: 13px 0 5px; flex-wrap: wrap; }
+.mini-member-row span { font-size: 12px; }
+.npc-note { padding: 15px 0; }
+.npc-note strong { font-size: 12px; }
+.npc-note p { font-size: 13px; line-height: 1.75; }
+
+/* Characters: compact visual card first, member-specific attributes immediately below. */
+.character-page .page-heading { margin-bottom: 12px; }
+.member-tabs { position: sticky; top: 0; z-index: 12; gap: 7px; flex-wrap: wrap; margin: 0 -2px 15px; padding: 10px 2px; background: var(--paper); }
+.member-tabs > button { flex: 1 1 58px; min-height: 46px; padding: 9px 6px; gap: 5px; justify-content: center; font-size: 14px; border-radius: 8px; }
+.member-tabs > button > span { width: 19px; height: 19px; line-height: 19px; font-size: 10px; flex-shrink: 0; }
+.member-tabs small { display: none; }
+.member-progress { flex-basis: 100%; text-align: right; font-size: 11px; line-height: 1; padding-top: 2px; }
+.character-layout { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+.role-card { border: 1px solid #c9b282; border-radius: 13px; background: var(--role-color); padding: 12px; touch-action: pan-y; }
+.role-card-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: #70572c; font-size: 11px; line-height: 1.4; }
+.role-card-content { display: grid; grid-template-columns: 115px minmax(0, 1fr); gap: 9px; align-items: center; min-height: 145px; }
+.role-art { display: grid; place-items: center; min-width: 0; }
+.role-art > .character { --size: 125px; }
+.role-copy { min-width: 0; }
+.role-copy h2 { font-size: 23px; line-height: 1.4; }
+.role-copy p { font-size: 13px; line-height: 1.7; color: #725d3d; margin: 6px 0 10px; }
+.role-copy .button { min-height: 46px; padding: 10px 12px; justify-content: center; gap: 8px; font-size: 14px; width: 100%; }
+.role-navigation { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #7c602829; padding-top: 7px; }
+.role-navigation .circle-button { width: 46px; height: 44px; border-radius: 8px; border-color: #8c6c3f60; }
+.role-position { display: flex; gap: 7px; }
+.role-position > span { width: 6px; height: 6px; background: #7e633d50; border-radius: 8px; }
+.role-position > span.active { width: 21px; background: var(--red); }
+.role-help { font-size: 12px; color: #847151; line-height: 1.7; padding: 8px 3px 0; }
+.attribute-panel { padding: 20px 17px 5px; }
+.attribute-heading { margin-bottom: 17px; }
+.attribute-heading .eyebrow { font-size: 10px; }
+.attribute-heading h2 { font-size: 19px; margin-top: 4px; }
+.attribute-field { padding-bottom: 21px; margin-bottom: 20px; }
+.attribute-field > label, .attribute-field legend, .budget-title > label { font-size: 15px; }
+.attribute-field legend { margin-bottom: 12px; }
+.attribute-field legend small { display: inline-block; font-size: 12px; margin-left: 7px; line-height: 1.6; }
+.budget-title { margin-bottom: 6px; }
+.budget-input input { min-height: 44px; width: 78px; font-size: 32px; }
+.budget-range { appearance: none; -webkit-appearance: none; height: 44px; margin: 0; background: transparent; }
+.budget-range::-webkit-slider-runnable-track { height: 6px; background: #e6d4b2; border-radius: 5px; }
+.budget-range::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 27px; height: 27px; border: 3px solid var(--white); border-radius: 50%; background: var(--red); box-shadow: 0 0 0 1px #b34e3c; margin-top: -10px; }
+.budget-range::-moz-range-track { height: 6px; background: #e6d4b2; border-radius: 5px; }
+.budget-range::-moz-range-thumb { width: 23px; height: 23px; border: 3px solid var(--white); border-radius: 50%; background: var(--red); box-shadow: 0 0 0 1px #b34e3c; }
+.range-labels { font-size: 11px; margin-top: 0; }
+.hunger-picker { gap: 7px; }
+.hunger-picker button { min-height: 90px; padding: 11px 2px; gap: 6px; }
+.hunger-picker strong { font-size: 14px; }
+.hunger-picker small { font-size: 11px; line-height: 1.5; }
+.hunger-bars { font-size: 17px; }
+.food-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.food-chips button { min-height: 48px; font-size: 14px; padding: 10px 7px; gap: 5px; justify-content: center; border-radius: 8px; }
+.food-chips button > span { font-size: 18px; }
+.food-chips i { font-size: 12px; }
+.requirement-field select, .custom-requirement textarea { font-size: 16px; }
+.custom-requirement > label { font-size: 14px; }
+.custom-requirement textarea { min-height: 120px; padding: 12px 12px 28px; }
+.custom-counter { font-size: 11px; }
+.requirement-field .field-hint { font-size: 12px; margin-top: 10px; }
+
+/* Mediation: readable member summaries on a two-column phone grid. */
+.court-members { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 21px 12px; margin: 25px 0; }
+.court-member { width: auto; min-width: 0; }
+.court-member > .character { --size: 90px; }
+.court-member > strong { font-size: 15px; margin: 4px 0; }
+.court-member > span { font-size: 12px; }
+.demand-bubble { width: 100%; padding: 12px; font-size: 14px; line-height: 1.7; max-width: 100%; overflow-wrap: anywhere; }
+.demand-bubble small { font-size: 12px; }
+.court-desk { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 19px; }
+.court-npc { flex-direction: row; justify-content: center; }
+.court-npc > .character { --size: 75px; }
+.court-npc > span { font-size: 12px; }
+.court-report > p { font-size: 14px; line-height: 1.8; }
+.progress-list { gap: 15px; }
+.progress-list li { font-size: 13px; gap: 9px; line-height: 1.7; flex-wrap: wrap; }
+.progress-list small { font-size: 11px; }
+
+/* Results: meals and amounts first; explanations are tap-to-expand. */
+.strategy-tabs { position: sticky; top: 0; z-index: 12; margin-bottom: 15px; }
+.strategy-tabs button { min-height: 66px; padding: 10px 7px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.strategy-tabs button > span { font-size: 22px; }
+.strategy-tabs strong { font-size: 16px; }
+.strategy-tabs small { display: none; }
+.results-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.mobile-plan-summary { padding: 2px 2px 1px; }
+.mobile-plan-summary > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.mobile-plan-summary span { font-size: 14px; }
+.mobile-plan-summary strong { font-family: Georgia, serif; font-size: 35px; font-weight: 500; color: var(--red); }
+.mobile-plan-summary p { font-size: 13px; color: #8b7450; line-height: 1.7; margin-top: 5px; }
+.allocation-card { padding: 17px; }
+.allocation-header { align-items: flex-start; gap: 8px; padding-bottom: 14px; }
+.allocation-member { min-width: 0; gap: 7px; }
+.allocation-member > .character { --size: 48px; margin: -3px 0 0 -4px; }
+.allocation-member > div { min-width: 0; }
+.allocation-member h2 { display: block; font-size: 17px; line-height: 1.4; margin-bottom: 5px; }
+.allocation-member h2 small { display: block; font-size: 12px; margin-top: 3px; }
+.allocation-member > div > span { display: block; font-size: 12px; line-height: 1.7; }
+.allocation-price { flex-shrink: 0; }
+.allocation-price strong { font-size: 28px; line-height: 1.3; }
+.allocation-price > span { font-size: 12px; line-height: 1.6; }
+.product-list { margin: 12px 0; }
+.product-list li { gap: 8px; font-size: 14px; padding: 9px 0; align-items: center; }
+.product-list li > span:nth-child(2) { min-width: 0; }
+.product-emoji { width: 32px; height: 36px; font-size: 22px; }
+.product-list small { font-size: 12px; }
+.product-quantity { font-size: 12px; flex-shrink: 0; }
+.product-list b { width: 40px; flex-shrink: 0; font-size: 14px; }
+.allocation-checks { gap: 7px; margin-top: 12px; }
+.allocation-checks span { font-size: 12px; line-height: 1.6; padding: 5px 8px; }
+.allocation-details { border-top: 1px solid #ece2d1; margin-top: 14px; }
+.allocation-details summary { min-height: 46px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; cursor: pointer; list-style: none; color: #7e6b4b; gap: 10px; }
+.allocation-details summary::-webkit-details-marker { display: none; }
+.allocation-details summary::after { content: '+'; font-size: 19px; }
+.allocation-details[open] summary::after { content: '−'; }
+.allocation-reason { font-size: 13px; line-height: 1.8; margin: 0 0 8px; }
+.result-summary { position: static; }
+.receipt { padding: 23px; }
+.receipt > .eyebrow { font-size: 10px; }
+.receipt-line { font-size: 14px; }
+.receipt-total > span { font-size: 16px; }
+.receipt-total strong { font-size: 41px; }
+.receipt-budget { font-size: 13px; }
+.receipt-demo { font-size: 11px; line-height: 1.8; }
+.receipt .button { font-size: 15px; }
+.receipt .receipt-accept { display: none; }
+.receipt-edit { font-size: 13px; }
+.custom-review-note { padding: 13px; }
+.custom-review-note strong { font-size: 14px; }
+.custom-review-note p { font-size: 13px; }
+.custom-review-confirm { align-items: center; font-size: 14px; min-height: 48px; padding: 7px 0; }
+.custom-review-confirm input { width: 21px; height: 21px; margin: 0; }
+.plan-notes { font-size: 13px; }
+.plan-notes summary { min-height: 48px; display: flex; align-items: center; }
+.result-mobile-dock { gap: 10px; }
+.result-mobile-dock > .button { font-size: 14px; padding-inline: 12px; gap: 6px; }
+.dock-total { flex-shrink: 0; min-width: 68px; }
+.dock-total span { display: block; color: #897554; font-size: 11px; }
+.dock-total strong { display: block; font-family: Georgia, serif; font-size: 27px; font-weight: 500; color: var(--red); line-height: 1.3; }
+.result-mobile-dock > .dock-revise { font-size: 13px; padding-inline: 5px; }
+.accepted-banner { padding: 16px; gap: 10px; flex-wrap: wrap; }
+.accepted-banner strong { font-size: 15px; line-height: 1.7; }
+.accepted-banner p { font-size: 13px; line-height: 1.7; }
+.accepted-banner > button { font-size: 13px; }
+.empty-state { padding: 23px 18px; }
+.empty-state h2 { font-size: 22px; line-height: 1.6; }
+.empty-state p, .empty-state ul { font-size: 14px; }
+.empty-actions { flex-direction: column; gap: 10px; width: 100%; }
+
+/* Revision stays inside a scrollable bottom sheet and keeps background scroll locked. */
+body:has(.revision-dialog[open]) { overflow: hidden; }
+.revision-dialog { position: fixed; inset: auto 0 0; margin: 0 auto; width: min(100%, 600px); max-width: none; max-height: calc(100dvh - 20px); padding: 22px 22px max(22px, env(safe-area-inset-bottom)); border-radius: 20px 20px 0 0; overflow-y: auto; overscroll-behavior: contain; }
+.dialog-top .circle-button { width: 44px; height: 44px; border: 1px solid #d5c5a8; }
+.revision-dialog h2 { font-size: 25px; margin: 12px 0; }
+.revision-dialog > p { font-size: 14px; line-height: 1.8; }
+.revision-dialog > label { font-size: 15px; margin: 21px 0 10px; }
+.revision-dialog select { font-size: 16px; }
+.revision-dialog .dialog-demo { font-size: 12px; }
+.revision-dialog .button { position: sticky; bottom: 0; }
+
+@media (max-width: 359px) {
+  .app-shell { padding-inline: 14px; }
+  .brand { font-size: 14px; gap: 7px; }
+  .brand small { display: none; }
+  .brand-stamp { width: 32px; height: 32px; line-height: 32px; }
+  .demo-badge { font-size: 9px; }
+  .page-heading h1 { font-size: 25px; }
+  .hero-copy h1 { font-size: 30px; }
+  .hero-stage > .character { --size: 120px; left: 8px; top: 12px; }
+  .npc-nameplate { left: 140px; right: 9px; }
+  .npc-nameplate > strong { font-size: 20px; }
+  .npc-nameplate p { font-size: 11px; }
+  .hero-footnote { font-size: 10px; gap: 6px; }
+  .home-bottom > div { font-size: 10px; }
+  .role-card-content { grid-template-columns: 96px minmax(0, 1fr); gap: 7px; }
+  .role-art > .character { --size: 109px; }
+  .role-copy h2 { font-size: 21px; }
+  .role-copy p { font-size: 12px; }
+  .attribute-panel, .allocation-card { padding-inline: 14px; }
+  .food-chips button { font-size: 13px; gap: 3px; padding-inline: 4px; }
+  .hunger-picker small { font-size: 10px; }
+  .mobile-dock { padding-inline: 14px; gap: 8px; }
+  .mobile-dock > .text-button { font-size: 12px; gap: 4px; }
+  .mobile-dock .button { font-size: 14px; padding-inline: 10px; gap: 8px; }
+  .allocation-member > .character { --size: 38px; }
+  .allocation-member { gap: 4px; }
+  .allocation-member > div > span { font-size: 11px; }
+  .product-emoji { width: 27px; font-size: 20px; }
+  .product-list li { font-size: 13px; gap: 5px; }
+  .product-list b { font-size: 13px; width: 34px; }
+  .result-mobile-dock .button { font-size: 13px; }
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .app-shell { padding-inline: 28px; }
+  .role-card-content { grid-template-columns: 170px minmax(0, 1fr); min-height: 180px; }
+  .role-art > .character { --size: 165px; }
+  .mobile-dock { padding-inline: 28px; }
+  .hero-copy h1 { font-size: 45px; }
+}
+
+@media (min-width: 960px) {
+  .app-shell { max-width: 1280px; padding: 0 42px; }
+  .site-header { min-height: 98px; }
+  .brand { font-size: 20px; gap: 13px; }
+  .brand-stamp { width: 45px; height: 45px; line-height: 45px; font-size: 27px; }
+  .brand small { font-size: 9px; letter-spacing: 1.2px; }
+  .demo-badge { padding: 8px 14px; font-size: 12px; }
+  .header-right { gap: 25px; }
+  .edition { display: inline; }
+  .chapter-nav li { min-height: 58px; flex-direction: row; gap: 12px; font-size: 14px; }
+  .chapter-nav li > span:first-child { font-size: 14px; }
+  .page { padding-top: 38px; }
+  .page-heading h1 { font-size: 38px; }
+  .page-heading { margin-bottom: 30px; }
+  .home-page { grid-template-columns: 1.1fr 1fr; gap: 40px; padding-top: 50px; }
+  .hero-copy { display: block; padding: 10px 0 30px; }
+  .hero-copy > .eyebrow { font-size: 13px; }
+  .hero-copy h1 { font-size: clamp(46px, 4.5vw, 61px); margin: 20px 0 23px; line-height: 1.28; }
+  .hero-copy h1 br:first-of-type { display: initial; }
+  .hero-description { font-size: 15px; line-height: 1.9; }
+  .hero-actions { display: flex; gap: 23px; margin-top: 28px; }
+  .hero-actions .button { width: auto; gap: 36px; }
+  .hero-footnote { justify-content: flex-start; margin-top: 25px; }
+  .hero-stage { grid-row: auto; min-height: 510px; border-radius: 47% 47% 12px 12px; margin-top: 0; background: #f1e4c8; }
+  .hero-stage::before { inset: 11px; border-radius: inherit; }
+  .hero-stage > .character { --size: 230px; top: 70px; left: 50%; transform: translateX(-50%) rotate(-7deg); }
+  .npc-halo { width: 252px; height: 252px; left: 50%; top: 80px; transform: translateX(-50%); }
+  .npc-nameplate { position: static; text-align: center; margin-bottom: 30px; }
+  .npc-nameplate > strong { font-size: 30px; margin: 10px 0; }
+  .npc-nameplate p { font-size: 13px; }
+  .hero-stage > .asset-label { display: block; margin-bottom: 10px; }
+  .speech--one { top: 48px; bottom: auto; left: 4px; padding: 13px 17px; font-size: 13px; }
+  .speech--two { display: block; right: 4px; top: 217px; font-size: 13px; }
+  .stage-corner { display: block; right: 14px; top: 139px; }
+  .home-bottom { grid-row: auto; grid-column: 1 / -1; padding: 28px 0; margin-top: 0; }
+  .bottom-label { width: auto; margin: 0; }
+  .home-bottom > div { font-size: 14px; gap: 10px; }
+  .bottom-arrow { display: inline; }
+  .site-footer { flex-direction: row; align-items: center; margin-top: 17px; }
+  .page-1 main, .page-2 main, .page-4 main { padding-bottom: 0; }
+  .mobile-dock { position: static; transform: none; width: auto; max-width: none; padding: 23px 0 8px; margin-top: 20px; background: none; box-shadow: none; backdrop-filter: none; justify-content: space-between; }
+  .mobile-dock > .button, .mobile-dock > .action-end { flex: initial; }
+  .mobile-dock .form-error { position: static; background: none; border: 0; padding: 0; max-width: 260px; }
+  .is-keyboard-open .mobile-dock { display: flex; }
+  .setup-layout { grid-template-columns: 1.25fr .8fr; gap: 40px; }
+  .panel { padding: 26px; }
+  .count-picker button { min-height: 135px; }
+  .store-meta { display: block; font-size: 12px; }
+  .setup-aside { padding: 12px 0; }
+  .order-illustration { display: grid; height: 260px; }
+  .character-layout { grid-template-columns: .85fr 1.15fr; gap: 32px; align-items: start; }
+  .member-tabs { position: static; gap: 10px; margin-bottom: 24px; padding-bottom: 16px; }
+  .member-tabs > button { flex: initial; padding: 10px 15px; gap: 8px; }
+  .member-tabs small { display: inline; font-size: 11px; }
+  .member-progress { flex-basis: auto; margin-left: auto; }
+  .role-card { padding: 20px; }
+  .role-card-content { grid-template-columns: 1fr; gap: 5px; }
+  .role-art { height: 250px; }
+  .role-art > .character { --size: 225px; }
+  .role-copy { text-align: center; padding: 0 10px 17px; }
+  .role-copy h2 { font-size: 29px; }
+  .role-copy p { font-size: 14px; margin: 9px 0 20px; }
+  .role-copy .button { width: auto; min-width: 220px; }
+  .role-help { text-align: center; }
+  .attribute-panel { padding: 27px 28px 6px; }
+  .food-chips { display: flex; flex-wrap: wrap; }
+  .food-chips button { padding-inline: 12px; }
+  .court-members { display: flex; gap: 30px; margin: 30px 0; }
+  .court-member { width: 165px; }
+  .court-member > .character { --size: 108px; }
+  .court-desk { grid-template-columns: 170px minmax(0, 1fr); gap: 27px; padding: 27px; }
+  .court-npc { flex-direction: column; }
+  .strategy-tabs { position: static; margin-bottom: 25px; }
+  .strategy-tabs button { display: grid; grid-template-columns: 28px 1fr; text-align: left; justify-content: initial; padding: 18px 20px; }
+  .strategy-tabs button > span { grid-row: 1 / 3; }
+  .strategy-tabs small { display: block; font-size: 12px; }
+  .results-layout { grid-template-columns: 1.45fr 1fr; gap: 25px; }
+  .mobile-plan-summary, .result-mobile-dock { display: none; }
+  .result-summary { position: sticky; top: 20px; }
+  .receipt .receipt-accept { display: flex; }
+  .allocation-member > .character { --size: 58px; }
+  .allocation-member h2 { display: flex; }
+  .allocation-member h2 small { margin-top: 0; }
+  .allocation-price strong { font-size: 31px; }
+  .allocation-details summary { font-size: 14px; }
+  .revision-dialog { inset: 0; margin: auto; width: 510px; max-height: calc(100dvh - 60px); padding: 30px; border-radius: 14px; }
+  .revision-dialog .button { position: static; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
