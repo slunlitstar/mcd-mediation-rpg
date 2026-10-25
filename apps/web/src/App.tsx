@@ -48,6 +48,13 @@ export default function App() {
   const keyboardOpen = useMobileKeyboard();
   const member = party.members[activeMember] ?? party.members[0];
   const plan = result?.plans.find(item => item.strategy === strategy) ?? result?.plans[0];
+  const revisionTarget = party.members.find(person => person.id === revisionMember) ?? party.members[0];
+  const revisionAllocation = plan?.allocations.find(allocation => allocation.memberId === revisionTarget.id);
+  const revisionCatalog = result?.products;
+  const revisionIncludes = (category: Category, memberId = revisionTarget.id) => plan?.allocations.find(allocation => allocation.memberId === memberId)?.items.some(item => {
+    const product = revisionCatalog?.find(product => product.id === item.productId);
+    return product ? (product.includedCategories ?? [product.category]).includes(category) : false;
+  }) ?? false;
   const store = selectedStore ?? (!live ? stores.find(item => item.id === party.storeId) : undefined);
   useEffect(() => { setReviewedCustom(false); }, [plan]);
   useEffect(() => {
@@ -131,6 +138,9 @@ export default function App() {
     const target = party.members.find(person => person.id === revisionMember)!;
     if (['fries', 'burger', 'drink'].includes(revisionAction) && target.dislikes.includes(revisionAction as Category)) {
       setRevisionError('这项食物在该成员的不喜欢列表里，请先回角色卡调整。'); return;
+    }
+    if (live && ['fries', 'burger', 'drink'].includes(revisionAction) && revisionIncludes(revisionAction as Category)) {
+      setRevisionError('当前分配已包含这类食物（含套餐默认子项）。想增加份量，可以选择“更饿了”。'); return;
     }
     const nextParty: Party = { ...party, members: party.members.map(person => {
       if (person.id !== revisionMember) return person;
@@ -216,7 +226,7 @@ export default function App() {
         {step === 4 && <MealResults party={party} result={result} live={live} storeName={store?.name} strategy={strategy} onStrategy={value => { setStrategy(value); setReviewedCustom(false); }} accepted={accepted} onAccept={setAccepted} reviewed={reviewedCustom} onReviewed={setReviewedCustom} revisionCount={revisionCount} onEdit={editMember} onRetry={() => { setCourtReady(false); setProgress(0); setRequest({ party }); go(3); }} onRevise={openRevision} onSuggestion={useSuggestion} />}
       </main>
       <footer className="site-footer"><span>饭局有分歧，开饭有共识。<span className="footer-star">✳</span></span><span>{live ? '真实门店与试算 · 仅推荐，不下单' : '离线体验 · 示例菜单与价格'}</span></footer>
-      <dialog ref={dialogRef} className="revision-dialog" onCancel={event => { if (revisionBusy) event.preventDefault(); else setRevising(false); }} onClose={() => { if (!revisionBusy) setRevising(false); }} aria-labelledby="revision-title"><div className="dialog-top"><div className="dialog-mediator"><MediatorArtwork variant="note" /><span>袋袋再听一轮</span></div><button className="circle-button" aria-label="关闭复议" disabled={revisionBusy} onClick={() => setRevising(false)}>×</button></div><h2 id="revision-title">这顿，还能再商量。</h2><p>只调整选中成员的诉求，其余成员的要求继续保留。</p><label htmlFor="revision-member">谁想调整？</label><select id="revision-member" value={revisionMember} disabled={revisionBusy} onChange={event => { setRevisionMember(Number(event.target.value)); setRevisionError(''); }}>{party.members.map(person => <option value={person.id} key={person.id}>成员{person.id} · {roleFor(person.roleId)?.name ?? '待选角色'}</option>)}</select><label htmlFor="revision-action">这次想怎么改？</label><select id="revision-action" value={revisionAction} disabled={revisionBusy} onChange={event => { setRevisionAction(event.target.value as Revision['action']); setRevisionError(''); }}><option value="cheaper">在原有条件下，再便宜一点</option><option value="hungrier" disabled={party.members.find(person => person.id === revisionMember)?.hunger === 'faint'}>更饿了，提高一档饥饿程度</option><option value="fries">优先安排薯条</option><option value="burger">优先安排汉堡</option><option value="drink">优先安排饮料</option></select><p className="field-hint">个人预算与不可退让的要求保持；需要更改时返回角色卡。</p>{revisionError && <p className="form-error" role="alert">{revisionError}</p>}<button className="button button-primary" disabled={revisionBusy} onClick={() => void submitRevision()}>{revisionBusy ? '正在重新试算…' : '提交复议'}<span>↻</span></button><p className="dialog-demo">{live ? '仅调整推荐方案，不会创建订单。' : '本轮使用本地示例数据演示复议。'}</p></dialog>
+      <dialog ref={dialogRef} className="revision-dialog" onCancel={event => { if (revisionBusy) event.preventDefault(); else setRevising(false); }} onClose={() => { if (!revisionBusy) setRevising(false); }} aria-labelledby="revision-title"><div className="dialog-top"><div className="dialog-mediator"><MediatorArtwork variant="note" /><span>袋袋再听一轮</span></div><button className="circle-button" aria-label="关闭复议" disabled={revisionBusy} onClick={() => setRevising(false)}>×</button></div><h2 id="revision-title">这顿，还能再商量。</h2><p>重新搭配选中成员的一餐，其余成员的餐品保持不变。</p><label htmlFor="revision-member">谁想调整？</label><select id="revision-member" value={revisionMember} disabled={revisionBusy} onChange={event => { setRevisionMember(Number(event.target.value)); setRevisionAction('cheaper'); setRevisionError(''); }}>{party.members.map(person => <option value={person.id} key={person.id}>成员{person.id} · {roleFor(person.roleId)?.name ?? '待选角色'}</option>)}</select><label htmlFor="revision-action">这次想怎么改？</label><select id="revision-action" value={revisionAction} disabled={revisionBusy} onChange={event => { setRevisionAction(event.target.value as Revision['action']); setRevisionError(''); }}><option value="cheaper">在原有条件下，再便宜一点</option><option value="hungrier">更饿了，增加主餐或配餐</option>{(['fries', 'burger', 'drink'] as const).map(category => { const included = live && revisionIncludes(category); const excluded = revisionTarget.dislikes.includes(category); return <option key={category} value={category} disabled={included || excluded}>{({ fries: '安排薯条', burger: '安排汉堡', drink: '安排饮料' })[category]}{excluded ? '（已排除）' : included ? '（当前已包含）' : ''}</option>; })}</select><div className="revision-current"><strong>当前个人实付 ¥{((revisionAllocation?.totalCents ?? 0) / 100).toFixed(2)} / 预算 ¥{revisionTarget.budget}</strong><p>会重新搭配整份餐，允许替换单品和默认套餐；其他成员餐品保留。</p></div><p className="field-hint">预算和食物限制保持。“更饿了”比较主餐／配餐份数，不承诺实际饱腹程度。</p>{revisionError && <p className="form-error" role="alert">{revisionError}</p>}<button className="button button-primary" disabled={revisionBusy} onClick={() => void submitRevision()}>{revisionBusy ? '正在重新试算…' : '提交复议'}<span>↻</span></button><p className="dialog-demo">{live ? '仅调整推荐方案，不会创建订单。' : '本轮使用本地示例数据演示复议。'}</p></dialog>
     </div>
   );
 }

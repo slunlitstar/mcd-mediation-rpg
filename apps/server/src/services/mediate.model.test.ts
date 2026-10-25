@@ -340,6 +340,7 @@ test('复议：不调用模型，其他成员餐品原样保留', async () => {
   );
 
   assert.equal(provider.calls, 0, '复议不应调用模型');
+  assert.ok(revised.plans.length, '复议必须实际产生新餐品，不能用空数组通过金额断言');
   assert.equal(revised.meta.reasoning, 'rules');
   assert.equal(revised.meta.degraded, false);
   assert.ok(revised.meta.llmDetail?.every((entry) => entry.status === 'skipped'));

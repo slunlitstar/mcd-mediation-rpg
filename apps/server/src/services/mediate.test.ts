@@ -16,7 +16,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { mediate, toCategory, inferDietary } from './mediate.js';
-import type { MediateDependencies } from './mediate.js';
+import type { ExcludedPlan, MediateDependencies, MemberInput } from './mediate.js';
 import type { UnifiedMenu, UnifiedMenuItem, UnifiedPricing } from '../mcp/normalize.js';
 
 interface Seed {
@@ -529,4 +529,106 @@ test('a failed recovery quote preserves the original constraint response without
   assert.equal(result.plans.length, 0);
   assert.equal(result.suggestions?.length, 0);
   assert.ok(result.issues.some(issue => issue.kind === 'constraint'));
+});
+
+function priorPlan(menu: UnifiedMenu, baskets: Array<Array<[string, number]>>): ExcludedPlan {
+  const allocations = baskets.map((basket, index) => ({ memberId: index + 1, items: basket.map(([productId, quantity]) => ({ productId, quantity })), totalCents: basket.reduce((sum, [id, quantity]) => sum + menu.items.find(item => item.id === id)!.priceFen * quantity, 0) }));
+  const total = allocations.reduce((sum, allocation) => sum + allocation.totalCents, 0);
+  return { planId: 'previous', strategy: 'peace', allocations, productSubtotalCents: total, discountCents: 0, payableCents: total };
+}
+
+function revisionMenu(): UnifiedMenu {
+  const menu = makeMenu([
+    { id: 'combo', name: '鸡腿堡三件套', priceYuan: 26 },
+    { id: 'expensive', name: '大鸡腿堡', priceYuan: 18 },
+    { id: 'b', name: '鸡腿堡', priceYuan: 10 },
+    { id: 'f', name: '中薯条', priceYuan: 5, category: '小食' },
+    { id: 'd', name: '可乐', priceYuan: 3, category: '饮品' },
+    { id: 'x', name: '冰淇淋', priceYuan: 2, category: '甜品' },
+  ]);
+  menu.items[0].isCombo = true;
+  menu.items[0].combo = { verified: true, components: [{ id: 'b', name: '鸡腿堡', quantity: 1 }, { id: 'f', name: '中薯条', quantity: 1 }, { id: 'd', name: '可乐', quantity: 1 }], roundList: [{ round: '1', comboItemList: [{ code: 'b', quantity: 1 }] }, { round: '2', comboItemList: [{ code: 'f', quantity: 1 }] }, { round: '3', comboItemList: [{ code: 'd', quantity: 1 }] }] };
+  return menu;
+}
+
+test('hungrier revision replaces an unaffordable-to-extend combo with more main portions and locks other members', async () => {
+  const menu = revisionMenu(); const excluded = priorPlan(menu, [[['combo', 1]], [['combo', 1]]]);
+  const members: MemberInput[] = [{ id: 1, budget: 30, hunger: 'hungry', dislikes: ['dessert'] }, { id: 2, budget: 30 }];
+  const result = await mediate({ storeId: 'S001', members, revision: { memberId: 1, action: 'hungrier' }, excludePlan: excluded }, deps(menu));
+  assert.equal(result.plans.length, 1);
+  const plan = result.plans[0];
+  assert.equal(plan.strategy, 'peace');
+  const target = plan.allocations[0];
+  assert.ok(target.items.some(item => item.productId === 'b' && item.quantity >= 2));
+  assert.ok(target.items.every(item => item.productId !== 'combo' && item.productId !== 'x'));
+  assert.deepEqual(plan.allocations[1].items.map(item => ({ productId: item.productId, quantity: item.quantity })), excluded.allocations[1].items);
+  assert.ok(target.totalCents <= 3000);
+  assert.equal(plan.allocations.reduce((sum, member) => sum + member.totalCents, 0), plan.payableCents);
+  assert.ok(result.hints.some(hint => hint.message.includes('移除') && hint.message.includes('加入') && hint.message.includes('个人实付')));
+});
+
+test('requested fries are found by replacing the original main when direct add-on would exceed budget', async () => {
+  const menu = revisionMenu(); const excluded = priorPlan(menu, [[['expensive', 1]], [['expensive', 1]]]);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 20 }, { id: 2, budget: 40 }], revision: { memberId: 1, action: 'fries' }, excludePlan: excluded }, deps(menu));
+  assert.equal(result.plans.length, 1);
+  assert.deepEqual(result.plans[0].allocations[0].items.map(item => item.productId).sort(), ['b', 'f']);
+  assert.equal(result.plans[0].allocations[0].totalCents, 1500);
+  assert.equal(result.plans[0].allocations[1].items[0].productId, 'expensive');
+});
+
+test('cheaper revision may replace a combo with individual items while preserving the hard required category', async () => {
+  const menu = revisionMenu(); const excluded = priorPlan(menu, [[['combo', 1]], [['combo', 1]]]);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 30, requirement: 'fries' }, { id: 2, budget: 30 }], revision: { memberId: 1, action: 'cheaper' }, excludePlan: excluded }, deps(menu));
+  assert.equal(result.plans.length, 1);
+  const target = result.plans[0].allocations[0];
+  assert.ok(target.totalCents < excluded.allocations[0].totalCents);
+  assert.ok(target.items.some(item => item.productId === 'f'));
+  assert.ok(target.items.some(item => item.productId === 'b'));
+});
+
+test('already included combo category is explained without a redundant quote or returning the old plan as new', async () => {
+  const menu = revisionMenu(); let quotes = 0;
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 30 }, { id: 2, budget: 30 }], revision: { memberId: 1, action: 'drink' }, excludePlan: priorPlan(menu, [[['combo', 1]], [['combo', 1]]]) }, { ...deps(menu), price: async (...args) => { quotes++; return fakePrice(menu)(args[0], args[1]); } });
+  assert.equal(result.plans.length, 0); assert.equal(quotes, 0);
+  assert.equal(result.issues[0].code, 'revision_already_included');
+});
+
+test('an impossible larger meal gives a specific budget explanation and preserves the input plan', async () => {
+  const menu = makeMenu([{ id: 'b', name: '鸡腿堡', priceYuan: 20 }]);
+  const excluded = priorPlan(menu, [[['b', 1]], [['b', 1]]]);
+  const copy = structuredClone(excluded);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 20 }, { id: 2, budget: 20 }], revision: { memberId: 1, action: 'hungrier' }, excludePlan: excluded }, deps(menu));
+  assert.equal(result.plans.length, 0);
+  assert.equal(result.issues[0].code, 'revision_no_larger_meal');
+  assert.match(result.issues[0].message, /20/);
+  assert.deepEqual(excluded, copy);
+});
+
+test('revision tries another complete candidate after real pricing exceeds a member budget', async () => {
+  const menu = revisionMenu(); let quotes = 0;
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 30 }, { id: 2, budget: 30 }], revision: { memberId: 1, action: 'cheaper' }, excludePlan: priorPlan(menu, [[['combo', 1]], [['combo', 1]]]) }, {
+    ...deps(menu), price: async (...args) => {
+      const price = await fakePrice(menu)(args[0], args[1]); quotes++;
+      return quotes === 1 ? { ...price, productPriceFen: price.productPriceFen + 10000, productPrice: price.productPrice + 100, payableFen: price.payableFen + 10000, payable: price.payable + 100 } : price;
+    },
+  });
+  assert.ok(quotes > 1 && quotes <= 8);
+  assert.equal(result.plans.length, 1);
+  assert.ok(result.plans[0].allocations.every(allocation => allocation.totalCents <= allocation.budgetCents));
+});
+
+test('cheaper means lower actual personal payment, not just a lower menu sticker price', async () => {
+  const menu = revisionMenu(); const excluded = priorPlan(menu, [[['combo', 1]], [['combo', 1]]]);
+  // Simulate a previous heavily discounted price which current quotes cannot beat.
+  excluded.allocations[0].totalCents = 1; excluded.allocations[1].totalCents = 1;
+  excluded.productSubtotalCents = 5200; excluded.discountCents = 5198; excluded.payableCents = 2;
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 30 }, { id: 2, budget: 30 }], revision: { memberId: 1, action: 'cheaper' }, excludePlan: excluded }, deps(menu));
+  assert.equal(result.plans.length, 0); assert.equal(result.issues[0].code, 'revision_no_cheaper_plan');
+});
+
+test('a missing product in another member basket cannot silently disappear during revision', async () => {
+  const menu = revisionMenu(); const excluded = priorPlan(menu, [[['expensive', 1]], [['combo', 1]]]);
+  excluded.allocations[1].items[0].productId = 'removed-product';
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 30 }, { id: 2, budget: 30 }], revision: { memberId: 1, action: 'fries' }, excludePlan: excluded }, deps(menu));
+  assert.equal(result.plans.length, 0); assert.equal(result.issues[0].code, 'revision_menu_changed');
 });

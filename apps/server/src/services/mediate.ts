@@ -872,95 +872,126 @@ async function buildPlan(
 
 // ---------------------------------------------------------------- 复议
 
-/**
- * 复议：保住其他成员原来的餐品，只改目标成员。
- * 返回目标成员新的选择；找不到更便宜的替代就原样返回并给 `constraint`。
- */
-function applyRevision(
-  selection: MemberSelection,
-  member: MemberInput,
-  action: RevisionAction,
-  pool: Candidate[],
-): { selection: MemberSelection; note?: MediateIssue } {
-  const hard = hardFilter(pool, member).filter(candidate => !isNonMeal(candidate));
-  const currentIds = new Set(selection.items.map((entry) => entry.candidate.product.id));
-  const currentTotal = selection.items.reduce((sum, entry) => sum + entry.candidate.product.priceCents, 0);
-  const budgetCents = Math.round((member.budget ?? 0) * 100);
+/** Re-plan one member's entire basket, leaving every other basket locked. */
+function basketKey(items: MemberSelection['items']): string {
+  return items.map(entry => `${entry.candidate.product.id}:${entry.quantity}`).sort().join('|');
+}
 
-  const nextItems = [...selection.items];
+function basketPrice(items: MemberSelection['items']): number {
+  return items.reduce((sum, entry) => sum + entry.candidate.product.priceCents * entry.quantity, 0);
+}
 
-  if (action === 'cheaper') {
-    // 逐项替换成同类别更便宜的替代，总价必须严格下降。
-    for (let index = 0; index < nextItems.length; index += 1) {
-      const current = nextItems[index];
-      if (current === undefined) continue;
-      const cheaper = hard
-        .filter(
-          (candidate) =>
-            candidate.product.category === current.candidate.product.category &&
-            included(current.candidate).every(category => included(candidate).includes(category)) &&
-            (!isMain(current.candidate) || isMain(candidate)) &&
-            candidate.product.priceCents < current.candidate.product.priceCents &&
-            !currentIds.has(candidate.product.id),
-        )
-        .sort((a, b) => a.product.priceCents - b.product.priceCents)[0];
-
-      if (cheaper !== undefined) {
-        nextItems[index] = { candidate: cheaper, quantity: current.quantity };
-        currentIds.delete(current.candidate.product.id);
-        currentIds.add(cheaper.product.id);
+/** Counts actual main/side portions, not invented calories or fullness scores. */
+function mealPortions(items: MemberSelection['items']): { mains: number; food: number } {
+  let mains = 0; let food = 0;
+  for (const entry of items) {
+    const components = entry.candidate.product.components;
+    if (components?.length) {
+      for (const component of components) {
+        const main = component.category === 'burger' || /饭|粥|松饼|整鸡|鸡腿|鸡排/.test(component.name);
+        if (main) mains += component.quantity * entry.quantity;
+        if (main || ['fries', 'snack'].includes(component.category) && !/(?:酱|蘸料|调料)$/.test(component.name)) food += component.quantity * entry.quantity;
       }
-    }
-  } else {
-    const wanted: Category =
-      action === 'hungrier' ? 'burger' : action === 'fries' ? 'fries' : action === 'burger' ? 'burger' : 'drink';
-
-    const extra = hard
-      .filter(
-        (candidate) =>
-          candidate.product.category === wanted &&
-          !currentIds.has(candidate.product.id) &&
-          currentTotal + candidate.product.priceCents <= budgetCents,
-      )
-      .sort((a, b) => a.product.priceCents - b.product.priceCents)[0];
-
-    if (extra !== undefined) {
-      nextItems.push({ candidate: extra, quantity: 1 });
-      currentIds.add(extra.product.id);
+    } else {
+      if (isMain(entry.candidate)) mains += entry.quantity;
+      if (isMain(entry.candidate) || ['fries', 'snack'].includes(entry.candidate.product.category)) food += entry.quantity;
     }
   }
+  return { mains, food };
+}
 
-  const liked = member.likes ?? [];
-  const matchedLikes = liked.filter((category) =>
-    nextItems.some((entry) => included(entry.candidate).includes(category)),
-  );
-
-  const revised: MemberSelection = {
-    memberId: selection.memberId,
-    items: nextItems,
-    matchedLikes,
-    missingLikes: liked.filter((category) => !matchedLikes.includes(category)),
-    requiresManualReview: (member.customRequirement ?? '').trim() !== '',
-    reasons: nextItems.map(
-      (entry) => `${entry.candidate.product.name} ¥${String(fenToYuan(entry.candidate.product.priceCents))}`,
-    ),
+function revisionSelections(seed: MemberSelection, member: MemberInput, action: RevisionAction, pool: Candidate[]): MemberSelection[] {
+  const budget = Math.round((member.budget ?? 0) * 100);
+  const hard = hardFilter(pool, member).filter(candidate => !isNonMeal(candidate) && candidate.product.priceCents <= budget);
+  const required = requiredCategory(member);
+  const wanted = ['burger', 'fries', 'drink'].includes(action) ? action as Category : undefined;
+  const oldKey = basketKey(seed.items);
+  const oldPortions = mealPortions(seed.items);
+  const original = new Map(seed.items.map(entry => [entry.candidate.product.id, entry.quantity]));
+  type Option = { items: MemberSelection['items']; cost: number; key: string; distance: number; matches: number; eligible: boolean };
+  const seen = new Map<string, Option>();
+  const compare = (a: Option, b: Option): number => Number(b.eligible) - Number(a.eligible) ||
+    (action === 'cheaper' ? a.cost - b.cost || a.distance - b.distance : a.distance - b.distance || a.cost - b.cost) || b.matches - a.matches || a.key.localeCompare(b.key);
+  const add = (items: MemberSelection['items']): Option | undefined => {
+    if (items.length > 4 || items.some(entry => entry.quantity < 1 || entry.quantity > 3)) return;
+    const cost = basketPrice(items); if (cost > budget) return;
+    const key = basketKey(items); if (seen.has(key)) return;
+    const covered = new Set(items.flatMap(entry => included(entry.candidate)));
+    const portions = mealPortions(items);
+    if (!portions.mains) return;
+    // An explicit hungrier request may increase fries already in a combo, but
+    // other requests must not accidentally duplicate the default drink/side.
+    if (items.some(combo => combo.candidate.item.isCombo && items.some(entry => entry !== combo &&
+      (entry.candidate.product.category === 'drink' || action !== 'hungrier' && entry.candidate.product.category === 'fries') && included(combo.candidate).includes(entry.candidate.product.category)))) return;
+    const moreFood = portions.food > oldPortions.food || portions.mains > oldPortions.mains && portions.food >= oldPortions.food;
+    const eligible = key !== oldKey && (required === undefined || covered.has(required)) &&
+      (wanted === undefined || covered.has(wanted)) && (action !== 'hungrier' || moreFood);
+    const quantities = new Map(items.map(entry => [entry.candidate.product.id, entry.quantity]));
+    const distance = [...new Set([...original.keys(), ...quantities.keys()])].reduce((sum, id) => sum + Math.abs((original.get(id) ?? 0) - (quantities.get(id) ?? 0)), 0);
+    const option = { items, cost, key, distance, matches: (member.likes ?? []).filter(category => covered.has(category)).length, eligible };
+    seen.set(key, option); return option;
   };
-
-  const revisedTotal = nextItems.reduce((sum, entry) => sum + entry.candidate.product.priceCents, 0);
-  if (action === 'cheaper' && revisedTotal >= currentTotal) {
-    return {
-      selection: revised,
-      note: {
-        memberId: member.id,
-        code: 'no_cheaper_alternative',
-        kind: 'constraint',
-        blocking: true,
-        message: `成员 ${String(member.id)} 已无可替换的更便宜同类商品`,
-      },
-    };
+  // Start from the original basket as well as every affordable main (including
+  // default combos). Expanding fresh cores allows removing or replacing old items.
+  const seeds: Option[] = [];
+  if (seed.items.every(entry => hard.includes(entry.candidate))) { const old = add(seed.items); if (old) seeds.push(old); }
+  for (const candidate of hard.filter(isMain)) { const option = add([{ candidate, quantity: 1 }]); if (option) seeds.push(option); }
+  let frontier = seeds;
+  for (let depth = 0; depth < 3; depth += 1) {
+    const next: Option[] = [];
+    for (const option of frontier) for (const candidate of hard) {
+      const existing = option.items.find(entry => entry.candidate === candidate);
+      if (existing && (action !== 'hungrier' || candidate.product.category === 'drink' || candidate.product.category === 'dessert')) continue;
+      const items = existing ? option.items.map(entry => entry === existing ? { ...entry, quantity: entry.quantity + 1 } : entry) : [...option.items, { candidate, quantity: 1 }];
+      const added = add(items); if (added) next.push(added);
+    }
+    // Bound CPU and quote count on large menus; retain all discovered eligible
+    // options and only use a beam for further expansion. No optimality claim.
+    frontier = next.sort(compare).slice(0, 180);
+    if (!frontier.length) break;
   }
+  return [...seen.values()].filter(option => option.eligible).sort(compare).slice(0, 40).map(option => {
+    const liked = member.likes ?? [];
+    const matchedLikes = liked.filter(category => option.items.some(entry => included(entry.candidate).includes(category)));
+    return { memberId: member.id, items: option.items, matchedLikes, missingLikes: liked.filter(category => !matchedLikes.includes(category)), requiresManualReview: Boolean(member.customRequirement?.trim()), reasons: option.items.map(entry => `${entry.candidate.product.name} ×${entry.quantity}`) };
+  });
+}
 
-  return { selection: revised };
+async function replanRevision(request: MediateRequest, pool: Candidate[], fixed: Map<number, MemberSelection>, deps: MediateDependencies, traceId: string): Promise<{ plan?: MediatePlan; issue?: MediateIssue; hint?: MediateHint }> {
+  const revision = request.revision!; const member = request.members.find(entry => entry.id === revision.memberId)!;
+  const seed = fixed.get(member.id)!; const previous = request.excludePlan!.allocations.find(entry => entry.memberId === member.id)!;
+  const fail = (code: string, message: string, kind: MediateIssue['kind'] = 'constraint') => ({ issue: { memberId: member.id, code, kind, blocking: true, message } });
+  // Never silently drop a missing original item from any locked basket.
+  for (const allocation of request.excludePlan!.allocations) {
+    const current = fixed.get(allocation.memberId);
+    if (!current || current.items.length !== allocation.items.length) return fail('revision_menu_changed', '原方案的部分餐品已不可用，请重新生成整顿饭的方案；原方案已保留。', 'unavailable');
+  }
+  const wanted = ['burger', 'fries', 'drink'].includes(revision.action) ? revision.action as Category : undefined;
+  const label = wanted === 'burger' ? '汉堡' : wanted === 'fries' ? '薯条' : '饮料';
+  if (wanted && (member.dislikes ?? []).includes(wanted)) return fail('revision_food_excluded', `成员${member.id}已排除${label}，请先调整食物限制；原方案已保留。`);
+  if (wanted && seed.items.some(entry => included(entry.candidate).includes(wanted))) return fail('revision_already_included', `原方案已经包含${label}（含套餐默认子项），无需重复添加。想增加主餐或配餐，可以选择“更饿了”；原方案已保留。`);
+  const options = revisionSelections(seed, member, revision.action, pool);
+  let pricedCount = 0;
+  for (const option of options) {
+    if (pricedCount++ >= 8) break;
+    const selections = request.members.map(entry => entry.id === member.id ? option : fixed.get(entry.id)!);
+    const built = await buildPlan(request.storeId, request.excludePlan!.strategy, request.members, selections, request.orderType ?? 1, request.beType ?? 1, deps, traceId, 500 + pricedCount);
+    if ('error' in built) continue;
+    const allocation = built.plan.allocations.find(entry => entry.memberId === member.id)!;
+    if (revision.action === 'cheaper' && allocation.totalCents >= previous.totalCents) continue;
+    const changes = (from: MemberSelection['items'], to: MemberSelection['items']) => to.flatMap(entry => {
+      const delta = entry.quantity - (from.find(old => old.candidate.product.id === entry.candidate.product.id)?.quantity ?? 0);
+      return delta > 0 ? [`${entry.candidate.product.name} ×${delta}`] : [];
+    });
+    const removed = changes(option.items, seed.items); const added = changes(seed.items, option.items);
+    const message = `成员${member.id}已重新搭配：${removed.length ? `移除${removed.join('、')}；` : ''}${added.length ? `加入${added.join('、')}；` : ''}个人实付 ¥${fenToYuan(previous.totalCents)} → ¥${fenToYuan(allocation.totalCents)}。其他成员餐品保留。`;
+    built.plan.explanations.unshift(message);
+    return { plan: built.plan, hint: { memberId: member.id, level: 'info', message } };
+  }
+  const budget = `预算 ¥${member.budget}`;
+  if (revision.action === 'cheaper') return fail('revision_no_cheaper_plan', `已尝试重新组合单品与默认套餐，暂未找到个人实付低于 ¥${fenToYuan(previous.totalCents)}、同时满足${budget}和食物限制的方案；原方案已保留。`);
+  if (revision.action === 'hungrier') return fail('revision_no_larger_meal', `已尝试加餐及替换整份搭配，在${budget}和现有食物限制下，暂未找到能增加主餐或配餐份数的组合；可以提高预算或调整食物限制，原方案已保留。`);
+  return fail('revision_no_requested_food', `已尝试替换整份搭配，暂未找到同时包含${label}、保留主餐并满足${budget}和食物限制的组合；原方案已保留。`);
 }
 
 /** Bounded recovery search. Every suggestion carries a real priced proof.
@@ -1122,7 +1153,7 @@ export async function mediate(
   }
 
   // ---- 复议：只用目标成员重新求解，其他人锁定 ----
-  let fixedByMember = new Map<number, MemberSelection>();
+  const fixedByMember = new Map<number, MemberSelection>();
   let revisionIssue: MediateIssue | undefined;
   let targetMemberId: number | undefined;
 
@@ -1188,11 +1219,20 @@ export async function mediate(
     };
   }
 
+  if (request.revision) {
+    const outcome = await replanRevision(request, pool, fixedByMember, deps, traceId);
+    if (outcome.issue) issues.push(outcome.issue);
+    if (outcome.hint) hints.push(outcome.hint);
+    const strategy = request.excludePlan!.strategy;
+    const couponCount = outcome.plan ? await deps.couponCount(request.storeId, orderType, beType) : 0;
+    if (provider) llmDetail.push({ strategy, status: 'skipped', model: provider.label, code: 'revision_uses_rules', message: '复议使用有界组合搜索与真实试算，不调用模型' });
+    return { source: 'live', traceId, store: { id: menu.store.id, name: menu.store.name }, products, plans: outcome.plan ? [outcome.plan] : [], issues, hints,
+      meta: buildMeta({ provider, menuCapturedAt: menu.capturedAt, couponCount, pricingVerified: Boolean(outcome.plan), strategiesReturned: outcome.plan ? [strategy] : [], strategiesDeduplicated: [], llmDetail }) };
+  }
+
   const maxPlans = Math.min(3, Math.max(1, request.options?.maxPlans ?? 3));
 
-  // 先算出这轮真正要产出的策略，再一次请求让模型全部给出。
-  // 复议（revision）一律走规则版：动作语义明确（更便宜 / 加一份薯条…），
-  // 其他成员还必须一动不动，模型很容易误解成整单重排。
+  // Normal generation requests all strategies once; revision returned above.
   const requestedStrategies: Strategy[] = [];
   for (const strategy of STRATEGIES) {
     if (requestedStrategies.length >= maxPlans) break;
@@ -1203,21 +1243,7 @@ export async function mediate(
   }
 
   let modelRun: ModelRun | undefined;
-  if (provider !== null) {
-    if (request.revision !== undefined) {
-      for (const strategy of requestedStrategies) {
-        llmDetail.push({
-          strategy,
-          status: 'skipped',
-          model: provider.label,
-          code: 'revision_uses_rules',
-          message: '复议动作由规则版处理，不调用模型',
-        });
-      }
-    } else {
-      modelRun = await planWithModel(provider, pool, request.members, requestedStrategies, menu.store.name);
-    }
-  }
+  if (provider !== null) modelRun = await planWithModel(provider, pool, request.members, requestedStrategies, menu.store.name);
 
   for (const strategy of STRATEGIES) {
     if (builtPlans.length >= maxPlans) break;
@@ -1226,30 +1252,8 @@ export async function mediate(
       continue;
     }
 
-    /** 规则版选品：模型不可用、被拦下、或复议时都走这里。 */
-    const buildRuleSelections = (): MemberSelection[] => {
-      const selections: MemberSelection[] = [];
-      for (const member of request.members) {
-        const fixed = fixedByMember.get(member.id);
-
-        if (request.revision !== undefined && member.id === targetMemberId) {
-          const seed = fixed ?? selectForMember(pool, member, strategy, true);
-          const { selection, note } = applyRevision(seed, member, request.revision.action, pool);
-          // 不要覆盖更早、更根本的错误（例如 excludePlan 缺失）。
-          if (note !== undefined && revisionIssue === undefined) revisionIssue = note;
-          selections.push(selection);
-          continue;
-        }
-
-        if (fixed !== undefined) {
-          selections.push(fixed);
-          continue;
-        }
-
-        selections.push(selectForMember(pool, member, strategy, true));
-      }
-      return selections;
-    };
+    /** 规则版选品：模型不可用或被拦下时走这里。 */
+    const buildRuleSelections = (): MemberSelection[] => request.members.map(member => selectForMember(pool, member, strategy, true));
 
     let built: BuiltPlan | { error: MediateIssue } | undefined;
 
@@ -1295,13 +1299,9 @@ export async function mediate(
       });
     }
 
-    if (revisionIssue !== undefined) break;
-
     if (built === undefined || 'error' in built) {
       const selections = buildRuleSelections();
-      if (revisionIssue !== undefined) break;
-
-      built = await buildPlan(
+        built = await buildPlan(
         request.storeId,
         strategy,
         request.members,
@@ -1328,30 +1328,6 @@ export async function mediate(
     seenSignatures.set(built.signature, strategy);
     builtPlans.push(built);
     strategiesReturned.push(strategy);
-  }
-
-  // 复议过程中发现目标成员做不到（例如已无更便宜替代）：按契约返回空方案，
-  // 不用旧方案充数。
-  if (revisionIssue !== undefined) {
-    issues.push(revisionIssue);
-    return {
-      source: 'live',
-      traceId,
-      store: { id: menu.store.id, name: menu.store.name },
-      products,
-      plans: [],
-      issues,
-      hints,
-      meta: buildMeta({
-        provider,
-        menuCapturedAt: menu.capturedAt,
-        couponCount: 0,
-        pricingVerified: false,
-        strategiesReturned: [],
-        strategiesDeduplicated: [],
-        llmDetail,
-      }),
-    };
   }
 
   if (builtPlans.length === 0 && issues.every((issue) => issue.blocking === false)) {

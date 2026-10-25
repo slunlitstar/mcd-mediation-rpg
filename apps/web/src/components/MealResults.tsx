@@ -53,7 +53,7 @@ export default function MealResults({ party, result, live, storeName, strategy, 
       <div className="strategy-tabs" role="tablist" aria-label="选择方案策略">{strategies.map(item => {
         const available = result!.plans.some(plan => plan.strategy === item.id);
         const duplicate = result?.meta?.strategiesDeduplicated?.includes(item.id);
-        return <button key={item.id} role="tab" id={`tab-${item.id}`} aria-controls="plan-panel" aria-selected={plan.strategy === item.id} disabled={!available} className={plan.strategy === item.id ? 'active' : ''} onClick={() => { onStrategy(item.id); onAccept(false); }}><span>{item.id === 'peace' ? '✳' : item.id === 'saving' ? '¥' : '✦'}</span><strong>{item.name}</strong><small>{available ? item.description : duplicate ? '结果相同，已合并' : '暂无可行方案'}</small></button>;
+        return <button key={item.id} role="tab" id={`tab-${item.id}`} aria-controls="plan-panel" aria-selected={plan.strategy === item.id} disabled={!available} className={plan.strategy === item.id ? 'active' : ''} onClick={() => { onStrategy(item.id); onAccept(false); }}><span>{item.id === 'peace' ? '✳' : item.id === 'saving' ? '¥' : '✦'}</span><strong>{item.name}</strong><small>{available ? item.description : duplicate ? '结果相同，已合并' : revisionCount > 0 ? '本次未重新生成' : '暂无可行方案'}</small></button>;
       })}</div>
       {Boolean(result?.meta?.strategiesDeduplicated?.length) && <p className="strategy-notice">{result!.meta!.strategiesDeduplicated!.map(id => strategies.find(item => item.id === id)?.name).join('、')}与已有方案餐品相同，已合并展示。</p>}
       <div className="results-layout" id="plan-panel" role="tabpanel" aria-labelledby={`tab-${plan.strategy}`}>

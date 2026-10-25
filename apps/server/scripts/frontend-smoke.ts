@@ -76,6 +76,12 @@ try {
   const comboResult = await generateLivePlans({ party: comboParty }, undefined, fetcher);
   assert.ok(comboResult.plans.some(plan => plan.allocations.some(allocation => allocation.items.some(item => comboResult.products!.find(product => product.id === item.productId)!.isCombo))));
   console.log('PASS default combo content is retained through HTTP route and browser client');
+  const hungrier = structuredClone(party); hungrier.members[0].hunger = 'hungry';
+  const larger = await generateLivePlans({ party: hungrier, revision: { memberId: 1, action: 'hungrier' }, excludePlan: plan }, undefined, fetcher);
+  assert.ok(larger.plans.length === 1);
+  assert.deepEqual(larger.plans[0].allocations[1].items.map(item => [item.productId, item.quantity]), plan.allocations[1].items.map(item => [item.productId, item.quantity]));
+  assert.ok(larger.hints?.some(hint => hint.message.includes('重新搭配') && hint.message.includes('个人实付')));
+  console.log('PASS hungrier revision returns a genuinely changed, priced basket and an explicit change summary');
 } finally {
   Object.assign(mcd, original);
   server.closeAllConnections();

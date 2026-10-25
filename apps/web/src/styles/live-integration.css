@@ -30,3 +30,6 @@
 .combo-label { display: inline-block; font-size: 11px; font-style: normal; padding: 2px 6px; margin-left: 6px; border-radius: 5px; background: #f6e5ba; color: #68492f; }
 .product-list .combo-contents { white-space: normal; overflow-wrap: anywhere; line-height: 1.6; font-size: 12px; margin-top: 4px; }
 @media (min-width: 960px) { .recovery-options { max-width: 720px; margin-inline: auto; } }
+.revision-current { padding: 12px; margin-top: 16px; border-radius: 10px; background: var(--yellow-pale); border: 1px solid var(--line); }
+.revision-current strong { font-size: 14px; line-height: 1.7; }
+.revision-dialog .revision-current p { margin-top: 6px; font-size: 14px; line-height: 1.7; }
