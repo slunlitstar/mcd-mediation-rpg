@@ -18,6 +18,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { describeGatewayError, mcd } from '../services/mcd.js';
+import { describeAiConfig, loadAiConfig } from '../services/ai.js';
 import { planMeal } from '../services/plan.js';
 import type { MemberRequest } from '../services/plan.js';
 import { isCategory, isStrategy, mediate } from '../services/mediate.js';
@@ -391,6 +392,8 @@ export async function handleApi(
           time: new Date().toISOString(),
           mcpConfigured: (process.env.MCD_MCP_TOKEN ?? '') !== '',
           planner: 'rule-based-v2',
+          // 三项齐全才算模型可用；只填 key 时这里是 not_configured，和 meta.llm 口径一致。
+          llm: describeAiConfig(loadAiConfig()),
         },
       });
       return true;

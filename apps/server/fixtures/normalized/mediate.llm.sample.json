@@ -1,6 +1,6 @@
 {
   "source": "live",
-  "traceId": "med_1792898704199",
+  "traceId": "med_1792899241144",
   "store": {
     "id": "1950059",
     "name": "麦当劳北京新王府井餐厅"
@@ -2561,7 +2561,7 @@
   ],
   "plans": [
     {
-      "planId": "med_1792898704199_1_saving",
+      "planId": "med_1792899241144_1_saving",
       "strategy": "saving",
       "allocations": [
         {
@@ -2582,12 +2582,18 @@
             "burger"
           ],
           "missingLikes": [],
-          "reason": "选择最低价汉堡，满足想吃汉堡的偏好。",
+          "reason": "选择主食汉堡，满足其汉堡偏好。",
           "requiresManualReview": false
         },
         {
           "memberId": 2,
           "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            },
             {
               "productId": "521741",
               "quantity": 1,
@@ -2595,20 +2601,26 @@
               "subtotalCents": 850
             }
           ],
-          "subtotalCents": 850,
-          "totalCents": 850,
+          "subtotalCents": 2250,
+          "totalCents": 2250,
           "budgetCents": 3500,
           "budgetOverCents": 0,
           "matchedLikes": [
             "fries"
           ],
           "missingLikes": [],
-          "reason": "选择非辣薯饼，满足想吃薯条类且避开甜品。",
+          "reason": "搭配非辣汉堡和薯饼，满足其薯条类偏好并避开甜品。",
           "requiresManualReview": false
         },
         {
           "memberId": 3,
           "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            },
             {
               "productId": "3010",
               "quantity": 1,
@@ -2616,28 +2628,236 @@
               "subtotalCents": 950
             }
           ],
-          "subtotalCents": 950,
-          "totalCents": 950,
+          "subtotalCents": 2350,
+          "totalCents": 2350,
           "budgetCents": 3000,
           "budgetOverCents": 0,
           "matchedLikes": [],
           "missingLikes": [],
-          "reason": "选择不含洋葱的饮品，满足饮料要求。",
+          "reason": "选择不含洋葱标识的汉堡并搭配饮料，满足饮品要求。",
           "requiresManualReview": true
         }
       ],
-      "productSubtotalCents": 3200,
+      "productSubtotalCents": 6000,
       "discountCents": 0,
-      "payableCents": 3200,
-      "totalCents": 3200,
+      "payableCents": 6000,
+      "totalCents": 6000,
       "explanations": [
-        "3 人预算合计 ¥105，实付 ¥32，未为了花满预算加购",
-        "无优惠，按原值分摊；1400+850+950 = 3200"
+        "3 人预算合计 ¥105，实付 ¥60，未为了花满预算加购",
+        "无优惠，按原值分摊；1400+2250+2350 = 6000"
       ],
       "allocationAudit": {
         "method": "proportional-largest-remainder",
-        "payableCents": 3200,
-        "allocatedCentsSum": 3200,
+        "payableCents": 6000,
+        "allocatedCentsSum": 6000,
+        "roundingAdjustmentCents": 0,
+        "budgetCheck": "passed"
+      },
+      "tradeoffs": [
+        {
+          "memberId": 3,
+          "issue": "存在自填要求，无法自动验证",
+          "chosen": "保留当前方案",
+          "reason": "当前只做人工核对，接入模型后再解析为结构化要求",
+          "costDeltaCents": 0
+        }
+      ],
+      "requiresManualReview": true
+    },
+    {
+      "planId": "med_1792899241144_2_peace",
+      "strategy": "peace",
+      "allocations": [
+        {
+          "memberId": 1,
+          "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            }
+          ],
+          "subtotalCents": 1400,
+          "totalCents": 1400,
+          "budgetCents": 4000,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "burger"
+          ],
+          "missingLikes": [],
+          "reason": "选择主食汉堡，照顾其汉堡偏好。",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 2,
+          "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            },
+            {
+              "productId": "4810",
+              "quantity": 1,
+              "unitPriceCents": 1450,
+              "subtotalCents": 1450
+            }
+          ],
+          "subtotalCents": 2850,
+          "totalCents": 2850,
+          "budgetCents": 3500,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "fries"
+          ],
+          "missingLikes": [],
+          "reason": "搭配非辣汉堡和薯条，兼顾其薯条偏好并避开甜品。",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 3,
+          "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            },
+            {
+              "productId": "3010",
+              "quantity": 1,
+              "unitPriceCents": 950,
+              "subtotalCents": 950
+            }
+          ],
+          "subtotalCents": 2350,
+          "totalCents": 2350,
+          "budgetCents": 3000,
+          "budgetOverCents": 0,
+          "matchedLikes": [],
+          "missingLikes": [],
+          "reason": "选择不含洋葱标识的汉堡并搭配饮料，满足饮品要求。",
+          "requiresManualReview": true
+        }
+      ],
+      "productSubtotalCents": 6600,
+      "discountCents": 0,
+      "payableCents": 6600,
+      "totalCents": 6600,
+      "explanations": [
+        "3 人预算合计 ¥105，实付 ¥66，未为了花满预算加购",
+        "无优惠，按原值分摊；1400+2850+2350 = 6600"
+      ],
+      "allocationAudit": {
+        "method": "proportional-largest-remainder",
+        "payableCents": 6600,
+        "allocatedCentsSum": 6600,
+        "roundingAdjustmentCents": 0,
+        "budgetCheck": "passed"
+      },
+      "tradeoffs": [
+        {
+          "memberId": 3,
+          "issue": "存在自填要求，无法自动验证",
+          "chosen": "保留当前方案",
+          "reason": "当前只做人工核对，接入模型后再解析为结构化要求",
+          "costDeltaCents": 0
+        }
+      ],
+      "requiresManualReview": true
+    },
+    {
+      "planId": "med_1792899241144_3_happy",
+      "strategy": "happy",
+      "allocations": [
+        {
+          "memberId": 1,
+          "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            }
+          ],
+          "subtotalCents": 1400,
+          "totalCents": 1400,
+          "budgetCents": 4000,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "burger"
+          ],
+          "missingLikes": [],
+          "reason": "选择主食汉堡，直接满足其汉堡偏好。",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 2,
+          "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            },
+            {
+              "productId": "4810",
+              "quantity": 1,
+              "unitPriceCents": 1450,
+              "subtotalCents": 1450
+            }
+          ],
+          "subtotalCents": 2850,
+          "totalCents": 2850,
+          "budgetCents": 3500,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "fries"
+          ],
+          "missingLikes": [],
+          "reason": "选择非辣汉堡搭配薯条，优先满足其薯条偏好并避开甜品。",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 3,
+          "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            },
+            {
+              "productId": "515280",
+              "quantity": 1,
+              "unitPriceCents": 950,
+              "subtotalCents": 950
+            }
+          ],
+          "subtotalCents": 2350,
+          "totalCents": 2350,
+          "budgetCents": 3000,
+          "budgetOverCents": 0,
+          "matchedLikes": [],
+          "missingLikes": [],
+          "reason": "选择不含洋葱标识的汉堡并搭配饮料，满足饮品要求。",
+          "requiresManualReview": true
+        }
+      ],
+      "productSubtotalCents": 6600,
+      "discountCents": 0,
+      "payableCents": 6600,
+      "totalCents": 6600,
+      "explanations": [
+        "3 人预算合计 ¥105，实付 ¥66，未为了花满预算加购",
+        "无优惠，按原值分摊；1400+2850+2350 = 6600"
+      ],
+      "allocationAudit": {
+        "method": "proportional-largest-remainder",
+        "payableCents": 6600,
+        "allocatedCentsSum": 6600,
         "roundingAdjustmentCents": 0,
         "budgetCheck": "passed"
       },
@@ -2675,36 +2895,35 @@
   "meta": {
     "planner": "llm-validated-v1",
     "pricingVerified": true,
-    "menuCapturedAt": "2026-10-25T03:25:05.576Z",
+    "menuCapturedAt": "2026-10-25T03:34:02.297Z",
     "couponCount": 1,
     "degraded": false,
     "reasoning": "llm",
     "strategiesReturned": [
-      "saving"
-    ],
-    "strategiesDeduplicated": [
+      "saving",
       "peace",
       "happy"
     ],
+    "strategiesDeduplicated": [],
     "llm": "gpt-6.1-sol",
     "llmDetail": [
       {
         "strategy": "saving",
         "status": "accepted",
         "model": "gpt-6.1-sol",
-        "latencyMs": 29594
+        "latencyMs": 11349
       },
       {
         "strategy": "peace",
         "status": "accepted",
         "model": "gpt-6.1-sol",
-        "latencyMs": 29594
+        "latencyMs": 11349
       },
       {
         "strategy": "happy",
         "status": "accepted",
         "model": "gpt-6.1-sol",
-        "latencyMs": 29594
+        "latencyMs": 11349
       }
     ]
   }

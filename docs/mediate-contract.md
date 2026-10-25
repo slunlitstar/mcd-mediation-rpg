@@ -455,6 +455,7 @@ Content-Type: application/json
 | 命中 `dislikes`（硬排除） | 整份方案拒绝 | `model_dislike_violation` |
 | `no-spicy` / `no-beef` 食材要求 | 整份方案拒绝 | `model_requirement_violation` |
 | 明确要 `burger/fries/drink` 却没给 | 整份方案拒绝 | `model_missing_required_category` |
+| 每人必须有主食（汉堡），不能拿一份薯条当一顿饭 | 整份方案拒绝 | `model_missing_main` |
 | 数量必须是 1–3 的整数 | 整份方案拒绝 | `model_invalid_quantity` |
 | 按菜单价预检不超个人预算 | 整份方案拒绝 | `model_budget_exceeded` |
 | 必须覆盖全部成员、且不能动被锁定成员 | 整份方案拒绝 | `model_missing_member` / `model_locked_member` |

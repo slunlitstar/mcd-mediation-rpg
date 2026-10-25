@@ -34,9 +34,13 @@
   "service": "mcd-mediation-rpg-server",
   "time": "2026-10-25T03:23:29.261Z",
   "mcpConfigured": true,
-  "planner": "rule-based-v1"
+  "planner": "rule-based-v2",
+  "llm": "not_configured"
 } }
 ```
+
+`llm` 是模型可用性口径：`AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` 三项齐全才会显示模型标识，
+否则为 `not_configured`（只填 Key 不算接入）。它和 `/api/mediate` 响应里的 `meta.llm` 一致。
 
 ## GET `/api/stores`
 
