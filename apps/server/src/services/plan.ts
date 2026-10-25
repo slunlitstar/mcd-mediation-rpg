@@ -389,14 +389,14 @@ function draftForMember(menuPool: UnifiedMenuItem[], member: MemberRequest, memb
 
 // ---------------------------------------------------------------- 整数分摊
 
-interface ShareInput {
-  memberId: string;
+interface ShareInput<K extends string | number = string> {
+  memberId: K;
   /** 该成员在试算明细里占的原值（分，可为小数）。 */
   rawFen: number;
 }
 
-interface ShareOutput {
-  allocatedFen: Map<string, number>;
+interface ShareOutput<K extends string | number = string> {
+  allocatedFen: Map<K, number>;
   roundingAdjustmentFen: number;
 }
 
@@ -406,9 +406,14 @@ interface ShareOutput {
  * 做法：先按权重取整（向下取整），再把「应付 − 已分配」这点零头，
  * 按小数部分从大到小逐分补齐（最大余数法）。这样不会出现
  * 三个人各摊 ¥27.33、加起来 ¥81.99 却声称应付 ¥81.7 的情况。
+ *
+ * 成员 id 允许是 string 或 number（`/api/plan` 用 string，`/api/mediate` 用 number）。
  */
-export function allocateCents(shares: ShareInput[], targetFen: number): ShareOutput {
-  const allocatedFen = new Map<string, number>();
+export function allocateCents<K extends string | number>(
+  shares: ShareInput<K>[],
+  targetFen: number,
+): ShareOutput<K> {
+  const allocatedFen = new Map<K, number>();
 
   if (shares.length === 0) return { allocatedFen, roundingAdjustmentFen: 0 };
 
@@ -426,7 +431,7 @@ export function allocateCents(shares: ShareInput[], targetFen: number): ShareOut
     return { allocatedFen, roundingAdjustmentFen: 0 };
   }
 
-  const exact = shares.map((share) => ({
+  const exact: Array<{ memberId: K; value: number }> = shares.map((share) => ({
     memberId: share.memberId,
     value: (Math.max(0, share.rawFen) * targetFen) / rawSum,
   }));
@@ -439,7 +444,7 @@ export function allocateCents(shares: ShareInput[], targetFen: number): ShareOut
   }
 
   let leftover = targetFen - assigned;
-  const byRemainder = [...exact].sort(
+  const byRemainder: Array<{ memberId: K; value: number }> = [...exact].sort(
     (a, b) => (b.value - Math.floor(b.value)) - (a.value - Math.floor(a.value)),
   );
 

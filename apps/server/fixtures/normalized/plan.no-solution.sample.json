@@ -1,8 +1,8 @@
 {
-  "_note": "无解样例：预算低于最便宜主食。plans 不存在，issues 里给出阻塞原因，前端据此渲染无解态。",
+  "_note": "无解样例：两人预算各 ¥5，低于最便宜主食。plans 不存在，issues 给出阻塞原因。",
   "_source": {
     "api": "POST /api/plan",
-    "request": "{ storeCode: 1950212, members: [{ name: \"只带五块钱\", budget: 5 }] }"
+    "request": "members: 2 人 × budget ¥5"
   },
   "status": "no_solution",
   "planner": {
@@ -17,23 +17,37 @@
     {
       "code": "no_main_within_budget",
       "memberId": "m1",
-      "message": "只带五块钱 预算 ¥5 低于最便宜主食「芝芝火腿扒堡」¥14，无解",
+      "message": "只带五块钱 预算 ¥5 低于最便宜主食「牛肉堡单品精选」¥15.5，无解",
       "budgetFen": 500,
-      "cheapestFen": 1400,
-      "shortfallFen": 900
+      "cheapestFen": 1550,
+      "shortfallFen": 1050
+    },
+    {
+      "code": "no_main_within_budget",
+      "memberId": "m2",
+      "message": "也带五块 预算 ¥5 低于最便宜主食「牛肉堡单品精选」¥15.5，无解",
+      "budgetFen": 500,
+      "cheapestFen": 1550,
+      "shortfallFen": 1050
     }
   ],
   "diagnostics": {
-    "memberCount": 1,
-    "budgetTotalFen": 500,
+    "memberCount": 2,
+    "budgetTotalFen": 1000,
     "cheapestPerMember": [
       {
         "memberId": "m1",
         "name": "只带五块钱",
-        "cheapestMainFen": 1400,
+        "cheapestMainFen": 1550,
+        "budgetFen": 500
+      },
+      {
+        "memberId": "m2",
+        "name": "也带五块",
+        "cheapestMainFen": 1550,
         "budgetFen": 500
       }
     ],
-    "cheapestTotalFen": 1400
+    "cheapestTotalFen": 3100
   }
 }

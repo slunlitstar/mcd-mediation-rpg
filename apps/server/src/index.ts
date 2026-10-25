@@ -32,7 +32,7 @@ const server = createServer((request, response) => {
 
 server.listen(port, host, () => {
   console.info(`Server listening at http://${host}:${String(port)}`);
-  console.info('Routes: GET /api/health | GET /api/stores | GET /api/menu | POST /api/plan');
+  console.info('Routes: GET /api/health | GET /api/stores | GET /api/menu | POST /api/plan | POST /api/mediate');
 });
 
 server.on('error', (error) => {

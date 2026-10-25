@@ -143,11 +143,17 @@ const checks: Check[] = [
       const storeCode = String((list[0] as Record<string, unknown> | undefined)?.id ?? '');
       if (storeCode === '') return { ok: false, detail: '没拿到 storeCode，跳过' };
 
-      // 预算 1 元，任何门店都不可能凑出一份主食
+      // 两人各 1 元，任何门店都不可能凑出一份主食；人数需满足 2–4
       const { status, body } = await getJson('/api/plan', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ storeCode, members: [{ name: '只带 1 块钱', budget: 1 }] }),
+        body: JSON.stringify({
+          storeCode,
+          members: [
+            { name: '只带 1 块钱', budget: 1 },
+            { name: '也带 1 块钱', budget: 1 },
+          ],
+        }),
       });
 
       const data = dataOf(body);
@@ -158,6 +164,119 @@ const checks: Check[] = [
         ok: status === 200 && data?.status === 'no_solution' && !hasPlan && issues.length > 0,
         detail: `HTTP ${String(status)} status=${String(data?.status)} 携带方案=${String(hasPlan)} 阻塞项=${String(issues.length)}`,
       };
+    },
+  },
+  {
+    name: 'POST /api/mediate（三策略 + 分摊不变量）',
+    run: async () => {
+      const stores = await getJson('/api/stores');
+      const list = (dataOf(stores.body) as unknown[] | undefined) ?? [];
+      const storeCode = String((list[0] as Record<string, unknown> | undefined)?.id ?? '');
+      if (storeCode === '') return { ok: false, detail: '没拿到 storeCode，跳过' };
+
+      const { status, body } = await getJson('/api/mediate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          storeId: storeCode,
+          members: [
+            { id: 1, budget: 35, hunger: 'hungry', likes: ['burger'], dislikes: [], requirement: 'no-spicy' },
+            { id: 2, budget: 30, hunger: 'faint', likes: ['fries'], dislikes: ['drink'], requirement: 'none' },
+            { id: 3, budget: 40, hunger: 'little', likes: ['drink'], dislikes: [], requirement: 'none', customRequirement: '不要洋葱' },
+          ],
+        }),
+      });
+
+      const data = dataOf(body);
+      const plans = (data?.plans as unknown[] | undefined) ?? [];
+      const issues = (data?.issues as unknown[] | undefined) ?? [];
+
+      if (status !== 200 || plans.length === 0) {
+        return { ok: false, detail: `HTTP ${String(status)} 方案 ${String(plans.length)} 个` };
+      }
+
+      let sumOk = true;
+      let budgetOk = true;
+      for (const planRaw of plans) {
+        const plan = planRaw as Record<string, unknown>;
+        const allocations = (plan.allocations as unknown[] | undefined) ?? [];
+        const payable = Number(plan.payableCents ?? 0);
+        const allocated = allocations.reduce(
+          (sum, entry) => sum + Number((entry as Record<string, unknown>).totalCents ?? 0),
+          0,
+        );
+        if (allocated !== payable) sumOk = false;
+        for (const entry of allocations) {
+          const record = entry as Record<string, unknown>;
+          if (Number(record.totalCents ?? 0) > Number(record.budgetCents ?? 0)) budgetOk = false;
+        }
+      }
+
+      // 人工核对必须是非阻塞
+      const manualIssues = issues.filter(
+        (issue) => (issue as Record<string, unknown>).code === 'custom_requirement_unverified',
+      );
+      const manualNonBlocking = manualIssues.every(
+        (issue) => (issue as Record<string, unknown>).blocking === false,
+      );
+
+      return {
+        ok: status === 200 && sumOk && budgetOk && manualNonBlocking,
+        detail:
+          `HTTP ${String(status)} 方案 ${String(plans.length)} 个 ` +
+          `分摊一致=${String(sumOk)} 预算合规=${String(budgetOk)} 人工核对非阻塞=${String(manualNonBlocking)}`,
+      };
+    },
+  },
+  {
+    name: 'POST /api/mediate（人数越界应 400）',
+    run: async () => {
+      const { status } = await getJson('/api/mediate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          storeId: '1950212',
+          members: [{ id: 1, budget: 30 }],
+        }),
+      });
+      return { ok: status === 400, detail: `HTTP ${String(status)}（期望 400）` };
+    },
+  },
+  {
+    name: 'POST /api/mediate（budget 越界应 400）',
+    run: async () => {
+      const { status } = await getJson('/api/mediate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          storeId: '1950212',
+          members: [
+            { id: 1, budget: 0 },
+            { id: 2, budget: 30 },
+          ],
+        }),
+      });
+      return { ok: status === 400, detail: `HTTP ${String(status)}（期望 400）` };
+    },
+  },
+  {
+    name: 'POST /api/mediate（excludePlan 不完整应 400）',
+    run: async () => {
+      const { status } = await getJson('/api/mediate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          storeId: '1950212',
+          members: [
+            { id: 1, budget: 30 },
+            { id: 2, budget: 30 },
+          ],
+          revision: { memberId: 1, action: 'cheaper' },
+          // 只传 strategy，缺 planId / allocations / 金额
+          excludePlan: { strategy: 'saving' },
+        }),
+      });
+      return { ok: status === 400, detail: `HTTP ${String(status)}（期望 400）` };
     },
   },
   {

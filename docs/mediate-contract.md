@@ -1,6 +1,7 @@
-# `/api/mediate` 契约（已按双方确认修订）
+# `/api/mediate` 契约（已实现）
 
-> 状态：**契约已定稿，代码尚未实现**。本文是前后端共同依据，实现时不得自行放宽。
+> 状态：**契约定稿，服务端已实现**（`apps/server/src/services/mediate.ts` + `POST /api/mediate`）。
+> 实现不得自行放宽本文规则；需要变更先改本文，再改代码。
 > 对标前端现有类型：`apps/web/src/types/demo.ts`（分支 `codex/demo-round-one`）。
 > 现有可用接口见 [`api.md`](./api.md)；本文是它的前端形状适配层。
 
@@ -23,17 +24,16 @@
 
 | | 现状 | 本契约 |
 |---|---|---|
-| 路由 | `POST /api/plan` | `POST /api/mediate`（新增，保留 `/api/plan`） |
+| 路由 | `POST /api/plan` | `POST /api/mediate`（已实现，保留 `/api/plan`） |
 | 金额 | 元 + 分双写 | **只用整数分**（`*Cents`），元字段不出现 |
 | 方案数量 | 单个 | `plans[]`，最多 3 个（每种策略 1 个） |
 | 成员模型 | `name/budget/spicy/...` | 兼容前端的 `roleId/hunger/likes/dislikes/requirement` |
 | 无解表达 | `status: 'no_solution'` + `issues` | `plans: []` + 带 `blocking` 标记的 `issues[]` |
-| 人员规模 | `/api/plan` 允许 1–10 | **`/api/mediate` 限定 2–4 人**（见 §2.1） |
+| 人员规模 | `/api/plan` 原允许 1–10 | **两个接口统一 2–4 人**（见 §2.1） |
 | 复议 | 无 | `revision` + `excludePlan`（基础版，单轮） |
 
 `/api/plan` 不删除，继续返回后端自有完整结构；`/api/mediate` 是给现有 UI 用的精简适配层。
-> ⚠️ 待办：`/api/plan` 目前允许 1–10 人，与本契约 2–4 不一致。实现 `/api/mediate` 时一并把
-> `/api/plan` 收敛到 2–4，避免两套规则漂移。
+两个接口的人数和预算范围已统一为 **2–4 人 / 1–200 元整数**，不再存在规则漂移。
 
 ---
 

@@ -81,12 +81,13 @@
 | 字段 | 必填 | 说明 |
 |---|---|---|
 | `storeCode` | ✅ | 来自 `/api/stores` |
+| `members[]` | ✅ | **2–4 人**（与 `/api/mediate` 一致） |
 | `members[].name` | ✅ | 显示用 |
 | `members[].budget` | ✅ | 预算上限（元），> 0 |
 | `members[].spicy` | | `false`/省略 = 忌辣，会**整体排除**辣味商品 |
 | `members[].lightEater` | | 减脂，降低油炸类权重 |
 | `members[].wantChicken` / `wantVegetable` | | 偏好加权 |
-| `members[]` 上限 | | 10 人 |
+| `members[]` 上限 | | 2–4 人 |
 
 返回 `PlanOutcome`，两种形态二选一：
 
@@ -131,6 +132,37 @@
 | `planner` | `engine: 'rule-based-v2'`，用于在 UI 上标注「规则版，未接 AI」 |
 
 实测（2026-10-25，真实 MCP）：3 人应付 8400 分，分摊合计 8400 分，无人超预算。
+
+## POST `/api/mediate`
+
+给前端 Demo 形状用的适配层，返回 `plans[]`（最多 3 个策略）+ `issues[]`。
+完整字段语义见 [`mediate-contract.md`](./mediate-contract.md)，这里只列要点。
+
+```json
+{
+  "storeId": "1950212",
+  "members": [
+    { "id": 1, "budget": 35, "hunger": "hungry", "likes": ["burger"], "dislikes": [], "requirement": "no-spicy" },
+    { "id": 2, "budget": 30, "hunger": "faint", "likes": ["fries"], "dislikes": ["drink"], "requirement": "none" }
+  ]
+}
+```
+
+| 规则 | 说明 |
+|---|---|
+| 人数 | **2–4 人**，越界返回 400 |
+| `budget` | **1–200 元整数**；`null` = 未填写（**不是不限预算**），只回非阻塞提示、不出方案 |
+| `dislikes` | **硬排除**；`likes` 只影响排序 |
+| 金额 | 响应全部是整数分（`*Cents`） |
+| `plans[]` | 只含可行方案；`Σ allocations[].totalCents === payableCents`，每人 ≤ 预算 |
+| `issues[]` | `blocking: true` 才会「整页无解」；`input` 类人工核对一律 `blocking: false` |
+| 复议 | 需同时传 `revision` 与**完整的** `excludePlan`，缺任一项 400 |
+
+策略：`saving`（最低实际应付）/ `peace`（均衡）/ `happy`（偏好匹配），
+结果相同则去重并记录在 `meta.strategiesDeduplicated`。
+
+实测（2026-10-25，真实 MCP，3 人）：返回 2 个方案，`strategiesDeduplicated: ["happy"]`，
+分摊合计与应付一致、无人超预算、人工核对为非阻塞提示。
 
 ## 验证
 

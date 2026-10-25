@@ -20,6 +20,7 @@ fixtures/
     ├── stores.json          # 门店列表
     ├── menu.json            # 菜单（统一格式）
     ├── pricing.json         # 计价（统一格式）
+    ├── mediate.sample.json  # ★ /api/mediate 前端适配层样例（plans / issues / hints）
     ├── plan.sample.json     # ★ 方案结果样例（第三页 / 第五页用）
     └── plan.no-solution.sample.json  # ★ 无解样例（预算不足，前端无解态用）
 ```
@@ -201,6 +202,25 @@ npm run mcp:fixtures -w @mcd/server
 ```
 
 无解时**没有 `plan`、没有 `members`、没有 `totals`** —— 前端只能渲染无解态，不能拿空方案凑页面。
+
+## 5.2 `mediate.sample.json` —— `/api/mediate` 适配层样例
+
+字段语义见 [`docs/mediate-contract.md`](../../../docs/mediate-contract.md)。与上面 `plan.sample.json` 的区别：
+
+| | `plan.sample.json` | `mediate.sample.json` |
+|---|---|---|
+| 来源接口 | `POST /api/plan` | `POST /api/mediate` |
+| 金额 | 元 + 分双写 | **只有整数分** |
+| 方案 | 单个 | `plans[]`，每种策略一个 |
+| 无解 | `status: "no_solution"` | `plans: []` + `issues[].blocking` |
+| 核对提示 | `unsatisfiable[]` | `issues[]`(非阻塞) + `hints[]` + `requiresManualReview` |
+
+真实样例里能看到的两个关键行为：
+
+- `meta.strategiesReturned: ["saving","peace"]`、`strategiesDeduplicated: ["happy"]`
+  —— 三种策略里有两个结果不同，第三个与已有方案重复，如实记录而不是重复返回；
+- `issues[0]` 是 `custom_requirement_unverified` 且 `blocking: false`
+  —— **人工核对不会让整页变成无解**。
 
 ---
 
