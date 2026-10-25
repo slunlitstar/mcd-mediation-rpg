@@ -1,17 +1,12 @@
-import { useState } from 'react';
 import BudgetUsage from './BudgetUsage';
+import ProductPicture from './ProductPicture';
+import { SharedMealList, SharedMemberItems } from './SharedMeals';
 import CharacterArtwork, { MediatorArtwork } from './CharacterArtwork';
 import MediationEmptyState from './MediationEmptyState';
 import { Arrow, NpcNote, PageTitle } from './UI';
 import { categories, hungerLabel, memberRequirementLabel, money, products as demoProducts, roleFor, strategies } from '../services/demo-data';
 import { resultSourceLabel } from '../services/live-service';
-import type { MediationResult, Party, Product, RecoverySuggestion, Strategy } from '../types/demo';
-
-function ProductPicture({ product }: { product: Product }) {
-  const [failed, setFailed] = useState(false);
-  return product.image && !failed ? <img className="product-photo" src={product.image} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} />
-    : <span className="product-emoji" aria-hidden="true">{product.emoji || categories.find(category => category.id === product.category)?.emoji || '🍽️'}</span>;
-}
+import type { MediationResult, Party, RecoverySuggestion, Strategy } from '../types/demo';
 
 interface Props {
   party: Party;
@@ -58,7 +53,7 @@ export default function MealResults({ party, result, live, storeName, strategy, 
       {Boolean(result?.meta?.strategiesDeduplicated?.length) && <p className="strategy-notice">{result!.meta!.strategiesDeduplicated!.map(id => strategies.find(item => item.id === id)?.name).join('、')}与已有方案餐品相同，已合并展示。</p>}
       <div className="results-layout" id="plan-panel" role="tabpanel" aria-labelledby={`tab-${plan.strategy}`}>
         <div className="mobile-plan-summary"><div><span>{currentStrategy.name} · 合计</span><strong>{money(plan.totalCents)}</strong></div><p>{currentStrategy.description}</p></div>
-        <div className="allocations">{plan.allocations.map(allocation => {
+        <div className="allocations"><SharedMealList plan={plan} products={catalog} />{plan.allocations.map(allocation => {
           const person = party.members.find(item => item.id === allocation.memberId)!;
           const inferredDiet = live && ['no-spicy', 'no-beef'].includes(person.requirement);
           return <article className="allocation-card panel" key={person.id}>
@@ -69,6 +64,7 @@ export default function MealResults({ party, result, live, storeName, strategy, 
               const unit = item.unitPriceCents ?? product.priceCents;
               return <li key={product.id}><ProductPicture key={`${product.id}-${product.image}`} product={product} /><span>{product.name}{product.isCombo && <em className="combo-label">默认套餐</em>}<small>{money(unit)} / 份</small>{product.components?.length ? <small className="combo-contents">含：{product.components.map(component => `${component.name} ×${component.quantity}`).join('、')}</small> : null}</span><span className="product-quantity">×{item.quantity}</span><b>{money(item.subtotalCents ?? unit * item.quantity)}</b></li>;
             })}</ul>
+            <SharedMemberItems allocation={allocation} plan={plan} products={catalog} />
             {live && <p className="allocation-pricing-note">个人实付已计入整单优惠分摊，可能与商品明细合计不同。</p>}
             <div className="allocation-checks"><span>✓ 预算内</span>{allocation.requiresManualReview ? <span className="check-pending">自填要求待核对</span> : inferredDiet ? <span className="check-pending">已按名称／标签筛选</span> : <span>✓ {person.requirement === 'none' ? (live ? '主餐已安排' : '已按份量偏好搭配') : memberRequirementLabel(person)}</span>}</div>
             {inferredDiet && <p className="dietary-note">{memberRequirementLabel(person)}：依据商品名称与标签推导，非官方配料确认；请在点餐时核对配料。</p>}

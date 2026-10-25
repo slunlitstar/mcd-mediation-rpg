@@ -7,7 +7,7 @@ import { handleApi } from '../src/routes/api.js';
 import { mcd } from '../src/services/mcd.js';
 import { defaultCombo } from '../src/mcp/default-combo.js';
 import type { UnifiedMenu, UnifiedPricing, UnifiedStore } from '../src/mcp/normalize.js';
-import { generateLivePlans, loadStores, prepareRecovery } from '../../web/src/services/live-service.js';
+import { generateLivePlans, liveRequestBody, loadStores, prepareRecovery } from '../../web/src/services/live-service.js';
 import { newMember } from '../../web/src/services/demo-data.js';
 import type { Party } from '../../web/src/types/demo.js';
 
@@ -82,6 +82,28 @@ try {
   assert.deepEqual(larger.plans[0].allocations[1].items.map(item => [item.productId, item.quantity]), plan.allocations[1].items.map(item => [item.productId, item.quantity]));
   assert.ok(larger.hints?.some(hint => hint.message.includes('重新搭配') && hint.message.includes('个人实付')));
   console.log('PASS hungrier revision returns a genuinely changed, priced basket and an explicit change summary');
+  // A deterministic discount in the offline gateway makes sharing the best
+  // option; this never modifies the saved real-price menu fixture.
+  const sharedProduct = menu.items.find(item => item.id === '9900011056')!;
+  assert.ok(sharedProduct.combo?.verified);
+  sharedProduct.priceFen = 1000; sharedProduct.price = 10;
+  const sharingParty = structuredClone(party); sharingParty.members.forEach(member => { member.hunger = 'hungry'; member.likes = ['burger', 'fries', 'drink']; });
+  const sharedResult = await generateLivePlans({ party: sharingParty }, undefined, fetcher);
+  const sharedPlan = sharedResult.plans.find(plan => plan.sharedMeals?.length)!;
+  assert.ok(sharedPlan);
+  assert.equal(sharedPlan.basket!.find(item => item.productId === sharedProduct.id)!.quantity, 1);
+  assert.ok(sharedPlan.allocations.every(member => member.sharedItems!.length > 0));
+  console.log('PASS shared meal travels through HTTP with one purchase and complete per-member ownership');
+  const shareRevision = await generateLivePlans({ party: sharingParty, revision: { memberId: 1, action: 'hungrier' }, excludePlan: sharedPlan }, undefined, fetcher);
+  assert.ok(shareRevision.plans.length === 1);
+  assert.deepEqual(shareRevision.plans[0].sharedMeals!.map(meal => meal.components), sharedPlan.sharedMeals!.map(meal => meal.components));
+  assert.deepEqual(shareRevision.plans[0].allocations[1].sharedItems, sharedPlan.allocations[1].sharedItems);
+  console.log('PASS shared-plan revision accepts empty private baskets and locks shared recipe/ownership');
+  const invalidShared = liveRequestBody({ party: sharingParty, revision: { memberId: 1, action: 'hungrier' }, excludePlan: sharedPlan });
+  invalidShared.excludePlan!.allocations[0].sharedItems!.pop();
+  const badSharedResponse = await fetch(`${base}/api/mediate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(invalidShared) });
+  assert.equal(badSharedResponse.status, 400);
+  console.log('PASS malformed shared ownership is rejected by the API route with HTTP 400');
 } finally {
   Object.assign(mcd, original);
   server.closeAllConnections();

@@ -1,0 +1,788 @@
+{
+  "_note": "真实 MCP 共享套餐试算样例；每人预算 80 元。目录仅保留方案涉及商品，未创建订单。",
+  "source": "live",
+  "traceId": "med_1792912243599",
+  "store": {
+    "id": "1950789",
+    "name": "麦当劳北京宣武门外大街餐厅"
+  },
+  "products": [
+    {
+      "id": "1406",
+      "name": "板烧鸡腿堡",
+      "category": "burger",
+      "isCombo": false,
+      "hasMain": true,
+      "includedCategories": [
+        "burger"
+      ],
+      "priceCents": 2350,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20241008/product/MS_1406_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1440",
+      "name": "麦辣鸡腿汉堡",
+      "category": "burger",
+      "isCombo": false,
+      "hasMain": true,
+      "includedCategories": [
+        "burger"
+      ],
+      "priceCents": 2250,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260325/product/MS_1440_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1700",
+      "name": "麦辣鸡翅",
+      "category": "snack",
+      "isCombo": false,
+      "hasMain": false,
+      "includedCategories": [
+        "snack"
+      ],
+      "priceCents": 1500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260325/product/MS_G1700_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "4810",
+      "name": "薯条",
+      "category": "fries",
+      "isCombo": false,
+      "hasMain": false,
+      "includedCategories": [
+        "fries"
+      ],
+      "priceCents": 1350,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20250523/product/MS_G4810_320_1747877491921.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900011056",
+      "name": "全明星双人分享餐八件套",
+      "category": "snack",
+      "isCombo": true,
+      "hasMain": true,
+      "includedCategories": [
+        "burger",
+        "snack",
+        "fries",
+        "drink"
+      ],
+      "components": [
+        {
+          "id": "1440",
+          "name": "麦辣鸡腿汉堡",
+          "quantity": 1,
+          "category": "burger",
+          "hasMain": true,
+          "referencePriceCents": 2250,
+          "dietary": {
+            "spicy": {
+              "inferred": true,
+              "source": "name",
+              "confidence": "medium"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        },
+        {
+          "id": "1406",
+          "name": "板烧鸡腿堡",
+          "quantity": 1,
+          "category": "burger",
+          "hasMain": true,
+          "referencePriceCents": 2350,
+          "dietary": {
+            "spicy": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        },
+        {
+          "id": "515106",
+          "name": "麦乐鸡4块",
+          "quantity": 1,
+          "category": "snack",
+          "hasMain": false,
+          "referencePriceCents": null,
+          "dietary": {
+            "spicy": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        },
+        {
+          "id": "1700",
+          "name": "麦辣鸡翅2块",
+          "quantity": 1,
+          "category": "snack",
+          "hasMain": false,
+          "referencePriceCents": 1500,
+          "dietary": {
+            "spicy": {
+              "inferred": true,
+              "source": "name",
+              "confidence": "medium"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        },
+        {
+          "id": "4810",
+          "name": "中薯条",
+          "quantity": 2,
+          "category": "fries",
+          "hasMain": false,
+          "referencePriceCents": 1350,
+          "dietary": {
+            "spicy": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        },
+        {
+          "id": "3050",
+          "name": "可乐中杯",
+          "quantity": 2,
+          "category": "drink",
+          "hasMain": false,
+          "referencePriceCents": null,
+          "dietary": {
+            "spicy": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        }
+      ],
+      "priceCents": 4990,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_9900011056_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005449",
+      "name": "吉士汉堡包套餐",
+      "category": "burger",
+      "isCombo": true,
+      "hasMain": true,
+      "includedCategories": [
+        "burger",
+        "fries",
+        "drink"
+      ],
+      "components": [
+        {
+          "id": "1010",
+          "name": "吉士汉堡包",
+          "quantity": 1,
+          "category": "burger",
+          "hasMain": true,
+          "referencePriceCents": null,
+          "dietary": {
+            "spicy": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            },
+            "beef": {
+              "inferred": true,
+              "source": "name",
+              "confidence": "medium"
+            }
+          }
+        },
+        {
+          "id": "4810",
+          "name": "中薯条",
+          "quantity": 1,
+          "category": "fries",
+          "hasMain": false,
+          "referencePriceCents": 1350,
+          "dietary": {
+            "spicy": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        },
+        {
+          "id": "3050",
+          "name": "可乐中杯",
+          "quantity": 1,
+          "category": "drink",
+          "hasMain": false,
+          "referencePriceCents": null,
+          "dietary": {
+            "spicy": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            },
+            "beef": {
+              "inferred": false,
+              "source": "name",
+              "confidence": "low"
+            }
+          }
+        }
+      ],
+      "priceCents": 2600,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504971_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    }
+  ],
+  "plans": [
+    {
+      "planId": "med_1792912243599_1_saving",
+      "strategy": "saving",
+      "allocations": [
+        {
+          "memberId": 1,
+          "items": [
+            {
+              "productId": "9900005449",
+              "quantity": 1,
+              "unitPriceCents": 2600,
+              "subtotalCents": 2600
+            }
+          ],
+          "subtotalCents": 2600,
+          "totalCents": 2600,
+          "budgetCents": 8000,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "burger",
+            "fries",
+            "drink"
+          ],
+          "missingLikes": [],
+          "reason": "默认套餐「吉士汉堡包套餐」¥26",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 2,
+          "items": [
+            {
+              "productId": "9900005449",
+              "quantity": 1,
+              "unitPriceCents": 2600,
+              "subtotalCents": 2600
+            }
+          ],
+          "subtotalCents": 2600,
+          "totalCents": 2600,
+          "budgetCents": 8000,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "burger",
+            "fries",
+            "drink"
+          ],
+          "missingLikes": [],
+          "reason": "默认套餐「吉士汉堡包套餐」¥26",
+          "requiresManualReview": false
+        }
+      ],
+      "basket": [
+        {
+          "productId": "9900005449",
+          "quantity": 2
+        }
+      ],
+      "productSubtotalCents": 5200,
+      "discountCents": 0,
+      "payableCents": 5200,
+      "totalCents": 5200,
+      "explanations": [
+        "2 人预算合计 ¥160，实付 ¥52，未为了花满预算加购",
+        "无优惠，按原值分摊；2600+2600 = 5200"
+      ],
+      "allocationAudit": {
+        "method": "proportional-largest-remainder",
+        "payableCents": 5200,
+        "allocatedCentsSum": 5200,
+        "roundingAdjustmentCents": 0,
+        "budgetCheck": "passed"
+      },
+      "tradeoffs": [],
+      "requiresManualReview": false
+    },
+    {
+      "planId": "med_1792912243599_1002_happy",
+      "strategy": "happy",
+      "allocations": [
+        {
+          "memberId": 1,
+          "items": [],
+          "sharedItems": [
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "0:0"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "2:0"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "3:0"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "4:0"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "5:0"
+            }
+          ],
+          "subtotalCents": 5725,
+          "totalCents": 5725,
+          "budgetCents": 8000,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "burger",
+            "fries",
+            "drink"
+          ],
+          "missingLikes": [],
+          "reason": "参与共享「全明星双人分享餐八件套」",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 2,
+          "items": [],
+          "sharedItems": [
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "1:0"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "3:0"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "4:0"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "4:1"
+            },
+            {
+              "sharedMealId": "shared-9900011056-1-2",
+              "componentId": "5:1"
+            }
+          ],
+          "subtotalCents": 5725,
+          "totalCents": 5725,
+          "budgetCents": 8000,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "burger",
+            "fries",
+            "drink"
+          ],
+          "missingLikes": [],
+          "reason": "参与共享「全明星双人分享餐八件套」",
+          "requiresManualReview": false
+        }
+      ],
+      "sharedMeals": [
+        {
+          "sharedMealId": "shared-9900011056-1-2",
+          "productId": "9900011056",
+          "quantity": 1,
+          "memberIds": [
+            1,
+            2
+          ],
+          "components": [
+            {
+              "id": "1440",
+              "name": "麦辣鸡腿汉堡",
+              "quantity": 1,
+              "category": "burger",
+              "hasMain": true,
+              "referencePriceCents": 2250,
+              "dietary": {
+                "spicy": {
+                  "inferred": true,
+                  "source": "name",
+                  "confidence": "medium"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "0:0",
+              "memberIds": [
+                1
+              ]
+            },
+            {
+              "id": "1406",
+              "name": "板烧鸡腿堡",
+              "quantity": 1,
+              "category": "burger",
+              "hasMain": true,
+              "referencePriceCents": 2350,
+              "dietary": {
+                "spicy": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "1:0",
+              "memberIds": [
+                2
+              ]
+            },
+            {
+              "id": "515106",
+              "name": "麦乐鸡4块",
+              "quantity": 1,
+              "category": "snack",
+              "hasMain": false,
+              "referencePriceCents": null,
+              "dietary": {
+                "spicy": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "2:0",
+              "memberIds": [
+                1
+              ]
+            },
+            {
+              "id": "1700",
+              "name": "麦辣鸡翅2块",
+              "quantity": 1,
+              "category": "snack",
+              "hasMain": false,
+              "referencePriceCents": 1500,
+              "dietary": {
+                "spicy": {
+                  "inferred": true,
+                  "source": "name",
+                  "confidence": "medium"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "3:0",
+              "memberIds": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "4810",
+              "name": "中薯条",
+              "quantity": 1,
+              "category": "fries",
+              "hasMain": false,
+              "referencePriceCents": 1350,
+              "dietary": {
+                "spicy": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "4:0",
+              "memberIds": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "4810",
+              "name": "中薯条",
+              "quantity": 1,
+              "category": "fries",
+              "hasMain": false,
+              "referencePriceCents": 1350,
+              "dietary": {
+                "spicy": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "4:1",
+              "memberIds": [
+                2
+              ]
+            },
+            {
+              "id": "3050",
+              "name": "可乐中杯",
+              "quantity": 1,
+              "category": "drink",
+              "hasMain": false,
+              "referencePriceCents": null,
+              "dietary": {
+                "spicy": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "5:0",
+              "memberIds": [
+                1
+              ]
+            },
+            {
+              "id": "3050",
+              "name": "可乐中杯",
+              "quantity": 1,
+              "category": "drink",
+              "hasMain": false,
+              "referencePriceCents": null,
+              "dietary": {
+                "spicy": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                },
+                "beef": {
+                  "inferred": false,
+                  "source": "name",
+                  "confidence": "low"
+                }
+              },
+              "componentId": "5:1",
+              "memberIds": [
+                2
+              ]
+            }
+          ],
+          "allocationBasis": "equal-portions",
+          "subtotalCents": 11450,
+          "memberSubtotals": [
+            {
+              "memberId": 1,
+              "subtotalCents": 5725
+            },
+            {
+              "memberId": 2,
+              "subtotalCents": 5725
+            }
+          ]
+        }
+      ],
+      "basket": [
+        {
+          "productId": "9900011056",
+          "quantity": 1
+        }
+      ],
+      "productSubtotalCents": 11450,
+      "discountCents": 0,
+      "payableCents": 11450,
+      "totalCents": 11450,
+      "explanations": [
+        "2 人预算合计 ¥160，实付 ¥114.5，未为了花满预算加购",
+        "无优惠，按原值分摊；5725+5725 = 11450"
+      ],
+      "allocationAudit": {
+        "method": "proportional-largest-remainder",
+        "payableCents": 11450,
+        "allocatedCentsSum": 11450,
+        "roundingAdjustmentCents": 0,
+        "budgetCheck": "passed"
+      },
+      "tradeoffs": [],
+      "requiresManualReview": false
+    }
+  ],
+  "issues": [],
+  "hints": [
+    {
+      "level": "info",
+      "message": "共享套餐按实际分到的餐品分摊，整套仅计价一次；共同配餐的份额在参与成员间均分。"
+    }
+  ],
+  "suggestions": [],
+  "meta": {
+    "planner": "rule-based-v2",
+    "pricingVerified": true,
+    "menuCapturedAt": "2026-10-25T07:10:44.860Z",
+    "couponCount": 1,
+    "degraded": false,
+    "reasoning": "rules",
+    "strategiesReturned": [
+      "saving",
+      "happy"
+    ],
+    "strategiesDeduplicated": [
+      "peace"
+    ],
+    "llm": "not_configured",
+    "llmDetail": []
+  }
+}

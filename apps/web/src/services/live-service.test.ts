@@ -4,11 +4,60 @@ import { readFileSync } from 'node:fs';
 import { ApiError, generateLivePlans, liveRequestBody, loadStores, parseLiveResult, preferredStrategy, prepareRecovery, resultSourceLabel } from './live-service';
 import { newMember } from './demo-data';
 import type { Party } from '../types/demo';
+import { allocationCategories } from './shared-meals';
 
 const sample = JSON.parse(readFileSync(new URL('../../../server/fixtures/normalized/mediate.sample.json', import.meta.url), 'utf8'));
 const party: Party = { storeId: sample.store.id, members: [35, 30, 40].map((budget, index) => ({ ...newMember(index + 1), roleId: 'saver', budget, configured: true })) };
 const fixture = () => structuredClone(sample);
 const respond = (value: unknown, status = 200): typeof fetch => async () => new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } });
+
+const sharedSample = JSON.parse(readFileSync(new URL('../../../server/fixtures/normalized/mediate.shared.sample.json', import.meta.url), 'utf8'));
+const sharedParty: Party = { storeId: sharedSample.store.id, members: [1, 2].map(id => ({ ...newMember(id), roleId: 'saver', budget: 80, configured: true })) };
+
+test('real shared fixture preserves one physical purchase, complete component ownership and exact money', () => {
+  const result = parseLiveResult(structuredClone(sharedSample), sharedParty);
+  const plan = result.plans.find(plan => plan.sharedMeals?.length)!;
+  assert.ok(plan);
+  assert.equal(plan.sharedMeals![0].quantity, 1);
+  assert.equal(plan.basket!.filter(item => item.productId === plan.sharedMeals![0].productId)[0].quantity, 1);
+  assert.equal(plan.allocations.reduce((sum, member) => sum + member.totalCents, 0), plan.totalCents);
+  assert.ok(plan.allocations.every(member => member.items.length === 0 && member.sharedItems!.length > 0));
+  assert.ok(allocationCategories(plan.allocations[0], plan, result.products!).includes('burger'));
+  const body = liveRequestBody({ party: sharedParty, revision: { memberId: 1, action: 'hungrier' }, excludePlan: plan });
+  assert.deepEqual(body.excludePlan!.sharedMeals, plan.sharedMeals);
+  assert.deepEqual(body.excludePlan!.allocations[1].sharedItems, plan.allocations[1].sharedItems);
+});
+
+test('shared inventory tampering, orphan references, double purchases and incorrect weights are rejected', () => {
+  const alter = (mutate: (data: typeof sharedSample, plan: any) => void) => {
+    const data = structuredClone(sharedSample); const plan = data.plans.find((plan: any) => plan.sharedMeals?.length); mutate(data, plan);
+    assert.throws(() => parseLiveResult(data, sharedParty), /共享套餐/);
+  };
+  alter((_data, plan) => { plan.sharedMeals[0].components[0].quantity = 2; });
+  alter((_data, plan) => { plan.allocations[0].sharedItems.pop(); });
+  alter((_data, plan) => { plan.sharedMeals[0].components.find((part: any) => part.hasMain).memberIds = [1, 2]; });
+  alter((_data, plan) => { plan.basket[0].quantity = 2; });
+  alter((_data, plan) => { plan.sharedMeals[0].memberSubtotals[0].subtotalCents++; plan.sharedMeals[0].memberSubtotals[1].subtotalCents--; });
+});
+
+test('client checks component-price weights as well as the equal-portion fallback', () => {
+  const data = structuredClone(sharedSample); const plan = data.plans.find((plan: any) => plan.sharedMeals?.length);
+  const meal = plan.sharedMeals[0]; const parent = data.products.find((product: any) => product.id === meal.productId);
+  parent.components.forEach((component: any, index: number) => { component.referencePriceCents = index === 0 ? 2 : 1; });
+  meal.allocationBasis = 'component-menu-price';
+  // This real recipe is split into 4 reference portions each; member1's main
+  // receives one extra reference unit, hence 5:4 of 11450 cents.
+  meal.memberSubtotals = [{ memberId: 1, subtotalCents: 6361 }, { memberId: 2, subtotalCents: 5089 }];
+  plan.allocations[0].totalCents = 6361; plan.allocations[1].totalCents = 5089;
+  assert.ok(parseLiveResult(data, sharedParty).plans.some(plan => plan.sharedMeals?.length));
+});
+
+test('revision cannot silently change another participant shared component ownership', async () => {
+  const previous = parseLiveResult(structuredClone(sharedSample), sharedParty).plans.find(plan => plan.sharedMeals?.length)!;
+  // A completely valid independent-meal response still cannot replace a shared meal in one-member revision.
+  const changed = structuredClone(sharedSample); changed.plans = changed.plans.filter((plan: any) => !plan.sharedMeals?.length);
+  await assert.rejects(generateLivePlans({ party: sharedParty, revision: { memberId: 1, action: 'hungrier' }, excludePlan: previous }, undefined, respond({ ok: true, data: changed })), /共享套餐分配/);
+});
 
 test('verified recovery applies only explicit changes and revalidates all prices without mutating the party', () => {
   const original = structuredClone(party); original.members[0].budget = 1;

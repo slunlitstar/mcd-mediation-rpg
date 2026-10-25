@@ -33,3 +33,19 @@
 .revision-current { padding: 12px; margin-top: 16px; border-radius: 10px; background: var(--yellow-pale); border: 1px solid var(--line); }
 .revision-current strong { font-size: 14px; line-height: 1.7; }
 .revision-dialog .revision-current p { margin-top: 6px; font-size: 14px; line-height: 1.7; }
+.shared-meals { display: grid; gap: 14px; min-width: 0; }
+.shared-meals h2 { font-size: 21px; line-height: 1.5; }
+.shared-meals > div > p, .shared-allocation-note { color: var(--muted); font-size: 13px; line-height: 1.8; margin-top: 8px; }
+.shared-meal-card { padding: 18px 14px; min-width: 0; border-color: var(--border-strong); }
+.shared-meal-heading { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center; }
+.shared-meal-heading .product-photo, .shared-meal-heading .product-emoji { width: 56px; height: 56px; object-fit: contain; border-radius: 10px; }
+.shared-meal-heading h3 { font-size: 16px; line-height: 1.7; margin-top: 6px; overflow-wrap: anywhere; }
+.shared-meal-heading .combo-label { margin: 0; font-size: 12px; line-height: 1.7; }
+.shared-meal-price { display: flex; gap: 12px; justify-content: space-between; align-items: baseline; margin-block: 16px 8px; font-size: 14px; }
+.shared-meal-price strong { font-size: 23px; color: var(--red); }
+.shared-meal-parts { list-style: none; margin: 0; padding: 0; }
+.shared-meal-parts li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(75px, .8fr); gap: 10px; padding-block: 10px; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+.shared-meal-parts b { font-size: 12px; font-weight: 500; text-align: right; color: var(--muted); }
+.shared-member-items .shared-item-origin { font-size: 12px; line-height: 1.7; }
+.shared-member-items small { font-size: 12px; line-height: 1.7; }
+.shared-item-tag { flex: 0 0 auto; padding: 4px 6px; font-size: 11px; background: var(--yellow-pale); border-radius: 5px; }

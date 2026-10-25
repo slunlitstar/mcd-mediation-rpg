@@ -23,6 +23,7 @@ import { planMeal } from '../services/plan.js';
 import type { MemberRequest } from '../services/plan.js';
 import { isCategory, isStrategy, mediate } from '../services/mediate.js';
 import type { ExcludedPlan, MediateRequest, MemberInput, RevisionAction } from '../services/mediate.js';
+import type { SharedMeal } from '../services/shared-meals.js';
 
 const MAX_BODY_BYTES = 64 * 1024;
 
@@ -269,9 +270,12 @@ function parseMediateRequest(body: unknown): MediateRequest {
         throw new Error(`excludePlan.allocations[${String(index)}].memberId 必须是整数`);
       }
 
-      if (!Array.isArray(entry.items) || entry.items.length === 0) {
+      if (!Array.isArray(entry.items)) {
         throw new Error(`excludePlan.allocations[${String(index)}].items 必填`);
       }
+      const sharedItems = entry.sharedItems;
+      if (sharedItems !== undefined && (!Array.isArray(sharedItems) || sharedItems.length > 24 || sharedItems.some(ref => !ref || typeof ref !== 'object' || typeof ref.sharedMealId !== 'string' || typeof ref.componentId !== 'string'))) throw new Error('excludePlan.sharedItems 非法');
+      if (entry.items.length === 0 && (!Array.isArray(sharedItems) || sharedItems.length === 0)) throw new Error('excludePlan 成员餐品不能为空');
 
       const items = entry.items.map((itemRaw, itemIndex) => {
         if (itemRaw === null || typeof itemRaw !== 'object') {
@@ -294,7 +298,7 @@ function parseMediateRequest(body: unknown): MediateRequest {
         throw new Error(`excludePlan.allocations[${String(index)}].totalCents 必须是非负整数分`);
       }
 
-      return { memberId, items, totalCents };
+      return { memberId, items, totalCents, sharedItems: Array.isArray(sharedItems) ? sharedItems.map(ref => ({ sharedMealId: String(ref.sharedMealId), componentId: String(ref.componentId) })) : undefined };
     });
 
     const covered = new Set(allocations.map((entry) => entry.memberId));
@@ -313,6 +317,22 @@ function parseMediateRequest(body: unknown): MediateRequest {
     const productSubtotalCents = intField('productSubtotalCents');
     const discountCents = intField('discountCents');
     const payableCents = intField('payableCents');
+    let sharedMeals: SharedMeal[] | undefined;
+    if (raw.sharedMeals !== undefined) {
+      if (!Array.isArray(raw.sharedMeals) || raw.sharedMeals.length > 2) throw new Error('excludePlan.sharedMeals 非法');
+      sharedMeals = raw.sharedMeals as SharedMeal[];
+      const seen = new Set<string>(); const expectedRefs = new Set<string>();
+      for (const meal of sharedMeals) {
+        if (!meal || typeof meal !== 'object' || typeof meal.sharedMealId !== 'string' || seen.has(meal.sharedMealId) || typeof meal.productId !== 'string' || meal.quantity !== 1 || !Array.isArray(meal.memberIds) || meal.memberIds.length < 2 || meal.memberIds.length > 4 || new Set(meal.memberIds).size !== meal.memberIds.length || meal.memberIds.some(id => !ids.has(id)) || !Array.isArray(meal.components) || !meal.components.length || meal.components.length > 24) throw new Error('excludePlan.sharedMeals 套餐或成员非法');
+        seen.add(meal.sharedMealId);
+        for (const part of meal.components) {
+          if (!part || typeof part !== 'object' || typeof part.componentId !== 'string' || typeof part.id !== 'string' || part.quantity !== 1 || !Array.isArray(part.memberIds) || !part.memberIds.length || new Set(part.memberIds).size !== part.memberIds.length || part.memberIds.some(id => !meal.memberIds.includes(id))) throw new Error('excludePlan.sharedMeals 分配非法');
+          for (const id of part.memberIds) { const key = `${id}/${meal.sharedMealId}/${part.componentId}`; if (expectedRefs.has(key)) throw new Error('excludePlan.sharedMeals 餐品重复'); expectedRefs.add(key); }
+        }
+      }
+      const refs = allocations.flatMap(allocation => (allocation.sharedItems ?? []).map(ref => `${allocation.memberId}/${ref.sharedMealId}/${ref.componentId}`));
+      if (refs.length !== expectedRefs.size || new Set(refs).size !== refs.length || refs.some(ref => !expectedRefs.has(ref))) throw new Error('excludePlan.sharedItems 数量或归属不一致');
+    } else if (allocations.some(allocation => allocation.sharedItems?.length)) throw new Error('excludePlan.sharedMeals 必填');
 
     const allocatedSum = allocations.reduce((sum, entry) => sum + entry.totalCents, 0);
     if (allocatedSum !== payableCents) {
@@ -333,6 +353,7 @@ function parseMediateRequest(body: unknown): MediateRequest {
       productSubtotalCents,
       discountCents,
       payableCents,
+      sharedMeals,
     };
   }
 
@@ -449,7 +470,7 @@ export async function handleApi(
     // 参数类错误是调用方的问题，MCP 侧问题才归 5xx。
     const isBadRequest =
       described.kind === 'internal' &&
-      /必填|必须|超过|至少|最多|JSON/.test(described.message);
+      /必填|必须|超过|至少|最多|JSON|^excludePlan/.test(described.message);
 
     if (isBadRequest) {
       sendError(response, 400, 'bad_request', described.message);

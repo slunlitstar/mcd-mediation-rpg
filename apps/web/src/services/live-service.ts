@@ -1,3 +1,4 @@
+import { validateSharedPlan, sharedSignature } from './shared-meals';
 import type { MediationRequest, MediationResult, Party, Plan, Product, RecoverySuggestion, Store, Strategy } from '../types/demo';
 
 type Fetcher = typeof fetch;
@@ -61,6 +62,7 @@ export function liveRequestBody(request: MediationRequest) {
     options: { maxPlans: 3, includeProducts: true },
     ...(request.revision ? { revision: request.revision, excludePlan: {
       planId: previous!.planId, strategy: previous!.strategy, allocations: previous!.allocations,
+      sharedMeals: previous!.sharedMeals,
       productSubtotalCents: previous!.productSubtotalCents, discountCents: previous!.discountCents, payableCents: previous!.payableCents,
     } } : {}),
   };
@@ -88,7 +90,7 @@ export function parseLiveResult(data: unknown, party: Party): MediationResult {
     const memberIds = new Set<number>();
     let total = 0;
     for (const allocation of raw.allocations) {
-      if (!record(allocation) || typeof allocation.memberId !== 'number' || memberIds.has(allocation.memberId) || !cents(allocation.totalCents) || !Array.isArray(allocation.items) || allocation.items.length === 0) return invalid();
+      if (!record(allocation) || typeof allocation.memberId !== 'number' || memberIds.has(allocation.memberId) || !cents(allocation.totalCents) || !Array.isArray(allocation.items) || allocation.items.length === 0 && (!Array.isArray(allocation.sharedItems) || allocation.sharedItems.length === 0)) return invalid();
       const member = party.members.find(person => person.id === allocation.memberId);
       if (!member || member.budget === null || allocation.totalCents > member.budget * 100) return invalid();
       memberIds.add(allocation.memberId);
@@ -98,6 +100,7 @@ export function parseLiveResult(data: unknown, party: Party): MediationResult {
       }
     }
     if (memberIds.size !== party.members.length || total !== raw.payableCents) return invalid();
+    try { validateSharedPlan(raw as unknown as Plan, products, party); } catch (error) { throw new ApiError(error instanceof Error ? error.message : '共享套餐分配有误，请重试。'); }
   }
   const issues = data.issues.filter(record).filter(issue => typeof issue.message === 'string');
   const hints = Array.isArray(data.hints) ? data.hints.filter(record).filter(hint => typeof hint.message === 'string') : [];
@@ -149,10 +152,12 @@ export async function generateLivePlans(input: MediationRequest, signal?: AbortS
     const signature = (items: Plan['allocations'][number]['items']) => items.map(item => `${item.productId}:${item.quantity}`).sort().join('|');
     const previous = input.excludePlan;
     for (const plan of result.plans) {
+      const sharedInventory = (plan: Plan) => JSON.stringify((plan.sharedMeals ?? []).map(meal => [meal.sharedMealId, meal.productId, meal.components.map(component => [component.componentId, component.id, component.memberIds]) ]));
+      if (sharedInventory(plan) !== sharedInventory(previous)) throw new ApiError('复议改变了共享套餐分配，未采用本次结果，原方案已保留。');
       for (const allocation of plan.allocations) {
         const old = previous.allocations.find(item => item.memberId === allocation.memberId)!;
-        if (allocation.memberId !== input.revision.memberId && signature(allocation.items) !== signature(old.items)) throw new ApiError('复议改变了其他成员的餐品，未采用本次结果，原方案已保留。');
-        if (allocation.memberId === input.revision.memberId && (signature(allocation.items) === signature(old.items) || input.revision.action === 'cheaper' && allocation.totalCents >= old.totalCents)) throw new ApiError('当前菜单未找到符合本次复议的新搭配，原方案已保留。', 'constraint');
+        if (allocation.memberId !== input.revision.memberId && (signature(allocation.items) !== signature(old.items) || sharedSignature(allocation) !== sharedSignature(old))) throw new ApiError('复议改变了其他成员的餐品，未采用本次结果，原方案已保留。');
+        if (allocation.memberId === input.revision.memberId && ((signature(allocation.items) === signature(old.items) && sharedSignature(allocation) === sharedSignature(old)) || input.revision.action === 'cheaper' && allocation.totalCents >= old.totalCents)) throw new ApiError('当前菜单未找到符合本次复议的新搭配，原方案已保留。', 'constraint');
       }
     }
   }

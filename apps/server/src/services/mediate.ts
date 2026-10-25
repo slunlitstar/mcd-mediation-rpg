@@ -16,6 +16,8 @@
 import { createProposalProvider, validateProposal } from './ai.js';
 import type { ProposalCandidate, ProposalProvider, ValidatableProduct } from './ai.js';
 import { mcd } from './mcd.js';
+import { sharedDrafts, sharedWeights, restoreSharedDrafts } from './shared-meals.js';
+import type { SharedDraft, SharedMeal, SharedReference } from './shared-meals.js';
 import type { PriceItem } from './mcd.js';
 import { allocateCents } from './plan.js';
 import { fenToYuan } from '../mcp/normalize.js';
@@ -57,11 +59,13 @@ export interface MemberInput {
 }
 
 export interface ExcludedPlan {
+  sharedMeals?: SharedMeal[];
   planId: string;
   strategy: Strategy;
   allocations: Array<{
     memberId: number;
     items: Array<{ productId: string; quantity: number }>;
+    sharedItems?: SharedReference[];
     totalCents: number;
   }>;
   productSubtotalCents: number;
@@ -96,7 +100,7 @@ export interface MediateProduct {
   isCombo?: boolean;
   hasMain?: boolean;
   includedCategories?: Category[];
-  components?: { id: string; name: string; quantity: number; category: Category }[];
+  components?: { id: string; name: string; quantity: number; category: Category; hasMain: boolean; referencePriceCents: number | null; dietary: { spicy: DietaryField; beef: DietaryField } }[];
   /** 真实数据恒为 null —— MCP 不提供饱腹数据。 */
   fullness: null;
   fullnessSource: 'unknown';
@@ -115,6 +119,7 @@ export interface MediateAllocationItem {
 }
 
 export interface MediateAllocation {
+  sharedItems?: SharedReference[];
   memberId: number;
   items: MediateAllocationItem[];
   subtotalCents: number;
@@ -128,6 +133,8 @@ export interface MediateAllocation {
 }
 
 export interface MediatePlan {
+  basket?: { productId: string; quantity: number }[];
+  sharedMeals?: SharedMeal[];
   planId: string;
   strategy: Strategy;
   allocations: MediateAllocation[];
@@ -328,7 +335,8 @@ function toProduct(item: UnifiedMenuItem, catalog: UnifiedMenuItem[] = []): Medi
     const inferred = inferDietary(componentItem);
     if (inferred.spicy.inferred) dietary.spicy = inferred.spicy;
     if (inferred.beef.inferred) dietary.beef = inferred.beef;
-    return { ...component, category: toCategory(componentItem) };
+    const category = toCategory(componentItem);
+    return { ...component, category, hasMain: category === 'burger' || /饭|粥|松饼|整鸡|鸡腿|鸡排/.test(component.name), referencePriceCents: known?.priceFen && known.priceFen > 0 ? known.priceFen : null, dietary: inferred };
   }) : undefined;
   const category = toCategory(item);
   const hasMain = item.isCombo ? Boolean(components?.some(component => component.category === 'burger' || /饭|粥|松饼|整鸡|鸡腿|鸡排/.test(component.name))) : category === 'burger' || /饭|粥|松饼|整鸡|鸡腿|鸡排/.test(item.name);
@@ -442,6 +450,8 @@ function pickCandidate(
 }
 
 interface MemberSelection {
+  sharedItems?: Array<SharedReference & { candidate: Candidate; shareCount: number }>;
+  sharedBudgetCents?: number;
   memberId: number;
   items: Array<{ candidate: Candidate; quantity: number }>;
   matchedLikes: Category[];
@@ -512,6 +522,79 @@ function selectForMember(
     requiresManualReview: (member.customRequirement ?? '').trim() !== '',
     reasons,
   };
+}
+
+function selectionCandidates(selection: MemberSelection): Candidate[] {
+  return [...selection.items.map(entry => entry.candidate), ...(selection.sharedItems ?? []).map(entry => entry.candidate)];
+}
+
+function attachSharedSelections(pool: Candidate[], members: MemberInput[], shared: SharedDraft[], privateSelections?: Map<number, MemberSelection>): MemberSelection[] {
+  return members.map(member => {
+    const groups = shared.filter(meal => meal.memberIds.includes(member.id));
+    if (!groups.length) return privateSelections?.get(member.id) ?? selectForMember(pool, member, 'saving', true);
+    const sharedItems: NonNullable<MemberSelection['sharedItems']> = [];
+    let sharedBudgetCents = 0;
+    for (const meal of groups) {
+      const parent = pool.find(candidate => candidate.product.id === meal.productId)!;
+      sharedBudgetCents += allocateCents(sharedWeights(meal), parent.product.priceCents).allocatedFen.get(member.id) ?? 0;
+      for (const component of meal.components.filter(component => component.memberIds.includes(member.id))) {
+        const item: UnifiedMenuItem = { ...parent.item, id: component.id, name: component.name, category: component.category, tags: [], isCombo: false, combo: undefined, priceFen: component.referencePriceCents ?? 0, price: (component.referencePriceCents ?? 0) / 100 };
+        const product: MediateProduct = { id: component.id, name: component.name, category: component.category, priceCents: item.priceFen, image: pool.find(candidate => candidate.product.id === component.id)?.product.image ?? null, hasMain: component.hasMain, includedCategories: [component.category], fullness: null, fullnessSource: 'unknown', dietary: { ...component.dietary, note: DIETARY_NOTE } };
+        sharedItems.push({ sharedMealId: meal.sharedMealId, componentId: component.componentId, candidate: { item, product }, shareCount: component.memberIds.length });
+      }
+    }
+    const selection: MemberSelection = { memberId: member.id, items: privateSelections?.get(member.id)?.items ?? [], sharedItems, sharedBudgetCents, matchedLikes: [], missingLikes: [], requiresManualReview: Boolean(member.customRequirement?.trim()), reasons: [] };
+    if (!privateSelections) {
+      const hard = hardFilter(pool, member).filter(candidate => !isNonMeal(candidate) && !candidate.item.isCombo);
+      const slots = slotsFor(member); const required = requiredCategory(member);
+      for (const wanted of [required ? [required] : [], slots.side ? ['fries', 'snack', 'dessert'] : [], slots.drink ? ['drink'] : []]) {
+        if (!wanted.length || selectionCandidates(selection).some(candidate => included(candidate).some(category => wanted.includes(category)))) continue;
+        const remaining = (member.budget ?? 0) * 100 - sharedBudgetCents - basketPrice(selection.items);
+        const candidate = pickCandidate(hard, member, 'saving', (member.budget ?? 0) * 100, entry => entry.product.priceCents <= remaining && included(entry).some(category => wanted.includes(category)) && !selection.items.some(item => item.candidate === entry));
+        if (candidate) selection.items.push({ candidate, quantity: 1 });
+      }
+    }
+    selection.matchedLikes = (member.likes ?? []).filter(category => selectionCandidates(selection).some(candidate => included(candidate).includes(category)));
+    selection.missingLikes = (member.likes ?? []).filter(category => !selection.matchedLikes.includes(category));
+    selection.reasons = [...selection.items.map(entry => `${entry.candidate.product.name} ×${entry.quantity}`), ...groups.map(meal => `参与共享「${pool.find(candidate => candidate.product.id === meal.productId)!.product.name}」`)];
+    return selection;
+  });
+}
+
+/** One shared group, or two disjoint pairs for a four-person party. */
+function sharedCombinations(drafts: SharedDraft[], pool: Candidate[], members: MemberInput[]): SharedDraft[][] {
+  const options = drafts.map(draft => [draft]);
+  if (members.length === 4) for (let a = 0; a < drafts.length; a++) for (let b = a + 1; b < drafts.length; b++) {
+    if (drafts[a].memberIds.length === 2 && drafts[b].memberIds.length === 2 && !drafts[a].memberIds.some(id => drafts[b].memberIds.includes(id))) options.push([drafts[a], drafts[b]]);
+  }
+  const estimated = (groups: SharedDraft[]) => {
+    const selections = attachSharedSelections(pool, members, groups);
+    return selections.reduce((sum, selection) => sum + basketPrice(selection.items) + (selection.sharedBudgetCents ?? 0), 0);
+  };
+  return options.filter(groups => attachSharedSelections(pool, members, groups).every(selection => { const member = members.find(member => member.id === selection.memberId)!; const required = requiredCategory(member); return selectionCandidates(selection).some(isMain) && (required === undefined || selectionCandidates(selection).some(candidate => included(candidate).includes(required))); })).map(groups => ({ groups, cost: estimated(groups) })).sort((a, b) => a.cost - b.cost).slice(0, 18).map(entry => entry.groups);
+}
+
+function planPreference(plan: MediatePlan, members: MemberInput[], pool: Candidate[]): number {
+  let appetite = 0; let likes = 0; let leastMatches = Infinity; let variety = 0;
+  for (const allocation of plan.allocations) {
+    const member = members.find(member => member.id === allocation.memberId)!;
+    const categories = new Set(allocation.items.flatMap(item => included(pool.find(candidate => candidate.product.id === item.productId)!)));
+    const foodIds = new Set(allocation.items.flatMap(item => {
+      const product = pool.find(candidate => candidate.product.id === item.productId)!.product;
+      return product.components?.filter(part => part.category !== 'drink').map(part => part.id) ?? (product.category !== 'drink' ? [product.id] : []);
+    }));
+    for (const ref of allocation.sharedItems ?? []) {
+      const component = plan.sharedMeals?.find(meal => meal.sharedMealId === ref.sharedMealId)?.components.find(component => component.componentId === ref.componentId);
+      if (component) { categories.add(component.category); if (component.category !== 'drink') foodIds.add(component.id); }
+    }
+    const slots = slotsFor(member);
+    appetite += Number(slots.side && ['fries', 'snack', 'dessert'].some(category => categories.has(category as Category))) + Number(slots.drink && categories.has('drink'));
+    const matches = (member.likes ?? []).filter(category => categories.has(category)).length;
+    likes += matches; leastMatches = Math.min(leastMatches, matches);
+    variety += foodIds.size;
+  }
+  const ratio = plan.totalCents / Math.max(1, members.reduce((sum, member) => sum + (member.budget ?? 0) * 100, 0));
+  return appetite * 20 + likes * (plan.strategy === 'happy' ? 6 : 3) + (plan.strategy === 'peace' ? leastMatches * 3 : variety * .5) - ratio * (plan.strategy === 'happy' ? 1 : 5);
 }
 
 // ---------------------------------------------------------------- 模型方案（只提议，不决定金额）
@@ -692,7 +775,7 @@ function signatureOf(selection: MemberSelection[]): string {
         .map((item) => `${item.candidate.product.id}x${String(item.quantity)}`)
         .sort()
         .join(',');
-      return `${String(entry.memberId)}:${items}`;
+      return `${String(entry.memberId)}:${items}:${(entry.sharedItems ?? []).map(ref => `${ref.sharedMealId}/${ref.componentId}`).sort().join(',')}`;
     })
     .sort()
     .join('|');
@@ -713,6 +796,7 @@ async function buildPlan(
   deps: MediateDependencies,
   traceId: string,
   sequence: number,
+  shared: Array<SharedDraft & { parent: UnifiedMenuItem }> = [],
 ): Promise<BuiltPlan | { error: MediateIssue }> {
   // A priced basket is not a feasible group meal if someone received no main,
   // or a required food was silently skipped while choosing affordable items.
@@ -720,8 +804,9 @@ async function buildPlan(
     const member = members.find(entry => entry.id === selection.memberId);
     if (!member) continue;
     const required = requiredCategory(member);
-    const hasMain = selection.items.some(entry => isMain(entry.candidate));
-    const meetsRequirement = required === undefined || selection.items.some(entry => included(entry.candidate).includes(required));
+    if (selectionCandidates(selection).some(candidate => violatesDislikes(candidate, member) || violatesRequirement(candidate, member))) return { error: { code: 'food_constraint_violated', kind: 'constraint', blocking: true, memberId: member.id, message: `成员${member.id}的分餐不符合食物限制。` } };
+    const hasMain = selectionCandidates(selection).some(isMain);
+    const meetsRequirement = required === undefined || selectionCandidates(selection).some(candidate => included(candidate).includes(required));
     if (!hasMain || !meetsRequirement) {
       return { error: {
         memberId: member.id,
@@ -740,6 +825,19 @@ async function buildPlan(
     }
   }
 
+  for (const meal of shared) {
+    const parent = poolCandidateForShared(meal);
+    const existing = basketMap.get(meal.productId);
+    if (existing) existing.quantity += 1;
+    else basketMap.set(meal.productId, { productCode: meal.productId, quantity: 1, roundList: parent.combo!.roundList });
+  }
+  function poolCandidateForShared(meal: SharedDraft): UnifiedMenuItem {
+    // Parent recipes are reconstructed by callers from this menu, never client prices.
+    const parent = shared.find(group => group.sharedMealId === meal.sharedMealId)?.parent;
+    if (!parent?.combo?.verified) throw new Error('共享套餐默认组成不可用');
+    return parent;
+  }
+
   if (basketMap.size === 0) {
     return {
       error: {
@@ -754,17 +852,24 @@ async function buildPlan(
   const pricing = await deps.price(storeId, [...basketMap.values()], orderType, beType);
   const quoteByItem = new Map(pricing.lines.map((line) => [line.itemId, line]));
 
-  // 各成员权重来自试算明细，而不是菜单价累加。
-  const rawShares = selections.map((selection) => {
-    let raw = 0;
-    for (const entry of selection.items) {
-      const line = quoteByItem.get(entry.candidate.product.id);
-      const totalQuantity = basketMap.get(entry.candidate.product.id)?.quantity ?? entry.quantity;
-      const lineSubtotal = line?.subtotalFen ?? entry.candidate.product.priceCents * entry.quantity;
-      raw += (lineSubtotal * entry.quantity) / Math.max(1, totalQuantity);
-    }
-    return { memberId: selection.memberId, rawFen: raw };
+  const purchases = selections.flatMap(selection => selection.items.map((entry, index) => ({ key: `private:${selection.memberId}:${index}`, productId: entry.candidate.product.id, quantity: entry.quantity })));
+  purchases.push(...shared.map(meal => ({ key: meal.sharedMealId, productId: meal.productId, quantity: 1 })));
+  const charges = new Map<string, number>();
+  for (const [productId, basket] of basketMap) {
+    const line = quoteByItem.get(productId);
+    if (shared.some(meal => meal.productId === productId) && !line) return { error: { code: 'shared_pricing_missing', kind: 'unavailable', blocking: true, message: '共享套餐未返回可核对的计价明细，请重试。' } };
+    const fallback = selections.flatMap(selection => selection.items).find(entry => entry.candidate.product.id === productId)?.candidate.product.priceCents ?? 0;
+    const subtotal = line?.subtotalFen ?? fallback * basket.quantity;
+    const split = allocateCents(purchases.filter(purchase => purchase.productId === productId).map(purchase => ({ memberId: purchase.key, rawFen: purchase.quantity })), subtotal);
+    for (const [key, value] of split.allocatedFen) charges.set(key, value);
+  }
+  const sharedMeals: SharedMeal[] = shared.map(meal => {
+    const subtotalCents = charges.get(meal.sharedMealId) ?? 0;
+    const split = allocateCents(sharedWeights(meal), subtotalCents);
+    return { sharedMealId: meal.sharedMealId, productId: meal.productId, quantity: 1, memberIds: meal.memberIds, components: meal.components, allocationBasis: meal.allocationBasis, subtotalCents, memberSubtotals: meal.memberIds.map(memberId => ({ memberId, subtotalCents: split.allocatedFen.get(memberId) ?? 0 })) };
   });
+  if (shared.length && ([...charges.values()].reduce((sum, value) => sum + value, 0) !== pricing.productPriceFen || pricing.productPriceFen - pricing.discountFen !== pricing.payableFen)) return { error: { code: 'shared_pricing_unreconciled', kind: 'unavailable', blocking: true, message: '共享套餐的计价明细与应付金额暂时无法对齐，请重新试算。' } };
+  const rawShares = selections.map(selection => ({ memberId: selection.memberId, rawFen: selection.items.reduce((sum, _, index) => sum + (charges.get(`private:${selection.memberId}:${index}`) ?? 0), 0) + sharedMeals.reduce((sum, meal) => sum + (meal.memberSubtotals.find(entry => entry.memberId === selection.memberId)?.subtotalCents ?? 0), 0) }));
 
   const allocation = allocateCents(rawShares, pricing.payableFen);
 
@@ -773,7 +878,7 @@ async function buildPlan(
     const budgetCents = Math.round((member?.budget ?? 0) * 100);
     const totalCents = allocation.allocatedFen.get(selection.memberId) ?? 0;
 
-    const items: MediateAllocationItem[] = selection.items.map((entry) => {
+    const items: MediateAllocationItem[] = selection.items.map((entry, index) => {
       const line = quoteByItem.get(entry.candidate.product.id);
       const unitPriceCents =
         line !== undefined && line.quantity > 0
@@ -784,15 +889,16 @@ async function buildPlan(
         productId: entry.candidate.product.id,
         quantity: entry.quantity,
         unitPriceCents,
-        subtotalCents: unitPriceCents * entry.quantity,
+        subtotalCents: charges.get(`private:${selection.memberId}:${index}`) ?? unitPriceCents * entry.quantity,
       };
     });
 
-    const subtotalCents = items.reduce((sum, item) => sum + item.subtotalCents, 0);
+    const subtotalCents = items.reduce((sum, item) => sum + item.subtotalCents, 0) + sharedMeals.reduce((sum, meal) => sum + (meal.memberSubtotals.find(entry => entry.memberId === selection.memberId)?.subtotalCents ?? 0), 0);
 
     return {
       memberId: selection.memberId,
       items,
+      sharedItems: selection.sharedItems?.map(({ sharedMealId, componentId }) => ({ sharedMealId, componentId })),
       subtotalCents,
       totalCents,
       budgetCents,
@@ -846,6 +952,8 @@ async function buildPlan(
     planId: `${traceId}_${String(sequence)}_${strategy}`,
     strategy,
     allocations,
+    ...(sharedMeals.length ? { sharedMeals } : {}),
+    basket: [...basketMap.values()].map(item => ({ productId: item.productCode, quantity: item.quantity })),
     productSubtotalCents: pricing.productPriceFen,
     discountCents: pricing.discountFen,
     payableCents: pricing.payableFen,
@@ -906,7 +1014,8 @@ function revisionSelections(seed: MemberSelection, member: MemberInput, action: 
   const required = requiredCategory(member);
   const wanted = ['burger', 'fries', 'drink'].includes(action) ? action as Category : undefined;
   const oldKey = basketKey(seed.items);
-  const oldPortions = mealPortions(seed.items);
+  const portionsFor = (items: MemberSelection['items']) => mealPortions([...items, ...(seed.sharedItems ?? []).map(ref => ({ candidate: ref.candidate, quantity: 1 / ref.shareCount }))]);
+  const oldPortions = portionsFor(seed.items);
   const original = new Map(seed.items.map(entry => [entry.candidate.product.id, entry.quantity]));
   type Option = { items: MemberSelection['items']; cost: number; key: string; distance: number; matches: number; eligible: boolean };
   const seen = new Map<string, Option>();
@@ -914,10 +1023,10 @@ function revisionSelections(seed: MemberSelection, member: MemberInput, action: 
     (action === 'cheaper' ? a.cost - b.cost || a.distance - b.distance : a.distance - b.distance || a.cost - b.cost) || b.matches - a.matches || a.key.localeCompare(b.key);
   const add = (items: MemberSelection['items']): Option | undefined => {
     if (items.length > 4 || items.some(entry => entry.quantity < 1 || entry.quantity > 3)) return;
-    const cost = basketPrice(items); if (cost > budget) return;
+    const cost = basketPrice(items); if (cost + (seed.sharedBudgetCents ?? 0) > budget) return;
     const key = basketKey(items); if (seen.has(key)) return;
-    const covered = new Set(items.flatMap(entry => included(entry.candidate)));
-    const portions = mealPortions(items);
+    const covered = new Set([...items.map(entry => entry.candidate), ...(seed.sharedItems ?? []).map(ref => ref.candidate)].flatMap(included));
+    const portions = portionsFor(items);
     if (!portions.mains) return;
     // An explicit hungrier request may increase fries already in a combo, but
     // other requests must not accidentally duplicate the default drink/side.
@@ -934,6 +1043,7 @@ function revisionSelections(seed: MemberSelection, member: MemberInput, action: 
   // Start from the original basket as well as every affordable main (including
   // default combos). Expanding fresh cores allows removing or replacing old items.
   const seeds: Option[] = [];
+  if (seed.sharedItems?.length) { const empty = add([]); if (empty) seeds.push(empty); }
   if (seed.items.every(entry => hard.includes(entry.candidate))) { const old = add(seed.items); if (old) seeds.push(old); }
   for (const candidate of hard.filter(isMain)) { const option = add([{ candidate, quantity: 1 }]); if (option) seeds.push(option); }
   let frontier = seeds;
@@ -952,12 +1062,12 @@ function revisionSelections(seed: MemberSelection, member: MemberInput, action: 
   }
   return [...seen.values()].filter(option => option.eligible).sort(compare).slice(0, 40).map(option => {
     const liked = member.likes ?? [];
-    const matchedLikes = liked.filter(category => option.items.some(entry => included(entry.candidate).includes(category)));
-    return { memberId: member.id, items: option.items, matchedLikes, missingLikes: liked.filter(category => !matchedLikes.includes(category)), requiresManualReview: Boolean(member.customRequirement?.trim()), reasons: option.items.map(entry => `${entry.candidate.product.name} ×${entry.quantity}`) };
+    const matchedLikes = liked.filter(category => [...option.items.map(entry => entry.candidate), ...(seed.sharedItems ?? []).map(ref => ref.candidate)].some(candidate => included(candidate).includes(category)));
+    return { memberId: member.id, items: option.items, sharedItems: seed.sharedItems, sharedBudgetCents: seed.sharedBudgetCents, matchedLikes, missingLikes: liked.filter(category => !matchedLikes.includes(category)), requiresManualReview: Boolean(member.customRequirement?.trim()), reasons: option.items.map(entry => `${entry.candidate.product.name} ×${entry.quantity}`) };
   });
 }
 
-async function replanRevision(request: MediateRequest, pool: Candidate[], fixed: Map<number, MemberSelection>, deps: MediateDependencies, traceId: string): Promise<{ plan?: MediatePlan; issue?: MediateIssue; hint?: MediateHint }> {
+async function replanRevision(request: MediateRequest, pool: Candidate[], fixed: Map<number, MemberSelection>, deps: MediateDependencies, traceId: string, shared: Array<SharedDraft & { parent: UnifiedMenuItem }> = []): Promise<{ plan?: MediatePlan; issue?: MediateIssue; hint?: MediateHint }> {
   const revision = request.revision!; const member = request.members.find(entry => entry.id === revision.memberId)!;
   const seed = fixed.get(member.id)!; const previous = request.excludePlan!.allocations.find(entry => entry.memberId === member.id)!;
   const fail = (code: string, message: string, kind: MediateIssue['kind'] = 'constraint') => ({ issue: { memberId: member.id, code, kind, blocking: true, message } });
@@ -969,13 +1079,13 @@ async function replanRevision(request: MediateRequest, pool: Candidate[], fixed:
   const wanted = ['burger', 'fries', 'drink'].includes(revision.action) ? revision.action as Category : undefined;
   const label = wanted === 'burger' ? '汉堡' : wanted === 'fries' ? '薯条' : '饮料';
   if (wanted && (member.dislikes ?? []).includes(wanted)) return fail('revision_food_excluded', `成员${member.id}已排除${label}，请先调整食物限制；原方案已保留。`);
-  if (wanted && seed.items.some(entry => included(entry.candidate).includes(wanted))) return fail('revision_already_included', `原方案已经包含${label}（含套餐默认子项），无需重复添加。想增加主餐或配餐，可以选择“更饿了”；原方案已保留。`);
+  if (wanted && selectionCandidates(seed).some(candidate => included(candidate).includes(wanted))) return fail('revision_already_included', `原方案已经包含${label}（含套餐默认子项），无需重复添加。想增加主餐或配餐，可以选择“更饿了”；原方案已保留。`);
   const options = revisionSelections(seed, member, revision.action, pool);
   let pricedCount = 0;
   for (const option of options) {
     if (pricedCount++ >= 8) break;
     const selections = request.members.map(entry => entry.id === member.id ? option : fixed.get(entry.id)!);
-    const built = await buildPlan(request.storeId, request.excludePlan!.strategy, request.members, selections, request.orderType ?? 1, request.beType ?? 1, deps, traceId, 500 + pricedCount);
+    const built = await buildPlan(request.storeId, request.excludePlan!.strategy, request.members, selections, request.orderType ?? 1, request.beType ?? 1, deps, traceId, 500 + pricedCount, shared);
     if ('error' in built) continue;
     const allocation = built.plan.allocations.find(entry => entry.memberId === member.id)!;
     if (revision.action === 'cheaper' && allocation.totalCents >= previous.totalCents) continue;
@@ -989,6 +1099,7 @@ async function replanRevision(request: MediateRequest, pool: Candidate[], fixed:
     return { plan: built.plan, hint: { memberId: member.id, level: 'info', message } };
   }
   const budget = `预算 ¥${member.budget}`;
+  if (revision.action === 'cheaper' && seed.sharedItems?.length) return fail('revision_shared_locked', '该成员参与共享套餐。为保留其他人的餐品，本轮不拆换共享部分；当前未找到可降低实付的个人加餐调整。需要更换共享套餐时，请重新生成整顿饭的方案，原方案已保留。');
   if (revision.action === 'cheaper') return fail('revision_no_cheaper_plan', `已尝试重新组合单品与默认套餐，暂未找到个人实付低于 ¥${fenToYuan(previous.totalCents)}、同时满足${budget}和食物限制的方案；原方案已保留。`);
   if (revision.action === 'hungrier') return fail('revision_no_larger_meal', `已尝试加餐及替换整份搭配，在${budget}和现有食物限制下，暂未找到能增加主餐或配餐份数的组合；可以提高预算或调整食物限制，原方案已保留。`);
   return fail('revision_no_requested_food', `已尝试替换整份搭配，暂未找到同时包含${label}、保留主餐并满足${budget}和食物限制的组合；原方案已保留。`);
@@ -1077,7 +1188,13 @@ export async function mediate(
   request: MediateRequest,
   overrides: Partial<MediateDependencies> = {},
 ): Promise<MediateResult> {
-  const deps: MediateDependencies = { ...defaultDependencies, ...overrides };
+  const base: MediateDependencies = { ...defaultDependencies, ...overrides };
+  const quotes = new Map<string, Promise<UnifiedPricing>>();
+  const deps: MediateDependencies = { ...base, price: (store, items, orderType, beType) => {
+    const key = JSON.stringify([store, [...items].sort((a, b) => a.productCode.localeCompare(b.productCode)), orderType, beType]);
+    let quote = quotes.get(key); if (!quote) { quote = base.price(store, items, orderType, beType).catch(error => { quotes.delete(key); throw error; }); quotes.set(key, quote); }
+    return quote;
+  } };
   const provider = deps.proposals ?? null;
   const llmDetail: LlmAttempt[] = [];
   const orderType = request.orderType ?? 1;
@@ -1220,7 +1337,22 @@ export async function mediate(
   }
 
   if (request.revision) {
-    const outcome = await replanRevision(request, pool, fixedByMember, deps, traceId);
+    let shared: Array<SharedDraft & { parent: UnifiedMenuItem }> = [];
+    try {
+      const drafts = restoreSharedDrafts(request.excludePlan!.sharedMeals, pool.map(candidate => candidate.product), request.members);
+      shared = drafts.map(group => ({ ...group, parent: pool.find(candidate => candidate.product.id === group.productId)!.item }));
+      const rebuilt = attachSharedSelections(pool, request.members, shared, fixedByMember);
+      for (const selection of rebuilt) {
+        const expected = (selection.sharedItems ?? []).map(ref => `${ref.sharedMealId}/${ref.componentId}`).sort().join('|');
+        const actual = (request.excludePlan!.allocations.find(allocation => allocation.memberId === selection.memberId)?.sharedItems ?? []).map(ref => `${ref.sharedMealId}/${ref.componentId}`).sort().join('|');
+        if (expected !== actual) throw new Error('共享餐品归属不一致');
+        fixedByMember.set(selection.memberId, selection);
+      }
+    } catch {
+      return { source: 'live', traceId, store: { id: menu.store.id, name: menu.store.name }, products, plans: [], issues: [{ code: 'revision_shared_changed', kind: 'unavailable', blocking: true, message: '共享套餐组成或分配已发生变化，请重新生成方案；原方案已保留。' }], hints,
+        meta: buildMeta({ provider, menuCapturedAt: menu.capturedAt, couponCount: 0, pricingVerified: false, strategiesReturned: [], strategiesDeduplicated: [], llmDetail }) };
+    }
+    const outcome = await replanRevision(request, pool, fixedByMember, deps, traceId, shared);
     if (outcome.issue) issues.push(outcome.issue);
     if (outcome.hint) hints.push(outcome.hint);
     const strategy = request.excludePlan!.strategy;
@@ -1229,6 +1361,8 @@ export async function mediate(
     return { source: 'live', traceId, store: { id: menu.store.id, name: menu.store.name }, products, plans: outcome.plan ? [outcome.plan] : [], issues, hints,
       meta: buildMeta({ provider, menuCapturedAt: menu.capturedAt, couponCount, pricingVerified: Boolean(outcome.plan), strategiesReturned: outcome.plan ? [strategy] : [], strategiesDeduplicated: [], llmDetail }) };
   }
+
+  const sharingOptions = sharedCombinations(sharedDrafts(pool.map(candidate => candidate.product), request.members), pool, request.members);
 
   const maxPlans = Math.min(3, Math.max(1, request.options?.maxPlans ?? 3));
 
@@ -1312,6 +1446,25 @@ export async function mediate(
         traceId,
         builtPlans.length + 1,
       );
+    }
+
+    let choseSharing = false;
+    for (const [index, groups] of sharingOptions.slice(0, 6).entries()) {
+      try {
+        const selections = attachSharedSelections(pool, request.members, groups);
+        const sharedPlan = await buildPlan(request.storeId, strategy, request.members, selections, orderType, beType, deps, traceId, 1000 + index, groups.map(group => ({ ...group, parent: pool.find(candidate => candidate.product.id === group.productId)!.item })));
+        if ('error' in sharedPlan) continue;
+        const better = 'error' in built || (strategy === 'saving' ? sharedPlan.plan.totalCents < built.plan.totalCents : planPreference(sharedPlan.plan, request.members, pool) > planPreference(built.plan, request.members, pool));
+        if (better) { built = sharedPlan; choseSharing = true; }
+      } catch {
+        if (!hints.some(hint => hint.message.includes('共享套餐试算'))) hints.push({ level: 'warn', message: '部分共享套餐试算暂不可用，保留其他已核对的方案。' });
+        break;
+      }
+    }
+    if (choseSharing) {
+      const accepted = llmDetail.find(attempt => attempt.strategy === strategy && attempt.status === 'accepted');
+      if (accepted) { accepted.status = 'skipped'; accepted.code = 'shared_rule_choice'; accepted.message = '比较后采用规则生成的共享套餐，非模型分餐'; }
+      if (!hints.some(hint => hint.message.includes('共享套餐按实际'))) hints.push({ level: 'info', message: '共享套餐按实际分到的餐品分摊，整套仅计价一次；共同配餐的份额在参与成员间均分。' });
     }
 
     if ('error' in built) {

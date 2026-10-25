@@ -35,11 +35,20 @@ export interface Product {
   isCombo?: boolean;
   hasMain?: boolean;
   includedCategories?: Category[];
-  components?: { id: string; name: string; quantity: number; category: Category }[];
+  components?: { id: string; name: string; quantity: number; category: Category; hasMain?: boolean; referencePriceCents?: number | null; dietary?: { spicy: { inferred: boolean }; beef: { inferred: boolean } } }[];
   dietary?: { spicy: { inferred: boolean; source: string; confidence: string }; beef: { inferred: boolean; source: string; confidence: string }; note: string };
 }
 
+export interface SharedReference { sharedMealId: string; componentId: string }
+export interface SharedMeal {
+  sharedMealId: string; productId: string; quantity: 1; memberIds: number[];
+  components: { componentId: string; id: string; name: string; quantity: number; category: Category; hasMain: boolean; memberIds: number[] }[];
+  allocationBasis: 'component-menu-price' | 'equal-portions';
+  subtotalCents: number; memberSubtotals: { memberId: number; subtotalCents: number }[];
+}
+
 export interface Allocation {
+  sharedItems?: SharedReference[];
   memberId: number;
   items: { productId: string; quantity: number; unitPriceCents?: number; subtotalCents?: number }[];
   totalCents: number;
@@ -50,6 +59,8 @@ export interface Allocation {
 }
 
 export interface Plan {
+  sharedMeals?: SharedMeal[];
+  basket?: { productId: string; quantity: number }[];
   planId?: string;
   strategy: Strategy;
   allocations: Allocation[];
