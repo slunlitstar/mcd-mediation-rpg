@@ -35,3 +35,38 @@ MCP 配置、Token 和密钥留在服务端，不能写入网页资源、提交�
 先确认门店与菜单，再接方案生成、真实商品展示和复议，最后核对金额及错误状态。
 对 2—4 位成员验证独立预算、硬性限制、自填要求待核对、无解、超时和重试。
 运行 `npm run check` 与前端现有逻辑测试；手机端完成实际点击与阅读检查。
+
+## 模型接入后的变化（前端不需要改渲染）
+
+真实模型已接入，但对网页来说 **`/api/mediate` 的响应形状没变**：`plans[] / issues[] / hints[]`
+字段完全一致，金额仍然全部是整数分，且 `Σ allocations[].totalCents === payableCents` 照旧成立。
+变的只有 `meta`：
+
+| 字段 | 规则版 | 模型版 | 前端怎么用 |
+|---|---|---|---|
+| `meta.planner` | `rule-based-v2` | `llm-validated-v1` | 「AI 推荐 / 规则兜底」标记，可以不显示 |
+| `meta.reasoning` | `rules` | `llm` / `rules-fallback` | 同上 |
+| `meta.degraded` | `false` | 模型失败或被拦时为 `true` | **不要据此报错或跳无解页**，方案仍然有效 |
+| `meta.llm` | `not_configured` | 模型标识 | 调试用 |
+| `meta.llmDetail[]` | `[]` | 逐策略 `accepted/rejected/skipped` + `code` + 耗时 | 调试用，可忽略 |
+
+三条前端要记住的边界：
+
+1. **模型不可用不是错误**：超时、限流（429）、输出非法都会回退规则版，接口照样 `ok: true` + 有效方案，
+   只会在 `hints[]` 里多一条非阻塞说明。
+2. **`blocking: true` 只代表真的无解**（预算不足、预算买不到主食、复议已无更便宜替代），
+   与「模型这次没顶上」无关。
+3. 「每人必须有主食」这条规则现在两边都生效：规则版在试算前判定（`no_main_within_budget`），
+   模型版在 `model_missing_main` 拦截，前端不需要自己判断。
+
+接口自检：`GET /api/health` 的 `llm` 字段能直接看出模型有没有配置（`AI_*` 三项齐全才显示模型标识）。
+
+验证命令：
+
+```powershell
+npm test                        # 服务端 59 条 + 前端 19 条
+npm run test:integration        # 前端客户端 → HTTP 路由 → 菜单网关（离线）
+npm run smoke -w @mcd/server    # 真实 MCP 冒烟（需先启动 dev:server）
+npm run ai:probe -w @mcd/server # 真实模型链路（需 AI_* 三项齐全）
+```
+
