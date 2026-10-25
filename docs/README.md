@@ -1,19 +1,17 @@
 # 项目文档
 
-当前已完成：工程骨架 + 麦当劳 MCP 接入层（client / 错误映射 / 工具探针 / 数据形状基线 / 写链路空跑验证）
-+ 统一格式转换层 + HTTP 接口（门店 / 菜单 / 方案生成）+ 前端样例数据。
+前端为五页手机优先界面，后端已提供真实 MCP 门店、菜单、计价及规则版推荐与复议。模型接入另行验收。
 
 | 文档 | 内容 |
-|---|---|
-| [`api.md`](./api.md) | **前后端接口契约**：4 个接口的入参、返回、错误码与缓存行为 |
-| [`mediate-contract.md`](./mediate-contract.md) | **`/api/mediate` 契约提议**（未实现）：前端形状适配、`plans/issues`、基础复议、模型接入边界 |
-| [`mcp-tools.md`](./mcp-tools.md) | 35 个 MCP 工具清单、业务线矩阵、风险分级、MVP 最小工具集 |
-| [`mcp-tools.snapshot.json`](./mcp-tools.snapshot.json) | `tools/list` 原始快照（`npm run mcp:probe -w @mcd/server` 生成） |
-| [`mcp-data-shapes.md`](./mcp-data-shapes.md) | 8 个 MVP 只读工具的真实 `data` 形状与 `outputSchema` 差异 |
-| [`mcp-data-shapes.json`](./mcp-data-shapes.json) | 取样原始快照，已脱敏（`npm run mcp:shapes -w @mcd/server` 生成） |
-| [`mcp-order-shapes.md`](./mcp-order-shapes.md) | 写链路实测：`create-order` / `query-order` / `cancel-order` 的真实载荷与状态码 |
-| [`mcp-order-shapes.json`](./mcp-order-shapes.json) | 写链路快照（`npm run mcp:order -w @mcd/server -- --confirm`，建单不付款并立即取消） |
-| [`../apps/server/fixtures/README.md`](../apps/server/fixtures/README.md) | **前端交付物**：统一格式样例 JSON + 每个字段的含义 + 数据可用性判定 |
-
-后续在本目录协作维护需求、页面流程、接口契约和 MCP / AI 接入设计。
-涉及前后端边界的变更，应先由两位开发者确认契约，再分别实现。
+| --- | --- |
+| [第一轮 Demo](demo-round-one.md) | 离线演示、五页流程及原始交接背景 |
+| [UI 配色](ui-theme.md) | 全站颜色与维护位置 |
+| [动态与可视化](ui-motion.md) | 角色姿态、仲裁阶段与预算条 |
+| [联调交接](integration-handoff.md) | 前后端分支与工作范围 |
+| [前端接口联调](frontend-live-integration.md) | 真实模式、离线模式、测试及模型后续接入 |
+| [接口](api.md) | 门店、菜单、方案等 HTTP 接口 |
+| [推荐与复议契约](mediate-contract.md) | 已实现的 /api/mediate、金额、限制与模型接入边界 |
+| [MCP 工具](mcp-tools.md) | 工具清单与能力 |
+| [MCP 数据形状](mcp-data-shapes.md) | 原始与规范化数据 |
+| [MCP 订单验证](mcp-order-shapes.md) | 历史验证记录，网页不自动创建订单 |
+| [样例数据](../apps/server/fixtures/README.md) | 真实采样与离线测试素材 |

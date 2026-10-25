@@ -181,12 +181,12 @@ test('未配置模型：meta 如实写 not_configured + rules，且不谎称降�
 });
 
 test('模型方案通过校验：采用模型选品，但金额仍来自真实计价（模型价格被忽略）', async () => {
-  // 规则版永远只选 1 份主食；模型这里给成员 1 点了 2 个汉堡、成员 2 只点薯条，
-  // 还伪造了 1 分钱的价格 —— 用来证明「选品来自模型、金额来自程序」。
+  // 规则版永远只选 1 份主食；模型这里给成员 1 点了 2 个汉堡，还伪造了 1 分钱的价格
+  // —— 用来证明「选品来自模型、金额来自程序」。
   const provider = providerWith([
-      { memberId: 1, items: [{ productId: 'b2', quantity: 2, priceCents: 1 }], reason: '两个汉堡更顶饱' },
-      { memberId: 2, items: [{ productId: 's1', quantity: 1, priceCents: 1 }], reason: '只想吃点薯条' },
-    ]);
+    { memberId: 1, items: [{ productId: 'b2', quantity: 2, priceCents: 1 }], reason: '两个汉堡更顶饱' },
+    { memberId: 2, items: [{ productId: 'b2', quantity: 1, priceCents: 1 }], reason: '一个堡就够了' },
+  ]);
 
   const result = await mediate(request(), deps(provider, 500));
 
@@ -206,11 +206,25 @@ test('模型方案通过校验：采用模型选品，但金额仍来自真实�
     '数量 2 只能来自模型，规则版不会这么点',
   );
 
-  // 金额来自假计价器（1400×2 + 1200 − 500 = 3500），不是模型说的 1 分。
-  assert.equal(plan.productSubtotalCents, 4000);
+  // 金额来自假计价器（1400×3 − 500 = 3700），不是模型说的 1 分。
+  assert.equal(plan.productSubtotalCents, 4200);
   assert.equal(plan.discountCents, 500);
-  assert.equal(plan.payableCents, 3500);
+  assert.equal(plan.payableCents, 3700);
 
+  assertAllocationInvariant(result.plans);
+});
+
+test('模型只给配餐、没有主食：拒绝并降级（烤不出「一份薯条当一顿饭」）', async () => {
+  const provider = providerWith([
+    { memberId: 1, items: [{ productId: 'b2', quantity: 1 }], reason: '正常' },
+    { memberId: 2, items: [{ productId: 's1', quantity: 1 }], reason: '只想吃薯条' },
+  ]);
+
+  const result = await mediate(request(), deps(provider));
+
+  assert.equal(result.meta.llmDetail?.[0]?.code, 'model_missing_main');
+  assert.equal(result.meta.planner, 'rule-based-v2');
+  assert.ok(result.plans.length > 0);
   assertAllocationInvariant(result.plans);
 });
 

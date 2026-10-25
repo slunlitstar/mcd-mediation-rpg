@@ -436,3 +436,21 @@ test('复议缺少 excludePlan 时给出阻塞提示', async () => {
   assert.equal(issue?.blocking, true);
   assert.equal(result.plans.length, 0);
 });
+
+test('mediate 不得把买不起主食的成员留成空餐盘再返回成功', async () => {
+  let priced = false;
+  const injected = deps(MENU);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 1 }, { id: 2, budget: 40 }] }, {
+    ...injected, price: async (...args) => { priced = true; return injected.price(...args); },
+  });
+  assert.equal(result.plans.length, 0);
+  assert.ok(result.issues.some(issue => issue.memberId === 1 && issue.kind === 'constraint' && issue.blocking));
+  assert.equal(priced, false, '缺少成员主食的组合不应送去试算');
+});
+
+test('必须有的类别不能因预算不足被静默省略', async () => {
+  const withoutDrink = makeMenu([{ id: 'b1', name: '鸡腿堡', priceYuan: 18 }]);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 30, requirement: 'drink' }, { id: 2, budget: 40 }] }, deps(withoutDrink));
+  assert.equal(result.plans.length, 0);
+  assert.ok(result.issues.some(issue => issue.code === 'required_food_unavailable' && issue.blocking));
+});

@@ -1,0 +1,78 @@
+/* Small, local feedback. Data and controls remain available throughout animation. */
+.page-2 .role-card { transition: border-color .2s ease, box-shadow .2s ease; }
+.app-shell .role-card[data-selected='true'] { border-color: var(--red-line); box-shadow: 0 4px 0 var(--surface-inset), 0 0 0 1px rgb(182 41 34 / 6%); }
+.role-slide--next { animation: role-slide-next .24s ease-out both; }
+.role-slide--previous { animation: role-slide-previous .24s ease-out both; }
+.role-card .role-portrait-image { animation: role-breathe 4.8s ease-in-out infinite; animation-play-state: paused; }
+.role-card[data-motion-active='true'] .role-portrait-image { will-change: transform; animation-play-state: running; }
+.role-card .role-portrait--selected { animation: role-confirm .38s ease-out; }
+.role-card[data-motion-active='false'] .role-portrait-image { animation-play-state: paused; }
+.role-selection-label[data-selected='true'] { animation: selection-acknowledged .25s ease-out; }
+
+.court-playback-note { font-size: 11px; line-height: 1.7; color: var(--muted); margin: 9px 0 0; }
+.mediation-page .court-member { animation: demand-arrive .3s ease-out both; animation-delay: var(--member-delay, 0ms); }
+.court-npc-line { animation: mediator-line-arrive .22s ease-out; }
+.stage-overview { padding: 14px; border: 1px solid var(--line); border-radius: 10px; margin-top: 14px; background: var(--white); }
+.stage-overview > .stage-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.stage-overview .stage-summary-label { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.65; }
+.stage-overview .stage-summary small { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+.stage-segments { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+.stage-segments i { position: relative; height: 5px; border-radius: 6px; background: var(--surface-inset); overflow: hidden; }
+.stage-segments i::after { content: ''; position: absolute; inset: 0; background: var(--yellow); transform: scaleX(0); transform-origin: left; transition: transform .25s ease; }
+.stage-segments i.done::after { transform: scaleX(1); background: var(--green); }
+.stage-segments i.current::after { transform: scaleX(1); animation: current-stage 1.2s ease-in-out infinite; }
+.court-report .mediation-timeline { gap: 17px; margin-top: 20px; }
+.court-report .mediation-timeline li { position: relative; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 10px; min-height: 74px; }
+.mediation-timeline li:not(:last-child)::before { content: ''; position: absolute; top: 33px; left: 13px; bottom: -12px; width: 1px; background: var(--line); }
+.mediation-timeline .stage-number { width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; background: var(--white); font-size: 12px; line-height: 1; }
+.app-shell .mediation-timeline li.done .stage-number { color: var(--green); background: var(--success-bg); border-color: var(--success-border); }
+.app-shell .mediation-timeline li.running .stage-number { background: var(--red); border-color: var(--red); color: var(--white); animation: none; }
+.mediation-timeline .stage-copy { min-width: 0; padding-top: 2px; }
+.mediation-timeline .stage-copy strong { font-size: 14px; font-weight: 600; line-height: 1.7; }
+.app-shell .mediation-timeline .stage-copy p { color: var(--muted); font-size: 12px; line-height: 1.8; margin-top: 4px; }
+.court-report .mediation-timeline .stage-status { grid-column: 2; font-size: 11px; margin: 0; }
+.page-3 main { padding-bottom: 102px; }
+.court-actions > span { color: var(--muted); font-size: 12px; line-height: 1.6; max-width: 100px; }
+.court-actions .button { justify-content: center; }
+
+/* Budget values are exact; only the width interpolates between real values. */
+.budget-visual { padding: 13px 0 11px; border-bottom: 1px solid var(--line); }
+.budget-visual-label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+.budget-visual-label > span { font-size: 12px; color: var(--muted); }
+.budget-visual-label strong { font-size: 13px; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.budget-visual-track { height: 8px; background: var(--surface-inset); border-radius: 8px; overflow: hidden; }
+.budget-visual-fill { display: block; height: 100%; border-radius: inherit; background: var(--yellow); transition: width .6s cubic-bezier(.22,.61,.36,1); }
+.budget-visual > p { font-size: 11px; line-height: 1.7; color: var(--muted); margin-top: 7px; }
+.budget-visual--over .budget-visual-fill { background: var(--red); }
+.budget-visual--over > p { color: var(--red-dark); }
+.budget-visual[data-motion-active='false'] .budget-visual-fill { transition: none; }
+
+@keyframes role-slide-next { from { opacity: .4; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes role-slide-previous { from { opacity: .4; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes role-breathe { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-2px) rotate(.4deg); } }
+@keyframes role-confirm { 45% { transform: translateY(-5px); } }
+@keyframes selection-acknowledged { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes demand-arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes mediator-line-arrive { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes current-stage { 50% { opacity: .5; } }
+
+@media (max-width: 359px) {
+  .stage-overview { padding: 12px; }
+  .stage-overview .stage-summary-label { font-size: 12px; }
+  .court-actions > span { font-size: 11px; max-width: 83px; }
+  .budget-visual-label strong { font-size: 12px; }
+}
+@media (min-width: 960px) {
+  .page-3 main { padding-bottom: 0; }
+  .stage-overview { max-width: 840px; margin-inline: auto; }
+  .court-report .mediation-timeline li { grid-template-columns: 28px minmax(0, 1fr) auto; }
+  .court-report .mediation-timeline .stage-status { grid-column: 3; }
+  .court-actions { max-width: 840px; margin-inline: auto; }
+  .court-actions > .button { flex: initial; min-width: 210px; }
+  .court-actions > span { max-width: none; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-card-content, .role-selection-label, .role-portrait-image, .role-card .role-portrait,
+  .mediation-page .court-member, .court-npc-line, .stage-segments i::after { animation: none !important; }
+  .role-card, .budget-visual-fill, .stage-segments i::after { transition: none !important; }
+}

@@ -5,6 +5,7 @@ build/
 coverage/
 .cache/
 *.tsbuildinfo
+/output/
 
 # Secrets: only examples may be committed
 .env

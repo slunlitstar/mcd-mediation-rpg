@@ -2,12 +2,11 @@
 
 一个结合轻 RPG 游戏化交互、多人点餐协商和麦当劳 MCP 的 AI Web 应用。
 
-**当前阶段：服务端已打通真实麦当劳 MCP，前端待开发。**
+**当前阶段：前后端已集成；真实 MCP 与真实模型均已接入。**
 
-已完成：MCP 接入层（握手 / 错误映射 / 缓存）、35 个工具盘点、数据形状基线、写链路空跑验证、
-统一格式转换层、HTTP 接口（门店 / 菜单 / 方案生成 / 前端适配层 `/api/mediate`）、前端样例 fixtures。
-
-未完成：前端页面（仍是占位）、下单链路（`create-order` + 支付）、多人房间与 RPG 玩法。
+已包含五页手机优先界面、定稿角色及姿态、真实 MCP 网关、菜单与推荐接口。
+真实门店、菜单与试算由后端提供；同一设备配置 2—4 位成员，无需线上房间。
+接受方案只确认推荐，不创建订单。交互规则与后端交接见 [第一轮 Demo](docs/demo-round-one.md)。
 
 方案生成有两条路径，`meta.planner` 会如实标注是哪一条：
 
@@ -82,8 +81,8 @@ cp .env.example .env
 npm run dev
 ```
 
-前端地址为 `http://127.0.0.1:5173`，当前仍是占位页面。
-服务端默认监听 `http://127.0.0.1:3001`，已提供真实业务接口（见下方「接口」）。
+前端地址为 `http://127.0.0.1:5173`。「开始饭局」调用真实后端；「体验三人示例」独立运行离线演示。
+服务端默认监听 `http://127.0.0.1:3001`，提供 `/api/health`、`/api/stores`、`/api/menu`、`/api/plan` 和 `/api/mediate`。
 Vite 已预留 `/api` 开发代理，目标随根目录 `.env` 中的服务端地址和端口调整。
 
 也可以分别运行：
@@ -93,38 +92,17 @@ npm run dev:web
 npm run dev:server
 ```
 
-## 接口
-
-所有接口统一返回 `{ ok: true, data }` 或 `{ ok: false, error: { kind, message } }`，
-前端只判 `ok`。字段含义见 [`apps/server/fixtures/README.md`](apps/server/fixtures/README.md)。
-
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| GET | `/api/health` | 健康检查，返回 MCP 是否已配置、当前规划器版本 |
-| GET | `/api/stores?city=北京&keyword=麦当劳` | 门店列表（真实 MCP `query-nearby-stores`） |
-| GET | `/api/menu?storeCode=1950059` | 门店菜单，96 个商品已归一化（真实 `query-meals`，5 分钟缓存） |
-| POST | `/api/plan` | 生成多人点餐方案（真实 `calculate-price` 校准金额） |
-
-`POST /api/plan` 请求示例：
-
-```json
-{
-  "storeCode": "1950059",
-  "members": [
-    { "name": "小王", "budget": 35, "spicy": false },
-    { "name": "小李", "budget": 30, "spicy": true, "wantChicken": true },
-    { "name": "小张", "budget": 40, "lightEater": true, "wantVegetable": true }
-  ]
-}
-```
-
-实测返回（2026-10-25 03:24，真实 MCP）：3 人、原价 ¥89.8、**优惠 ¥8.1**、应付 ¥81.7、人均 ¥27.23。
-
-重新抓取前端样例数据：
+手机预览：电脑与手机连接同一可信 Wi-Fi，在根目录运行：
 
 ```sh
-npm run mcp:fixtures --workspace=@mcd/server
+npm run dev:mobile
 ```
+
+在手机浏览器打开终端打印的 `Network` 地址。`127.0.0.1` 只适用于当前设备，不能把电脑上的该地址直接发给手机。
+该命令仅用于本地联调，会让开发服务监听网络接口；默认 `dev:web` 仍只监听本机。
+如有多个 Network 地址，选择当前 Wi-Fi 对应的局域网地址；访客网络隔离或系统防火墙可能阻止连接。
+
+页面默认按手机宽度组织，960px 起扩展为电脑布局。手机优先使用紧凑角色卡、单列属性、大尺寸选择按钮、底部操作栏与弹窗复议。
 
 ## 检查与构建
 
@@ -143,13 +121,12 @@ npm run start --workspace=@mcd/server
 ```
 
 CI 在 `main` 的推送和面向 `main` 的 PR 上运行 `npm ci` 与 `npm run check`。
-当前尚无自动化测试套件，接口正确性靠实跑验证（`npm run mcp:fixtures --workspace=@mcd/server`）。
+前后端离线测试：`npm test`。浏览器 API 客户端与真实 HTTP 路由的隔离联调：`npm run test:integration`，后者只调用本机临时服务，MCP 依赖使用样例替换。
 
 ## 环境变量与凭据
 
 前端和服务端使用仓库根目录的 `.env`。Vite 仅向浏览器公开 `VITE_` 前缀变量，
-任何密钥都不得使用该前缀。服务端会读取 `MCD_MCP_URL` / `MCD_MCP_TOKEN` 并**真实调用**麦当劳 MCP；
-`AI_*` 三项目前为空，代码尚未使用。
+任何密钥都不得使用该前缀。服务端读取 MCP 配置；当前提交的 AI 配置仍待后端实现模型调用。
 `.gitignore` 忽略真实 `.env`、日志、依赖和构建产物，仅允许环境变量示例入库。
 提交前仍应检查暂存区，禁止提交 API Key、Token、密码或其他真实凭据。
 
@@ -158,6 +135,8 @@ CI 在 `main` 的推送和面向 `main` 的 PR 上运行 `npm ci` 与 `npm run c
 主分支为 `main`。两人分别使用短期工作分支，通过 Pull Request 由另一人评审后合并。
 建议 A 负责前端，B 负责服务端 MCP / AI，双方共同维护接口契约和工程配置。
 详细流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+本轮分支提交与前后端联调交接见 [联调交接](docs/integration-handoff.md)。
+前端真实接口接入、验证范围与模型交接见 [前端接口联调](docs/frontend-live-integration.md)。
 
 ## GitHub 首次发布（需要本机授权）
 
@@ -181,3 +160,6 @@ gh repo create mcd-mediation-rpg --private --source=. --remote=origin --push
 ```
 
 仓库地址以命令实际返回结果为准。若同名仓库已存在，应先核对归属和内容，不覆盖现有仓库。
+
+真实 MCP 接入见 [MCP_INTEGRATION.md](MCP_INTEGRATION.md)，推荐与复议契约见 [mediate-contract.md](docs/mediate-contract.md)。
+后端离线测试：npm run test --workspace=@mcd/server；真实 MCP 冒烟测试需本地服务端配置，见接口文档。
