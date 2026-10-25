@@ -2,6 +2,7 @@
   "name": "mcd-mediation-rpg",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "麦门饭局调解所：轻 RPG、多人点餐协商与麦当劳 MCP 的 AI Web 应用（初始化骨架）",
   "workspaces": [
     "apps/*",
