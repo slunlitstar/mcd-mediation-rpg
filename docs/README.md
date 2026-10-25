@@ -6,6 +6,7 @@
 | 文档 | 内容 |
 |---|---|
 | [`api.md`](./api.md) | **前后端接口契约**：4 个接口的入参、返回、错误码与缓存行为 |
+| [`mediate-contract.md`](./mediate-contract.md) | **`/api/mediate` 契约提议**（未实现）：前端形状适配、`plans/issues`、基础复议、模型接入边界 |
 | [`mcp-tools.md`](./mcp-tools.md) | 35 个 MCP 工具清单、业务线矩阵、风险分级、MVP 最小工具集 |
 | [`mcp-tools.snapshot.json`](./mcp-tools.snapshot.json) | `tools/list` 原始快照（`npm run mcp:probe -w @mcd/server` 生成） |
 | [`mcp-data-shapes.md`](./mcp-data-shapes.md) | 8 个 MVP 只读工具的真实 `data` 形状与 `outputSchema` 差异 |

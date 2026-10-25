@@ -100,22 +100,63 @@ const checks: Check[] = [
       });
 
       const data = dataOf(body);
-      const totals = data?.totals as Record<string, unknown> | undefined;
-      const members = (data?.members as unknown[] | undefined) ?? [];
-      const costSum = members.reduce(
-        (sum, member) => sum + Number((member as Record<string, unknown>).cost ?? 0),
+      const outcome = data?.status;
+
+      // 无解也是合法业务结论，但冒烟场景给了充足预算，应当出方案。
+      if (outcome !== 'ok') {
+        return { ok: false, detail: `意料之外的 ${String(outcome)}：${JSON.stringify(data?.issues ?? '').slice(0, 120)}` };
+      }
+
+      const plan = data?.plan as Record<string, unknown> | undefined;
+      const totals = plan?.totals as Record<string, unknown> | undefined;
+      const members = (plan?.members as unknown[] | undefined) ?? [];
+      const allocation = plan?.allocation as Record<string, unknown> | undefined;
+
+      const payableFen = Number(totals?.payableFen ?? 0);
+      const allocatedFenSum = members.reduce(
+        (sum, member) => sum + Number((member as Record<string, unknown>).costFen ?? 0),
         0,
       );
-      const payable = Number(totals?.payable ?? 0);
+      const overBudget = members.filter((member) => {
+        const record = member as Record<string, unknown>;
+        return Number(record.costFen ?? 0) > Number(record.budgetFen ?? 0);
+      }).length;
 
-      // 关键自洽校验：成员花费之和必须等于 MCP 试算的应付
-      const consistent = Math.abs(costSum - payable) < 0.011;
+      // 两条核心不变量：分摊合计 == 应付；没人超预算
+      const sumMatches = allocatedFenSum === payableFen;
+      const budgetOk = overBudget === 0;
+      const auditOk = Number(allocation?.allocatedFenSum ?? -1) === payableFen;
 
       return {
-        ok: status === 200 && payable > 0 && consistent,
+        ok: status === 200 && payableFen > 0 && sumMatches && budgetOk && auditOk,
         detail:
-          `HTTP ${String(status)} 应付 ¥${String(payable)} 优惠 ¥${String(totals?.discount)} ` +
-          `人均 ¥${String(totals?.perPersonAvg)} 自洽=${String(consistent)}`,
+          `HTTP ${String(status)} 应付 ${String(payableFen)}分 分摊合计 ${String(allocatedFenSum)}分 ` +
+          `一致=${String(sumMatches)} 超预算人数=${String(overBudget)} 审计=${String(auditOk)}`,
+      };
+    },
+  },
+  {
+    name: 'POST /api/plan（预算不足应无解）',
+    run: async () => {
+      const stores = await getJson('/api/stores');
+      const list = (dataOf(stores.body) as unknown[] | undefined) ?? [];
+      const storeCode = String((list[0] as Record<string, unknown> | undefined)?.id ?? '');
+      if (storeCode === '') return { ok: false, detail: '没拿到 storeCode，跳过' };
+
+      // 预算 1 元，任何门店都不可能凑出一份主食
+      const { status, body } = await getJson('/api/plan', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ storeCode, members: [{ name: '只带 1 块钱', budget: 1 }] }),
+      });
+
+      const data = dataOf(body);
+      const hasPlan = data?.plan !== undefined;
+      const issues = (data?.issues as unknown[] | undefined) ?? [];
+
+      return {
+        ok: status === 200 && data?.status === 'no_solution' && !hasPlan && issues.length > 0,
+        detail: `HTTP ${String(status)} status=${String(data?.status)} 携带方案=${String(hasPlan)} 阻塞项=${String(issues.length)}`,
       };
     },
   },

@@ -20,7 +20,8 @@ fixtures/
     ├── stores.json          # 门店列表
     ├── menu.json            # 菜单（统一格式）
     ├── pricing.json         # 计价（统一格式）
-    └── plan.sample.json     # ★ 方案结果样例（第三页 / 第五页用）
+    ├── plan.sample.json     # ★ 方案结果样例（第三页 / 第五页用）
+    └── plan.no-solution.sample.json  # ★ 无解样例（预算不足，前端无解态用）
 ```
 
 重新生成（仓库根目录，会真实调用 MCP）：
@@ -161,12 +162,45 @@ npm run mcp:fixtures -w @mcd/server
 
 | 字段 | 含义 |
 |---|---|
-| `id` / `name` / `budget` | 成员标识、称呼、预算上限 |
+| `id` / `name` / `budget` | 成员标识、称呼、预算上限（元），并附 `budgetFen` |
 | `preferences` | 原始诉求（忌口、想吃、健康），用于回显「你提的要求」 |
-| `items[]` | 分到的餐品：`itemId`/`name`/`quantity`/`unitPrice`/`subtotal`/`isCombo`/`category` |
-| `cost` | 该成员花费合计 |
-| `budgetOverBy` | 超预算多少，`0` 表示未超 |
+| `items[]` | 分到的餐品：`itemId`/`name`/`quantity`/`unitPrice`/`subtotal`（元与分双写）/`isCombo`/`category` |
+| `cost` / `costFen` | **该成员分摊到的真实应付**。`Σ costFen === totals.payableFen`，且恒 `≤ budgetFen` |
+| `rawSubtotal` / `rawSubtotalFen` | 分摊前该成员在试算明细里的原值，用于排查「为什么我摊这么多」 |
+| `budgetOverBy` / `budgetOverFen` | 恒为 0 —— 超预算的方案不会被返回 |
+| `budgetCheck` | 固定 `"passed"`，表示分摊后复验过预算 |
 | `preferenceMatch` | 该成员自己的匹配情况：`score` + `matched[]` + `unmet[]` |
+
+`totals` 与 `allocation` 的关键字段：
+
+| 字段 | 含义 |
+|---|---|
+| `totals.payable` / `payableFen` | **实付**，来自 `calculate-price`，展示这个 |
+| `totals.discount` / `discountFen` | 优惠金额（正数表示省了多少） |
+| `totals.budgetRemainingFen` | 预算合计 − 应付 |
+| `allocation.method` | `proportional-largest-remainder`：按原值比例分摊 + 最大余数补零头 |
+| `allocation.allocatedFenSum` | 各成员分摊合计，**必须等于 `payableFen`** |
+| `allocation.roundingAdjustmentFen` | 整数取整产生的零头调整量 |
+| `allocation.budgetCheck` | 分摊后逐人复验预算的结论 |
+
+> 前端只需盯住一条不变量：`Σ members[].costFen === totals.payableFen`。
+> 这条不成立就说明服务端算错了，不要靠四舍五入去「圆」它。
+
+## 5.1 `plan.no-solution.sample.json` —— 无解样例
+
+预算不足（¥5 买不到最便宜的主食 ¥14）时的真实返回：
+
+```json
+{
+  "status": "no_solution",
+  "issues": [{ "code": "no_main_within_budget", "memberId": "m1",
+               "message": "只带五块钱 预算 ¥5 低于最便宜主食「芝芝火腿扒堡」¥14，无解",
+               "budgetFen": 500, "cheapestFen": 1400, "shortfallFen": 900 }],
+  "diagnostics": { "memberCount": 1, "budgetTotalFen": 500, "cheapestTotalFen": 1400 }
+}
+```
+
+无解时**没有 `plan`、没有 `members`、没有 `totals`** —— 前端只能渲染无解态，不能拿空方案凑页面。
 
 ---
 

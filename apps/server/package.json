@@ -9,6 +9,7 @@
     "mcp:shapes": "tsx --env-file-if-exists=../../.env src/mcp/probe-data.ts",
     "mcp:fixtures": "tsx --env-file-if-exists=../../.env src/mcp/snapshot-fixtures.ts",
     "smoke": "tsx --env-file-if-exists=../../.env scripts/smoke.ts",
+    "test": "node --import tsx --test src/services/plan.test.ts",
     "mcp:order": "tsx --env-file-if-exists=../../.env src/mcp/probe-order.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc",

@@ -8,7 +8,7 @@
  *   GET  /api/health                              健康检查
  *   GET  /api/stores?city=北京&keyword=麦当劳       门店列表 → UnifiedStore[]
  *   GET  /api/menu?storeCode=1950059              菜单 → UnifiedMenu
- *   POST /api/plan                                生成方案 → MealPlan
+ *   POST /api/plan                                生成方案 → PlanOutcome（ok / no_solution）
  *
  * 成功一律 `{ ok: true, data }`，失败 `{ ok: false, error: { kind, message } }`，
  * 前端只需要判 `ok`。
@@ -160,7 +160,7 @@ export async function handleApi(
           service: 'mcd-mediation-rpg-server',
           time: new Date().toISOString(),
           mcpConfigured: (process.env.MCD_MCP_TOKEN ?? '') !== '',
-          planner: 'rule-based-v1',
+          planner: 'rule-based-v2',
         },
       });
       return true;
@@ -193,8 +193,10 @@ export async function handleApi(
     if (url.pathname === '/api/plan' && request.method === 'POST') {
       const body = await readJsonBody(request);
       const parsed = parsePlanRequest(body);
-      const plan = await planMeal(parsed);
-      sendJson(response, 200, { ok: true, data: plan });
+      // 返回的是 PlanOutcome：`status: 'ok'` 带方案，`status: 'no_solution'` 带阻塞原因。
+      // 无解是正常的业务结论，不是 HTTP 错误，所以仍然 200。
+      const outcome = await planMeal(parsed);
+      sendJson(response, 200, { ok: true, data: outcome });
       return true;
     }
 

@@ -88,17 +88,58 @@
 | `members[].wantChicken` / `wantVegetable` | | 偏好加权 |
 | `members[]` 上限 | | 10 人 |
 
-返回 `MealPlan`，结构与 `apps/server/fixtures/normalized/plan.sample.json` 一致：
+返回 `PlanOutcome`，两种形态二选一：
+
+```jsonc
+{ "status": "ok",          "plan": { /* MealPlan */ } }
+{ "status": "no_solution", "issues": [ /* 阻塞原因 */ ], "diagnostics": { /* 诊断数字 */ } }
+```
+
+**无解也是 200 的合法业务结论**，不是 HTTP 错误。前端必须判 `status`，
+`no_solution` 时展示无解态，不要拿空方案凑页面。
+
+### 预算与分摊（v2 修正）
+
+- 预算按**硬约束**处理：预算内买不到主食的成员会让整体直接 `no_solution`，
+  不会给出超预算方案；
+- `plan.members[].costFen` 是按 `calculate-price` 真实应付分摊的金额，
+  **`Σ costFen === plan.totals.payableFen`**，且每人 `costFen ≤ budgetFen`；
+- 分摊方式见 `plan.allocation`（比例 + 最大余数，整数分）；
+- 金额同时给元与分：`cost` / `costFen`、`payable` / `payableFen`，计算请用分。
+
+`no_solution` 的 `issues[].code`：
+
+| code | 含义 |
+|---|---|
+| `no_menu_item_matching_constraints` | 忌口条件下门店没有任何可选商品 |
+| `no_main_within_budget` | 预算低于最便宜的主食 |
+| `total_budget_exceeded` | 合计应付超过预算合计 |
+| `allocation_exceeds_budget` | 分摊后某人超预算（如外送费这类加价导致） |
+
+### `MealPlan` 主要区块
 
 | 区块 | 前端用途 |
 |---|---|
 | `strategy` | 方案策略：`name` / `summary` / `rationale[]` / `rejectedAlternatives[]` |
-| `members[]` | 每人分到的 `items[]`、`cost`、`budgetOverBy`、`preferenceMatch` |
-| `totals` | `payable`（**展示这个**）、`discount`、`perPersonAvg`、`budgetRemaining` |
+| `members[]` | 每人分到的 `items[]`、`cost` / `costFen`、`rawSubtotal`、`budgetCheck`、`preferenceMatch` |
+| `totals` | `payable` / `payableFen`（**展示这个**）、`discount`、`perPersonAvg`、`budgetRemaining` |
+| `allocation` | 分摊审计：`payableFen`、`allocatedFenSum`、`roundingAdjustmentFen`、`budgetCheck` |
 | `preferenceMatch` | 总 `score` + 4 个 `dimensions[]` |
-| `tradeoffs[]` | 取舍说明：`issue` / `chosen` / `alternative` / `reason` / `costDelta` |
+| `tradeoffs[]` | 取舍说明：`issue` / `chosen` / `alternative` / `reason` / `costDeltaFen` |
 | `unsatisfiable[]` | 无法满足的原因，`severity` 为 `partial` 或 `blocked` |
 | `coupons` | `availableCount`；为 0 且 `discount > 0` 时说明优惠来自组合价 |
-| `planner` | `engine: 'rule-based-v1'`，用于在 UI 上标注「规则版，未接 AI」 |
+| `planner` | `engine: 'rule-based-v2'`，用于在 UI 上标注「规则版，未接 AI」 |
 
-实测（2026-10-25，真实 MCP）：原价 ¥89.8、优惠 ¥8.1、应付 ¥81.7、人均 ¥27.23。
+实测（2026-10-25，真实 MCP）：3 人应付 8400 分，分摊合计 8400 分，无人超预算。
+
+## 验证
+
+```powershell
+# 离线隔离测试（不连 MCP，验证预算无解与整数分摊）
+npm run test --workspace=@mcd/server
+
+# 真实接口冒烟（需先启动 dev:server）
+npm run smoke --workspace=@mcd/server
+```
+
+前端形状的适配层契约（`/api/mediate`，尚未实现）见 [`mediate-contract.md`](./mediate-contract.md)。

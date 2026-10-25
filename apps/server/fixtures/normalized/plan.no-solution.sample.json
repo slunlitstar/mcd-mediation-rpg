@@ -1,0 +1,39 @@
+{
+  "_note": "无解样例：预算低于最便宜主食。plans 不存在，issues 里给出阻塞原因，前端据此渲染无解态。",
+  "_source": {
+    "api": "POST /api/plan",
+    "request": "{ storeCode: 1950212, members: [{ name: \"只带五块钱\", budget: 5 }] }"
+  },
+  "status": "no_solution",
+  "planner": {
+    "engine": "rule-based-v2",
+    "note": "确定性规则协商：预算为硬约束，预算内无主食则整体无解；金额以 calculate-price 试算为准，按整数分等额分摊并复验个人预算。AI 排序待 AI_API_KEY 配置后接入，输出契约不变。"
+  },
+  "store": {
+    "id": "1950212",
+    "name": "麦当劳北京前门西街餐厅"
+  },
+  "issues": [
+    {
+      "code": "no_main_within_budget",
+      "memberId": "m1",
+      "message": "只带五块钱 预算 ¥5 低于最便宜主食「芝芝火腿扒堡」¥14，无解",
+      "budgetFen": 500,
+      "cheapestFen": 1400,
+      "shortfallFen": 900
+    }
+  ],
+  "diagnostics": {
+    "memberCount": 1,
+    "budgetTotalFen": 500,
+    "cheapestPerMember": [
+      {
+        "memberId": "m1",
+        "name": "只带五块钱",
+        "cheapestMainFen": 1400,
+        "budgetFen": 500
+      }
+    ],
+    "cheapestTotalFen": 1400
+  }
+}
