@@ -13,7 +13,7 @@
     "ai:probe": "tsx --env-file-if-exists=../../.env scripts/ai-probe.ts",
     "mcp:order": "tsx --env-file-if-exists=../../.env src/mcp/probe-order.ts",
     "typecheck": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc && node build-package.mjs",
     "start": "node --env-file-if-exists=../../.env dist/index.js"
   },
   "devDependencies": {

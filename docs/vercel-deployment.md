@@ -10,6 +10,7 @@
 - `server`：`apps/server/src/index.ts`，Node.js 24，香港 `hkg1`，单次请求最长 120 秒。
 - `/api` 和 `/api/*` 保留原始路径并转到后端，其余路径转到网页。
 - 前端使用同源 `/api`；不配置本机 `127.0.0.1:3001` 为线上 API 地址。
+- 服务端构建会写入 `apps/server/dist/package.json`（`type: module`）。Vercel 将 `dist/` 作为函数根目录打包，必须保留这份声明，否则启动时会将 ESM 产物当作 CommonJS 加载并返回 500。
 
 ## 服务端环境变量
 
