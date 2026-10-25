@@ -93,6 +93,10 @@ export interface MediateProduct {
   category: Category;
   priceCents: number;
   image: string | null;
+  isCombo?: boolean;
+  hasMain?: boolean;
+  includedCategories?: Category[];
+  components?: { id: string; name: string; quantity: number; category: Category }[];
   /** 真实数据恒为 null —— MCP 不提供饱腹数据。 */
   fullness: null;
   fullnessSource: 'unknown';
@@ -180,6 +184,15 @@ export interface LlmAttempt {
   latencyMs?: number;
 }
 
+export interface RecoverySuggestion {
+  id: string;
+  title: string;
+  summary: string;
+  verifiedAt: string;
+  changes: Array<{ memberId: number; budget?: number; requirement?: Requirement; dislikes?: Category[] }>;
+  plan: MediatePlan;
+}
+
 export interface MediateResult {
   source: 'live';
   traceId: string;
@@ -188,6 +201,7 @@ export interface MediateResult {
   plans: MediatePlan[];
   issues: MediateIssue[];
   hints: MediateHint[];
+  suggestions?: RecoverySuggestion[];
   meta: {
     planner: PlannerKind;
     pricingVerified: boolean;
@@ -235,7 +249,7 @@ const defaultDependencies: MediateDependencies = {
 const FRIES_RE = /薯条|薯饼/;
 const DRINK_RE = /饮品|可乐|雪碧|红茶|咖啡|牛奶|果汁|苹果汁|矿泉水|茶|汁/;
 const DESSERT_RE = /冰淇淋|麦旋风|圆筒|派|甜点|圣代|新地|奥利奥/;
-const BURGER_RE = /堡|卷/;
+const BURGER_RE = /堡|卷|巨无霸|麦香鱼|麦香鸡/;
 const SNACK_RE = /炸鸡|鸡翅|鸡块|麦乐鸡|小食|拼盘|薯条|薯饼/;
 
 /**
@@ -259,7 +273,7 @@ export function toCategory(item: UnifiedMenuItem): Category {
 }
 
 const SPICY_RE = /辣/;
-const BEEF_NAME_RE = /牛/;
+const BEEF_NAME_RE = /牛肉|牛排|牛扒|牛堡|巨无霸|双层吉士|吉士汉堡包/;
 const BEEF_TAG_RE = /牛肉|纯牛/;
 /**
  * 不是餐品的东西不能占「主食/配餐」名额。实测踩到两次：
@@ -267,12 +281,15 @@ const BEEF_TAG_RE = /牛肉|纯牛/;
  * 二是「旋旋星愿贴 ¥3.9」这种**周边贴纸**被选成配餐。
  * 它们仍保留在 `products` 里供前端展示，只是不参与组餐。
  */
-const NON_MEAL_RE = /酱|蘸料|调料|糖包|奶精|周边|限量|贴纸|盲盒|玩具|玩偶|卡片|徽章/;
+const NON_MEAL_RE = /周边|贴纸|星愿贴|盲盒|玩具|玩偶|卡片|徽章|会员卡|麦金卡/;
 
 function isNonMeal(candidate: Candidate): boolean {
   const haystack = `${candidate.product.name} ${candidate.item.tags.join(' ')}`;
-  return NON_MEAL_RE.test(haystack);
+  return NON_MEAL_RE.test(haystack) || /(?:酱|蘸料|调料|糖包|奶精)$/.test(candidate.product.name) || candidate.item.isCombo && !candidate.item.combo?.verified;
 }
+
+function included(candidate: Candidate): Category[] { return candidate.product.includedCategories ?? [candidate.product.category]; }
+function isMain(candidate: Candidate): boolean { return candidate.product.hasMain ?? candidate.product.category === 'burger'; }
 
 const DIETARY_NOTE =
   '由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含';
@@ -292,7 +309,7 @@ export function inferDietary(item: UnifiedMenuItem): { spicy: DietaryField; beef
       : { inferred: false, source: 'name', confidence: 'low' };
 
   const tagBeef = item.tags.some((tag) => BEEF_TAG_RE.test(tag));
-  const nameBeef = BEEF_NAME_RE.test(item.name) || BEEF_NAME_RE.test(item.category);
+  const nameBeef = BEEF_NAME_RE.test(item.name);
 
   const beef: DietaryField = tagBeef
     ? { inferred: true, source: 'tag', confidence: 'high' }
@@ -303,12 +320,26 @@ export function inferDietary(item: UnifiedMenuItem): { spicy: DietaryField; beef
   return { spicy, beef };
 }
 
-function toProduct(item: UnifiedMenuItem): MediateProduct {
+function toProduct(item: UnifiedMenuItem, catalog: UnifiedMenuItem[] = []): MediateProduct {
   const dietary = inferDietary(item);
+  const components = item.combo?.verified ? item.combo.components.map(component => {
+    const known = catalog.find(entry => entry.id === component.id);
+    const componentItem = known ?? { ...item, name: component.name, category: '', tags: [], isCombo: false, combo: undefined };
+    const inferred = inferDietary(componentItem);
+    if (inferred.spicy.inferred) dietary.spicy = inferred.spicy;
+    if (inferred.beef.inferred) dietary.beef = inferred.beef;
+    return { ...component, category: toCategory(componentItem) };
+  }) : undefined;
+  const category = toCategory(item);
+  const hasMain = item.isCombo ? Boolean(components?.some(component => component.category === 'burger' || /饭|粥|松饼|整鸡|鸡腿|鸡排/.test(component.name))) : category === 'burger' || /饭|粥|松饼|整鸡|鸡腿|鸡排/.test(item.name);
   return {
     id: item.id,
     name: item.name,
-    category: toCategory(item),
+    category,
+    isCombo: item.isCombo,
+    hasMain,
+    includedCategories: components ? [...new Set(components.map(component => component.category))] : [category],
+    components,
     priceCents: item.priceFen,
     image: item.image ?? null,
     fullness: null,
@@ -329,7 +360,7 @@ export type MediateCandidate = Candidate;
 
 function violatesDislikes(candidate: Candidate, member: MemberInput): boolean {
   const dislikes = member.dislikes ?? [];
-  return dislikes.includes(candidate.product.category);
+  return included(candidate).some(category => dislikes.includes(category));
 }
 
 function violatesRequirement(candidate: Candidate, member: MemberInput): boolean {
@@ -370,7 +401,7 @@ function slotsFor(member: MemberInput): SlotPlan {
 
 function matchScore(candidate: Candidate, member: MemberInput): number {
   const likes = member.likes ?? [];
-  return likes.includes(candidate.product.category) ? 1 : 0;
+  return included(candidate).filter(category => likes.includes(category)).length;
 }
 
 /**
@@ -423,7 +454,7 @@ function selectForMember(
   pool: Candidate[],
   member: MemberInput,
   strategy: Strategy,
-  requireMain: boolean,
+  _requireMain: boolean,
 ): MemberSelection {
   const budgetCents = Math.round((member.budget ?? 0) * 100);
   // 硬约束之后再剔除蘸酱/周边等非餐品：它们仍在 products 里供前端展示，但不参与组餐。
@@ -431,91 +462,45 @@ function selectForMember(
   const slots = slotsFor(member);
   const required = requiredCategory(member);
 
-  const selected: Array<{ candidate: Candidate; quantity: number }> = [];
-  const reasons: string[] = [];
-  let spent = 0;
-
-  const take = (candidate: Candidate | undefined, label: string): void => {
-    if (candidate === undefined) return;
-    if (spent + candidate.product.priceCents > budgetCents) return;
-    selected.push({ candidate, quantity: 1 });
-    spent += candidate.product.priceCents;
-    reasons.push(`${label}「${candidate.product.name}」¥${String(fenToYuan(candidate.product.priceCents))}`);
-  };
-
-  const picked = new Set<string>();
-  const remaining = (): number => budgetCents - spent;
-
-  // 1) 必须满足的类别（requirement 指定）优先。
-  if (required !== undefined) {
-    const candidate = pickCandidate(
-      hard,
-      member,
-      strategy,
-      budgetCents,
-      (entry) => entry.product.category === required && entry.product.priceCents <= budgetCents,
-    );
-    if (candidate !== undefined) {
-      take(candidate, `${required} 需求`);
-      picked.add(candidate.product.id);
+  // Search main and required food together; greedy selection can miss feasible pairs.
+  const cores: Candidate[][] = [];
+  for (const main of hard.filter(entry => isMain(entry) && entry.product.priceCents <= budgetCents)) {
+    if (required === undefined || included(main).includes(required)) cores.push([main]);
+    else for (const extra of hard) {
+      if (extra !== main && included(extra).includes(required) && main.product.priceCents + extra.product.priceCents <= budgetCents) cores.push([main, extra]);
     }
   }
-
-  // 2) 主食。
-  if (slots.main && (requireMain || required === undefined)) {
-    const alreadyBurger = selected.some((entry) => entry.candidate.product.category === 'burger');
-    if (!alreadyBurger) {
-      const candidate = pickCandidate(
-        hard,
-        member,
-        strategy,
-        budgetCents,
-        (entry) => entry.product.category === 'burger' && entry.product.priceCents <= remaining(),
-      );
-      if (candidate !== undefined) {
-        take(candidate, '主食');
-        picked.add(candidate.product.id);
-      }
+  let best: Candidate[] = [];
+  let bestScore = -Infinity;
+  for (const core of cores) {
+    const basket = [...core];
+    let spent = basket.reduce((sum, item) => sum + item.product.priceCents, 0);
+    const covered = () => basket.flatMap(included);
+    for (const wanted of [slots.side ? ['fries', 'snack', 'dessert'] : [], slots.drink ? ['drink'] : []]) {
+      if (!wanted.length || covered().some(category => wanted.includes(category))) continue;
+      const extra = pickCandidate(hard, member, strategy, budgetCents, entry =>
+        !basket.includes(entry) && included(entry).some(category => wanted.includes(category)) && spent + entry.product.priceCents <= budgetCents);
+      if (extra) { basket.push(extra); spent += extra.product.priceCents; }
     }
+    const coverage = new Set(covered());
+    const portions = Number(slots.side && ['fries', 'snack', 'dessert'].some(category => coverage.has(category as Category))) + Number(slots.drink && coverage.has('drink'));
+    const matches = (member.likes ?? []).filter(category => coverage.has(category)).length;
+    const ratio = spent / Math.max(1, budgetCents);
+    const score = portions * 20 + matches * (strategy === 'happy' ? 6 : strategy === 'peace' ? 3 : 1) - ratio * (strategy === 'saving' ? 10 : strategy === 'peace' ? 5 : 1);
+    if (score > bestScore) { bestScore = score; best = basket; }
   }
-
-  // 3) 配餐（薯条/小食/甜点）。
-  if (slots.side) {
-    const hasSide = selected.some((entry) =>
-      ['fries', 'snack', 'dessert'].includes(entry.candidate.product.category),
-    );
-    if (!hasSide) {
-      const candidate = pickCandidate(
-        hard,
-        member,
-        strategy,
-        budgetCents,
-        (entry) =>
-          ['fries', 'snack', 'dessert'].includes(entry.product.category) &&
-          entry.product.priceCents <= remaining(),
-      );
-      if (candidate !== undefined) take(candidate, '配餐');
-    }
+  // Retain an affordable main solely for an accurate missing-required-food error;
+  // buildPlan rejects this incomplete selection before calling the price tool.
+  if (!best.length) {
+    const main = pickCandidate(hard, member, 'saving', budgetCents, entry => isMain(entry) && entry.product.priceCents <= budgetCents);
+    if (main) best = [main];
   }
-
-  // 4) 饮料。
-  if (slots.drink) {
-    const hasDrink = selected.some((entry) => entry.candidate.product.category === 'drink');
-    if (!hasDrink) {
-      const candidate = pickCandidate(
-        hard,
-        member,
-        strategy,
-        budgetCents,
-        (entry) => entry.product.category === 'drink' && entry.product.priceCents <= remaining(),
-      );
-      if (candidate !== undefined) take(candidate, '饮料');
-    }
-  }
+  const selected = best.map(candidate => ({ candidate, quantity: 1 }));
+  const reasons = best.map(candidate => `${candidate.item.isCombo ? '默认套餐' : '餐品'}「${candidate.product.name}」¥${String(fenToYuan(candidate.product.priceCents))}`);
 
   const liked = member.likes ?? [];
   const matchedLikes = liked.filter((category) =>
-    selected.some((entry) => entry.candidate.product.category === category),
+    selected.some((entry) => included(entry.candidate).includes(category)),
   );
   const missingLikes = liked.filter((category) => !matchedLikes.includes(category));
 
@@ -543,6 +528,9 @@ function toValidatable(candidate: Candidate): ValidatableProduct {
     spicy: candidate.product.dietary.spicy.inferred,
     beef: candidate.product.dietary.beef.inferred,
     nonMeal: isNonMeal(candidate),
+    hasMain: isMain(candidate),
+    includedCategories: included(candidate),
+    isCombo: candidate.item.isCombo,
   };
 }
 
@@ -557,6 +545,9 @@ function modelCandidates(pool: Candidate[]): ProposalCandidate[] {
       name: candidate.product.name,
       category: candidate.product.category,
       priceCents: candidate.product.priceCents,
+      hasMain: isMain(candidate),
+      includedCategories: included(candidate),
+      isCombo: candidate.item.isCombo,
     }));
 }
 /** 一次请求覆盖全部策略：通过校验的进 `selections`，被拦的进 `failures`。 */
@@ -729,8 +720,8 @@ async function buildPlan(
     const member = members.find(entry => entry.id === selection.memberId);
     if (!member) continue;
     const required = requiredCategory(member);
-    const hasMain = selection.items.some(entry => entry.candidate.product.category === 'burger');
-    const meetsRequirement = required === undefined || selection.items.some(entry => entry.candidate.product.category === required);
+    const hasMain = selection.items.some(entry => isMain(entry.candidate));
+    const meetsRequirement = required === undefined || selection.items.some(entry => included(entry.candidate).includes(required));
     if (!hasMain || !meetsRequirement) {
       return { error: {
         memberId: member.id,
@@ -745,7 +736,7 @@ async function buildPlan(
     for (const entry of selection.items) {
       const existing = basketMap.get(entry.candidate.product.id);
       if (existing !== undefined) existing.quantity += entry.quantity;
-      else basketMap.set(entry.candidate.product.id, { productCode: entry.candidate.product.id, quantity: entry.quantity });
+      else basketMap.set(entry.candidate.product.id, { productCode: entry.candidate.product.id, quantity: entry.quantity, ...(entry.candidate.item.combo ? { roundList: entry.candidate.item.combo.roundList } : {}) });
     }
   }
 
@@ -907,6 +898,8 @@ function applyRevision(
         .filter(
           (candidate) =>
             candidate.product.category === current.candidate.product.category &&
+            included(current.candidate).every(category => included(candidate).includes(category)) &&
+            (!isMain(current.candidate) || isMain(candidate)) &&
             candidate.product.priceCents < current.candidate.product.priceCents &&
             !currentIds.has(candidate.product.id),
         )
@@ -939,7 +932,7 @@ function applyRevision(
 
   const liked = member.likes ?? [];
   const matchedLikes = liked.filter((category) =>
-    nextItems.some((entry) => entry.candidate.product.category === category),
+    nextItems.some((entry) => included(entry.candidate).includes(category)),
   );
 
   const revised: MemberSelection = {
@@ -968,6 +961,47 @@ function applyRevision(
   }
 
   return { selection: revised };
+}
+
+/** Bounded recovery search. Every suggestion carries a real priced proof.
+ * Changes apply only after a click. Dietary restrictions are never relaxed.
+ */
+async function recoverySuggestions(request: MediateRequest, pool: Candidate[], deps: MediateDependencies, traceId: string): Promise<RecoverySuggestion[]> {
+  const suggestions: RecoverySuggestion[] = [];
+  const trial = async (members: MemberInput[], changes: RecoverySuggestion['changes'], title: string): Promise<boolean> => {
+    const selections = members.map(member => selectForMember(pool, { ...member, hunger: 'little' }, 'saving', true));
+    const built = await buildPlan(request.storeId, 'saving', members, selections, request.orderType ?? 1, request.beType ?? 1, deps, traceId, 100 + suggestions.length);
+    if ('error' in built) return false;
+    suggestions.push({ id: `${traceId}_adjust_${suggestions.length}`, title, summary: '只改下列条件，其余要求保留；已按一份主餐起步，用当前门店菜单和真实价格试算。', verifiedAt: new Date().toISOString(), changes, plan: built.plan });
+    return true;
+  };
+  // Price the cheapest compatible cores, then verify the proposed budgets again.
+  // This is a feasible price, not a claim that no lower price exists.
+  const raised = request.members.map(member => ({ ...member, budget: 200 }));
+  const cores = raised.map(member => selectForMember(pool, { ...member, hunger: 'little' }, 'saving', true));
+  const proof = await buildPlan(request.storeId, 'saving', raised, cores, request.orderType ?? 1, request.beType ?? 1, deps, traceId, 99);
+  if (!('error' in proof)) {
+    const changes = request.members.flatMap(member => {
+      const allocation = proof.plan.allocations.find(entry => entry.memberId === member.id)!;
+      const menuCost = cores.find(entry => entry.memberId === member.id)!.items.reduce((sum, entry) => sum + entry.candidate.product.priceCents * entry.quantity, 0);
+      const budget = Math.max(member.budget ?? 0, Math.ceil(Math.max(allocation.totalCents, menuCost) / 100));
+      return budget > (member.budget ?? 0) && budget <= 200 ? [{ memberId: member.id, budget }] : [];
+    });
+    if (changes.length) await trial(request.members.map(member => ({ ...member, budget: changes.find(change => change.memberId === member.id)?.budget ?? member.budget })), changes, '调整预算，保留食物要求');
+  }
+  // At most six one-condition trials; never recurse into model calls.
+  let attempts = 0;
+  for (const member of request.members) {
+    const changes: RecoverySuggestion['changes'] = [];
+    if (['burger', 'fries', 'drink'].includes(member.requirement ?? '')) changes.push({ memberId: member.id, requirement: 'none' });
+    for (const category of member.dislikes ?? []) changes.push({ memberId: member.id, dislikes: member.dislikes!.filter(entry => entry !== category) });
+    for (const change of changes) {
+      if (suggestions.length >= 2 || attempts++ >= 6) return suggestions;
+      const members = request.members.map(entry => entry.id === member.id ? { ...entry, ...change } : entry);
+      if (await trial(members, [change], '放宽一项食物选择')) return suggestions;
+    }
+  }
+  return suggestions;
 }
 
 // ---------------------------------------------------------------- meta
@@ -1022,7 +1056,7 @@ export async function mediate(
   const menu = await deps.menu({ storeCode: request.storeId, orderType, beType });
   const pool: Candidate[] = menu.items
     .filter((item) => item.priceFen > 0)
-    .map((item) => ({ item, product: toProduct(item) }));
+    .map((item) => ({ item, product: toProduct(item, menu.items) }));
 
   const products = request.options?.includeProducts === false ? undefined : pool.map((entry) => entry.product);
   const issues: MediateIssue[] = [];
@@ -1341,6 +1375,12 @@ export async function mediate(
   }
 
   const couponCount = builtPlans.length > 0 ? await deps.couponCount(request.storeId, orderType, beType) : 0;
+  let suggestions: RecoverySuggestion[] = [];
+  if (builtPlans.length === 0 && !request.revision) {
+    try { suggestions = await recoverySuggestions(request, pool, deps, traceId); }
+    catch { hints.push({ level: 'warn', message: '暂时未能完成调整建议的价格核对，请稍后重新生成或换一家门店。' }); }
+  }
+  const uniqueIssues = issues.filter((issue, index) => issues.findIndex(other => other.code === issue.code && other.memberId === issue.memberId) === index);
 
   return {
     source: 'live',
@@ -1348,8 +1388,9 @@ export async function mediate(
     store: { id: menu.store.id, name: menu.store.name },
     products,
     plans: builtPlans.map((entry) => entry.plan),
-    issues,
+    issues: uniqueIssues,
     hints,
+    suggestions,
     meta: buildMeta({
       provider,
       menuCapturedAt: menu.capturedAt,

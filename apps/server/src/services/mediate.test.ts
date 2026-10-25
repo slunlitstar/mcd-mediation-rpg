@@ -441,11 +441,17 @@ test('mediate 不得把买不起主食的成员留成空餐盘再返回成功', 
   let priced = false;
   const injected = deps(MENU);
   const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 1 }, { id: 2, budget: 40 }] }, {
-    ...injected, price: async (...args) => { priced = true; return injected.price(...args); },
+    ...injected, price: async (...args) => {
+      priced = true;
+      const mains = args[1].filter(line => MENU.items.find(item => item.id === line.productCode)?.name.includes('堡'));
+      assert.ok(mains.reduce((sum, line) => sum + line.quantity, 0) >= 2, '调整建议也不得试算缺少主食的组合');
+      return injected.price(...args);
+    },
   });
   assert.equal(result.plans.length, 0);
   assert.ok(result.issues.some(issue => issue.memberId === 1 && issue.kind === 'constraint' && issue.blocking));
-  assert.equal(priced, false, '缺少成员主食的组合不应送去试算');
+  assert.equal(priced, true, '原预算无解后，允许试算明确提高预算的调整建议');
+  assert.ok(result.suggestions?.some(suggestion => suggestion.changes.some(change => change.memberId === 1 && Number(change.budget) > 1)));
 });
 
 test('必须有的类别不能因预算不足被静默省略', async () => {
@@ -453,4 +459,74 @@ test('必须有的类别不能因预算不足被静默省略', async () => {
   const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 30, requirement: 'drink' }, { id: 2, budget: 40 }] }, deps(withoutDrink));
   assert.equal(result.plans.length, 0);
   assert.ok(result.issues.some(issue => issue.code === 'required_food_unavailable' && issue.blocking));
+});
+
+test('joint selection finds an affordable main and mandatory side even when preference ranking favours an expensive side', async () => {
+  const menu = makeMenu([
+    { id: 'b', name: '鸡腿堡', priceYuan: 10 },
+    { id: 'f1', name: '中薯条', priceYuan: 6 },
+    { id: 'f2', name: '大薯条', priceYuan: 19 },
+  ]);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 16, requirement: 'fries' }, { id: 2, budget: 16 }] }, deps(menu));
+  assert.ok(result.plans.length);
+  for (const plan of result.plans) assert.deepEqual(plan.allocations[0].items.map(item => item.productId).sort(), ['b', 'f1']);
+});
+
+test('default combo covers required fries without duplicate sides or drinks and sends real rounds to pricing', async () => {
+  const menu = makeMenu([
+    { id: 'combo', name: '鸡腿堡三件套', priceYuan: 18 },
+    { id: 'b', name: '鸡腿堡', priceYuan: 14 },
+    { id: 'f', name: '中薯条', priceYuan: 8, category: '小食' },
+    { id: 'd', name: '可乐中杯', priceYuan: 6, category: '饮品' },
+  ]);
+  menu.items[0].isCombo = true;
+  menu.items[0].combo = { verified: true, components: [{ id: 'b', name: '鸡腿堡', quantity: 1 }, { id: 'f', name: '中薯条', quantity: 1 }, { id: 'd', name: '可乐中杯', quantity: 1 }], roundList: [{ round: '1', comboItemList: [{ code: 'b', quantity: 1 }] }, { round: '2', comboItemList: [{ code: 'f', quantity: 1 }] }, { round: '3', comboItemList: [{ code: 'd', quantity: 1 }] }] };
+  const injected = deps(menu);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 20, hunger: 'faint', requirement: 'fries' }, { id: 2, budget: 20, hunger: 'faint' }] }, {
+    ...injected, price: async (...args) => {
+      assert.deepEqual(args[1].find(item => item.productCode === 'combo')?.roundList, menu.items[0].combo!.roundList);
+      return injected.price(...args);
+    },
+  });
+  assert.ok(result.plans.length);
+  for (const plan of result.plans) {
+    assert.ok(plan.allocations.every(allocation => allocation.items.length === 1 && allocation.items[0].productId === 'combo'));
+    assert.equal(plan.allocations.reduce((sum, item) => sum + item.totalCents, 0), plan.payableCents);
+  }
+  const excluded = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 20, dislikes: ['drink'] }, { id: 2, budget: 20 }] }, injected);
+  assert.ok(excluded.plans.length);
+  assert.ok(excluded.plans.every(plan => plan.allocations[0].items.every(item => item.productId !== 'combo')));
+  delete menu.items[0].combo;
+  const unresolved = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 20 }, { id: 2, budget: 20 }] }, injected);
+  assert.ok(unresolved.plans.every(plan => plan.allocations.every(allocation => allocation.items.every(item => item.productId !== 'combo'))));
+});
+
+test('recovery suggestions are fully priced and preserve other members and dietary requirements', async () => {
+  const menu = makeMenu([{ id: 'b', name: '酱香鸡腿堡', priceYuan: 14 }, { id: 'f', name: '麦香鱼', priceYuan: 12 }, { id: 'd', name: '牛奶', priceYuan: 6, category: '饮品' }]);
+  const members = [{ id: 1, budget: 5, requirement: 'no-beef' as const }, { id: 2, budget: 30, requirement: 'no-spicy' as const }];
+  const result = await mediate({ storeId: 'S001', members }, deps(menu));
+  assert.equal(result.plans.length, 0);
+  const suggestion = result.suggestions?.find(suggestion => suggestion.changes.some(change => change.budget));
+  assert.ok(suggestion);
+  assert.deepEqual(suggestion.changes, [{ memberId: 1, budget: 12 }]);
+  assert.equal(suggestion.plan.allocations.reduce((sum, member) => sum + member.totalCents, 0), suggestion.plan.payableCents);
+  assert.ok(suggestion.plan.allocations.every(member => member.totalCents <= member.budgetCents));
+  assert.ok(suggestion.plan.allocations.every(member => member.items[0].productId === 'f'));
+  assert.equal(members[0].budget, 5, 'suggestions never mutate input automatically');
+  assert.equal(result.products!.find(product => product.id === 'd')!.dietary.beef.inferred, false, 'milk is not beef');
+});
+
+test('a single food exclusion may be explicitly relaxed; an impossible dietary restriction is never relaxed', async () => {
+  const menu = makeMenu([{ id: 'b', name: '麦辣牛肉汉堡', priceYuan: 10 }]);
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 20, dislikes: ['burger'] }, { id: 2, budget: 20 }] }, deps(menu));
+  assert.ok(result.suggestions?.some(suggestion => suggestion.changes[0].dislikes?.length === 0));
+  const blocked = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 20, requirement: 'no-beef' }, { id: 2, budget: 20 }] }, deps(menu));
+  assert.equal(blocked.suggestions?.length, 0);
+});
+
+test('a failed recovery quote preserves the original constraint response without unverified suggestions', async () => {
+  const result = await mediate({ storeId: 'S001', members: [{ id: 1, budget: 1 }, { id: 2, budget: 40 }] }, { ...deps(MENU), price: async () => { throw new Error('offline'); } });
+  assert.equal(result.plans.length, 0);
+  assert.equal(result.suggestions?.length, 0);
+  assert.ok(result.issues.some(issue => issue.kind === 'constraint'));
 });

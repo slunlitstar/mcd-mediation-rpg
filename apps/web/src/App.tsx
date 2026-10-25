@@ -9,19 +9,23 @@ import { mediatorName } from './assets/characters/character-assets';
 import { Arrow, NpcNote, PageTitle } from './components/UI';
 import { categories, exampleParty, hungers, newMember, requirements, roleFor, roles, stores } from './services/demo-data';
 import { generateDemoPlans, memberError } from './services/demo-service';
-import { ApiError, generateLivePlans, preferredStrategy } from './services/live-service';
-import type { Category, MediationRequest, MediationResult, Member, Party, Revision, Step, Store, Strategy } from './types/demo';
+import { ApiError, generateLivePlans, preferredStrategy, prepareRecovery } from './services/live-service';
+import { loadDraft, saveDraft } from './services/party-draft';
+import type { Category, MediationRequest, MediationResult, Member, Party, RecoverySuggestion, Revision, Step, Store, Strategy } from './types/demo';
 
 const chapters = ['调解所大厅', '小队集结', '职业与属性', '仲裁庭', '饭局结局'];
 const initialParty = (): Party => ({ storeId: '', members: [newMember(1), newMember(2), newMember(3)] });
 
 export default function App() {
+  const [savedDraft, setSavedDraft] = useState(loadDraft);
+  const [draftEnabled, setDraftEnabled] = useState(Boolean(savedDraft));
+  const [draftSaveFailed, setDraftSaveFailed] = useState(false);
   const [step, setStep] = useState<Step>(0);
-  const [mode, setMode] = useState<'live' | 'demo'>('live');
+  const [mode, setMode] = useState<'live' | 'demo'>(savedDraft?.mode ?? 'live');
   const live = mode === 'live';
-  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const [party, setParty] = useState<Party>(initialParty);
-  const [activeMember, setActiveMember] = useState(0);
+  const [selectedStore, setSelectedStore] = useState<Store | null>(savedDraft?.store ?? null);
+  const [party, setParty] = useState<Party>(savedDraft?.party ?? initialParty());
+  const [activeMember, setActiveMember] = useState(savedDraft?.activeMember ?? 0);
   const [previewRole, setPreviewRole] = useState(0);
   const [message, setMessage] = useState('');
   const [result, setResult] = useState<MediationResult | null>(null);
@@ -46,6 +50,11 @@ export default function App() {
   const plan = result?.plans.find(item => item.strategy === strategy) ?? result?.plans[0];
   const store = selectedStore ?? (!live ? stores.find(item => item.id === party.storeId) : undefined);
   useEffect(() => { setReviewedCustom(false); }, [plan]);
+  useEffect(() => {
+    if (!draftEnabled) return;
+    const stored = saveDraft({ mode, party, store: selectedStore, activeMember });
+    setDraftSaveFailed(!stored); if (stored) setSavedDraft(stored);
+  }, [draftEnabled, mode, party, selectedStore, activeMember]);
 
   function go(next: Step) {
     if (next !== 4) {
@@ -145,12 +154,27 @@ export default function App() {
     }
   }
   function beginLive() {
+    setDraftEnabled(true);
     setMode('live'); setParty(initialParty()); setSelectedStore(null); setActiveMember(0); setPreviewRole(0); setResult(null); setAccepted(false); setRevisionCount(0); go(1);
   }
   function loadExample() {
+    setDraftEnabled(true);
     setMode('demo'); setSelectedStore(null); setParty(exampleParty()); setActiveMember(0); setPreviewRole(0); setResult(null); setAccepted(false); setRevisionCount(0); go(1);
   }
   function openRevision() { setRevisionMember(party.members[0].id); setRevisionAction('cheaper'); setRevisionError(''); setRevising(true); }
+  function useSuggestion(suggestion: RecoverySuggestion) {
+    if (!result) return;
+    try {
+      const next = prepareRecovery(result, party, suggestion);
+      setParty(next.party); setResult(next.result); setStrategy(preferredStrategy(next.result.plans));
+      setAccepted(false); setReviewedCustom(false); setMessage('');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } catch (error) { setMessage(error instanceof Error ? error.message : '建议已失效，请重新生成。'); }
+  }
+  function resumeDraft() {
+    setResult(null); setAccepted(false); setReviewedCustom(false);
+    if (party.storeId) editMember(Math.min(activeMember, party.members.length - 1)); else go(1);
+  }
   return (
     <div className={`app-shell page-${step} ${keyboardOpen ? 'is-keyboard-open' : ''}`}>
       <header className="site-header">
@@ -159,6 +183,8 @@ export default function App() {
       </header>
       <nav className="chapter-nav" aria-label="饭局进度"><ol>{chapters.map((chapter, index) => <li key={chapter} className={`${index === step ? 'current' : ''} ${index < step ? 'passed' : ''}`} aria-current={index === step ? 'step' : undefined}><span>{index < step ? '✓' : `0${index + 1}`}</span><span>{chapter}</span></li>)}</ol></nav>
       <main id="main-content">
+        {step === 0 && savedDraft && <div className="page draft-resume service-notice"><strong>上次饭局的设置已保留 · {party.members.length} 位成员</strong><p>继续填写后重新核对菜单与价格，不会自动请求模型。</p><button className="button button-outline" onClick={resumeDraft}>继续上次饭局 <Arrow /></button></div>}
+        {draftSaveFailed && <p className="page service-notice" role="status">浏览器暂时无法保存设置，请保持当前页面打开。</p>}
         {step === 0 && <section className="home-page">
           <div className="hero-copy"><span className="eyebrow"><span className="tiny-star">✳</span> 饭点到了，意见也到了。</span><h1>今天这顿，<br />谁都别只说<br /><span className="hero-word">“随便”<span className="word-spark">✦</span></span></h1><p className="hero-description">省钱的、饿晕的、只想吃薯条的。<br />带上各自的要求，让袋袋来主持这一顿。</p><div className="hero-actions"><button className="button button-primary button-large" onClick={beginLive}>开始饭局 <Arrow /></button><button className="text-button" onClick={loadExample}>体验三人示例 <span>↗</span></button></div><div className="hero-footnote"><span>2—4 人同行</span><i /><span>一台设备就够</span><i /><span>各有主张，一起开饭</span></div></div>
           <section className="hero-scene" aria-label="认识袋袋调解官"><div className="hero-portrait"><MediatorArtwork variant="hero" /></div><div className="hero-introduction"><span className="eyebrow">今日值班</span><h2>{mediatorName}</h2><p>把“都可以”，变成一份具体菜单。</p><span className="hero-greeting">大家慢慢说，这顿我来调。</span></div></section>
@@ -186,7 +212,8 @@ export default function App() {
 
         {step === 3 && <MediationCourt live={live} party={party} progress={progress} resultReady={courtReady} onViewResult={() => { if (courtReady && result) go(4); }} onInspect={() => { courtHoldAuto.current = true; }} />}
 
-        {step === 4 && <MealResults party={party} result={result} live={live} storeName={store?.name} strategy={strategy} onStrategy={value => { setStrategy(value); setReviewedCustom(false); }} accepted={accepted} onAccept={setAccepted} reviewed={reviewedCustom} onReviewed={setReviewedCustom} revisionCount={revisionCount} onEdit={editMember} onRetry={() => { setCourtReady(false); setProgress(0); setRequest({ party }); go(3); }} onRevise={openRevision} />}
+        {step === 4 && message && <p className="page form-error" role="alert">{message}</p>}
+        {step === 4 && <MealResults party={party} result={result} live={live} storeName={store?.name} strategy={strategy} onStrategy={value => { setStrategy(value); setReviewedCustom(false); }} accepted={accepted} onAccept={setAccepted} reviewed={reviewedCustom} onReviewed={setReviewedCustom} revisionCount={revisionCount} onEdit={editMember} onRetry={() => { setCourtReady(false); setProgress(0); setRequest({ party }); go(3); }} onRevise={openRevision} onSuggestion={useSuggestion} />}
       </main>
       <footer className="site-footer"><span>饭局有分歧，开饭有共识。<span className="footer-star">✳</span></span><span>{live ? '真实门店与试算 · 仅推荐，不下单' : '离线体验 · 示例菜单与价格'}</span></footer>
       <dialog ref={dialogRef} className="revision-dialog" onCancel={event => { if (revisionBusy) event.preventDefault(); else setRevising(false); }} onClose={() => { if (!revisionBusy) setRevising(false); }} aria-labelledby="revision-title"><div className="dialog-top"><div className="dialog-mediator"><MediatorArtwork variant="note" /><span>袋袋再听一轮</span></div><button className="circle-button" aria-label="关闭复议" disabled={revisionBusy} onClick={() => setRevising(false)}>×</button></div><h2 id="revision-title">这顿，还能再商量。</h2><p>只调整选中成员的诉求，其余成员的要求继续保留。</p><label htmlFor="revision-member">谁想调整？</label><select id="revision-member" value={revisionMember} disabled={revisionBusy} onChange={event => { setRevisionMember(Number(event.target.value)); setRevisionError(''); }}>{party.members.map(person => <option value={person.id} key={person.id}>成员{person.id} · {roleFor(person.roleId)?.name ?? '待选角色'}</option>)}</select><label htmlFor="revision-action">这次想怎么改？</label><select id="revision-action" value={revisionAction} disabled={revisionBusy} onChange={event => { setRevisionAction(event.target.value as Revision['action']); setRevisionError(''); }}><option value="cheaper">在原有条件下，再便宜一点</option><option value="hungrier" disabled={party.members.find(person => person.id === revisionMember)?.hunger === 'faint'}>更饿了，提高一档饥饿程度</option><option value="fries">优先安排薯条</option><option value="burger">优先安排汉堡</option><option value="drink">优先安排饮料</option></select><p className="field-hint">个人预算与不可退让的要求保持；需要更改时返回角色卡。</p>{revisionError && <p className="form-error" role="alert">{revisionError}</p>}<button className="button button-primary" disabled={revisionBusy} onClick={() => void submitRevision()}>{revisionBusy ? '正在重新试算…' : '提交复议'}<span>↻</span></button><p className="dialog-demo">{live ? '仅调整推荐方案，不会创建订单。' : '本轮使用本地示例数据演示复议。'}</p></dialog>

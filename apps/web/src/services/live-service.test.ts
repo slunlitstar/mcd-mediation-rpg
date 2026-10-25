@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { ApiError, generateLivePlans, liveRequestBody, loadStores, parseLiveResult, preferredStrategy, resultSourceLabel } from './live-service';
+import { ApiError, generateLivePlans, liveRequestBody, loadStores, parseLiveResult, preferredStrategy, prepareRecovery, resultSourceLabel } from './live-service';
 import { newMember } from './demo-data';
 import type { Party } from '../types/demo';
 
@@ -9,6 +9,25 @@ const sample = JSON.parse(readFileSync(new URL('../../../server/fixtures/normali
 const party: Party = { storeId: sample.store.id, members: [35, 30, 40].map((budget, index) => ({ ...newMember(index + 1), roleId: 'saver', budget, configured: true })) };
 const fixture = () => structuredClone(sample);
 const respond = (value: unknown, status = 200): typeof fetch => async () => new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } });
+
+test('verified recovery applies only explicit changes and revalidates all prices without mutating the party', () => {
+  const original = structuredClone(party); original.members[0].budget = 1;
+  const raw = { ...fixture(), plans: [], issues: [{ code: 'no_main_within_budget', kind: 'constraint', blocking: true, message: '预算不足' }], suggestions: [{ id: 's1', title: '调整预算', summary: '保留其他要求', verifiedAt: new Date().toISOString(), changes: [{ memberId: 1, budget: 35 }], plan: sample.plans[0] }] };
+  const result = parseLiveResult(raw, original);
+  assert.equal(result.plans.length, 0); assert.equal(result.suggestions?.length, 1);
+  const next = prepareRecovery(result, original, result.suggestions![0]);
+  assert.equal(original.members[0].budget, 1);
+  assert.equal(next.party.members[0].budget, 35);
+  assert.deepEqual(next.party.members.slice(1), original.members.slice(1));
+  assert.equal(next.result.meta?.reasoning, 'rules');
+  assert.equal(next.result.plans[0].allocations.reduce((sum, item) => sum + item.totalCents, 0), next.result.plans[0].payableCents);
+  const invalid = structuredClone(raw); invalid.suggestions[0].changes[0].budget = 1;
+  assert.equal(parseLiveResult(invalid, original).suggestions?.length, 0);
+  const stale = structuredClone(raw); stale.suggestions[0].verifiedAt = new Date(Date.now() - 6 * 60 * 1000).toISOString();
+  assert.equal(parseLiveResult(stale, original).suggestions?.length, 0);
+  const dietary = structuredClone(original); dietary.members[0].requirement = 'no-beef';
+  assert.throws(() => prepareRecovery(result, dietary, { ...result.suggestions![0], changes: [{ memberId: 1, requirement: 'none' }] }), ApiError);
+});
 
 test('backend fixture uses live catalog, exact cents and nonblocking manual review', () => {
   const result = parseLiveResult(fixture(), party);

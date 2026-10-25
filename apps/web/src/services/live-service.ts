@@ -1,4 +1,4 @@
-import type { MediationRequest, MediationResult, Party, Plan, Product, Store, Strategy } from '../types/demo';
+import type { MediationRequest, MediationResult, Party, Plan, Product, RecoverySuggestion, Store, Strategy } from '../types/demo';
 
 type Fetcher = typeof fetch;
 type RecordValue = Record<string, unknown>;
@@ -77,6 +77,7 @@ export function parseLiveResult(data: unknown, party: Party): MediationResult {
   for (const raw of rawProducts) {
     if (!record(raw) || typeof raw.id !== 'string' || catalog.has(raw.id) || typeof raw.name !== 'string' || !cents(raw.priceCents) || !categories.includes(String(raw.category))) return invalid();
     catalog.add(raw.id);
+    if (raw.components !== undefined && (!Array.isArray(raw.components) || raw.components.some(item => !record(item) || typeof item.id !== 'string' || typeof item.name !== 'string' || !Number.isSafeInteger(item.quantity) || Number(item.quantity) < 1 || !categories.includes(String(item.category))))) return invalid();
     products.push({ ...raw, fullness: null, emoji: '' } as Product);
   }
   const seenStrategies = new Set<string>();
@@ -100,7 +101,45 @@ export function parseLiveResult(data: unknown, party: Party): MediationResult {
   }
   const issues = data.issues.filter(record).filter(issue => typeof issue.message === 'string');
   const hints = Array.isArray(data.hints) ? data.hints.filter(record).filter(hint => typeof hint.message === 'string') : [];
-  return { ...data, products, issues, hints, plans: data.plans as Plan[] } as unknown as MediationResult;
+  const result = { ...data, products, issues, hints, plans: data.plans as Plan[], suggestions: [] } as unknown as MediationResult;
+  if (Array.isArray(data.suggestions) && !result.plans.length) for (const raw of data.suggestions.slice(0, 2)) {
+    try {
+      if (!record(raw) || typeof raw.id !== 'string' || typeof raw.title !== 'string' || typeof raw.summary !== 'string' || typeof raw.verifiedAt !== 'string' || !Number.isFinite(Date.parse(raw.verifiedAt))) continue;
+      const suggestion = raw as unknown as RecoverySuggestion;
+      prepareRecovery(result, party, suggestion);
+      result.suggestions!.push(suggestion);
+    } catch { /* A malformed suggestion must not hide the original no-solution state. */ }
+  }
+  return result;
+}
+
+/** Validate both explicit input changes and the priced preview before using it. */
+export function prepareRecovery(current: MediationResult, party: Party, suggestion: RecoverySuggestion): { party: Party; result: MediationResult } {
+  const invalid = () => { throw new ApiError('这条调整建议已失效，请重新生成。'); };
+  if (current.source !== 'live' || !Array.isArray(suggestion.changes) || !suggestion.changes.length || !Number.isFinite(Date.parse(suggestion.verifiedAt)) || Date.now() - Date.parse(suggestion.verifiedAt) > 5 * 60 * 1000 || Date.parse(suggestion.verifiedAt) > Date.now() + 60000) return invalid();
+  const members = party.members.map(member => ({ ...member }));
+  const changedIds = new Set<number>();
+  for (const change of suggestion.changes) {
+    if (!record(change) || changedIds.has(change.memberId)) return invalid();
+    changedIds.add(change.memberId);
+    const member = members.find(member => member.id === change.memberId);
+    if (!member || Object.keys(change).some(key => !['memberId', 'budget', 'requirement', 'dislikes'].includes(key))) return invalid();
+    if (change.budget !== undefined) {
+      if (!Number.isInteger(change.budget) || change.budget < Math.max(1, member.budget ?? 0) || change.budget > 200) return invalid();
+      member.budget = change.budget;
+    }
+    if (change.requirement !== undefined) {
+      if (change.requirement !== 'none' || !['burger', 'fries', 'drink'].includes(member.requirement)) return invalid();
+      member.requirement = 'none';
+    }
+    if (change.dislikes !== undefined) {
+      if (!Array.isArray(change.dislikes) || change.dislikes.length !== member.dislikes.length - 1 || change.dislikes.some(category => !member.dislikes.includes(category))) return invalid();
+      member.dislikes = change.dislikes;
+    }
+  }
+  const nextParty = { ...party, members };
+  const result = parseLiveResult({ source: 'live', store: current.store, products: current.products, plans: [suggestion.plan], issues: [], hints: [{ level: 'info', message: '已采用你确认的条件调整，按一份主餐起步；价格以实际点餐时为准。' }], meta: { planner: 'rule-based-v2', pricingVerified: true, reasoning: 'rules', degraded: false } }, nextParty);
+  return { party: nextParty, result };
 }
 
 export async function generateLivePlans(input: MediationRequest, signal?: AbortSignal, fetcher?: Fetcher): Promise<MediationResult> {

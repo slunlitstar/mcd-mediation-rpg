@@ -102,6 +102,9 @@ export interface ProposalCandidate {
   name: string;
   category: string;
   priceCents: number;
+  hasMain?: boolean;
+  includedCategories?: string[];
+  isCombo?: boolean;
 }
 
 export interface ProposalRequest {
@@ -149,7 +152,8 @@ const SYSTEM_PROMPT = [
   '3. dislikes 是排除条件，命中类别的商品绝对不能选。',
   '4. requirement 为 no-spicy 时不能选辣味商品；no-beef 时不能选牛肉商品；',
   '   burger/fries/drink 表示该成员明确想吃这一类，必须包含至少一个该类商品。',
-  '5. 每个成员必须至少有一个主食（category 为 burger）；每人 1 到 4 件商品，每件数量是 1 到 3 的整数。',
+  '5. 每个成员必须至少有一个主食（hasMain 为 true；未提供时 category 为 burger）；每人 1 到 4 件商品，每件数量是 1 到 3 的整数。',
+  '套餐 includedCategories 是实际默认组成的类别；dislikes 和必点类别同时检查子项，套餐已有饮品或配餐时不要重复加购。',
   '6. 模型不负责算钱：不要返回任何价格、总价、优惠或分摊金额，这些由程序试算。',
   '7. 不为了花满预算而加购，也不要为了凑单重复同一种商品。',
   '8. 每个成员在每个策略里都必须有且只有一条 allocation。',
@@ -313,6 +317,9 @@ export interface ValidatableProduct {
   name: string;
   category: string;
   priceCents: number;
+  hasMain?: boolean;
+  includedCategories?: string[];
+  isCombo?: boolean;
   /** 由名称/标签推导，可能是 false negative。 */
   spicy: boolean;
   beef: boolean;
@@ -366,6 +373,7 @@ export type ProposalViolationCode =
   | 'model_requirement_violation'
   | 'model_missing_required_category'
   | 'model_missing_main'
+  | 'model_duplicate_combo_side'
   | 'model_budget_exceeded';
 
 export interface ProposalViolation {
@@ -504,7 +512,7 @@ export function validateProposal(
         };
       }
 
-      if (member.dislikes.includes(product.category)) {
+      if ((product.includedCategories ?? [product.category]).some(category => member.dislikes.includes(category))) {
         return {
           ok: false,
           violation: {
@@ -541,9 +549,15 @@ export function validateProposal(
       items.push({ product, quantity: item.quantity });
     }
 
+    // A default drink/side already in a combo must not be added again separately.
+    for (const combo of items.filter(item => item.product.isCombo)) {
+      if (items.some(item => item !== combo && ['fries', 'drink'].includes(item.product.category) && combo.product.includedCategories?.includes(item.product.category))) {
+        return { ok: false, violation: { code: 'model_duplicate_combo_side', memberId: member.id, message: '套餐已含配餐或饮料，不能重复加购同类单品' } };
+      }
+    }
     // 明确要求吃某类（burger/fries/drink）时，方案里必须有。
     if (REQUIRED_CATEGORIES.has(member.requirement)) {
-      const has = items.some((item) => item.product.category === member.requirement);
+      const has = items.some((item) => (item.product.includedCategories ?? [item.product.category]).includes(member.requirement));
       if (!has) {
         return {
           ok: false,
@@ -558,7 +572,7 @@ export function validateProposal(
 
     // 每人必须有主食：这是「一份饭」的下限，规则版的 buildPlan 也是这么判的。
     // 模型只给一份薯条不算一餐，必须在进试算之前就拦掉。
-    if ((options.requireMain ?? true) && !items.some((item) => item.product.category === 'burger')) {
+    if ((options.requireMain ?? true) && !items.some((item) => (item.product.hasMain ?? item.product.category === 'burger'))) {
       return {
         ok: false,
         violation: {
@@ -582,7 +596,7 @@ export function validateProposal(
     }
 
     const matchedLikes = member.likes.filter((category) =>
-      items.some((item) => item.product.category === category),
+      items.some((item) => (item.product.includedCategories ?? [item.product.category]).includes(category)),
     );
 
     selections.push({

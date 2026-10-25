@@ -32,6 +32,10 @@ export interface Product {
   beef?: boolean;
   emoji: string;
   image?: string | null;
+  isCombo?: boolean;
+  hasMain?: boolean;
+  includedCategories?: Category[];
+  components?: { id: string; name: string; quantity: number; category: Category }[];
   dietary?: { spicy: { inferred: boolean; source: string; confidence: string }; beef: { inferred: boolean; source: string; confidence: string }; note: string };
 }
 
@@ -67,6 +71,15 @@ export interface MediationRequest {
   excludePlan?: Plan;
 }
 
+export interface RecoverySuggestion {
+  id: string;
+  title: string;
+  summary: string;
+  verifiedAt: string;
+  changes: { memberId: number; budget?: number; requirement?: Requirement; dislikes?: Category[] }[];
+  plan: Plan;
+}
+
 export interface MediationResult {
   source: 'demo' | 'live';
   plans: Plan[];
@@ -74,6 +87,7 @@ export interface MediationResult {
   products?: Product[];
   store?: Store;
   hints?: { memberId?: number; level: 'info' | 'warn'; message: string }[];
+  suggestions?: RecoverySuggestion[];
   meta?: { planner: string; pricingVerified: boolean; reasoning: string; llm?: string; degraded: boolean; strategiesDeduplicated?: Strategy[]; llmDetail?: { strategy: Strategy; status: 'accepted' | 'rejected' | 'skipped'; code?: string }[] };
 }
 

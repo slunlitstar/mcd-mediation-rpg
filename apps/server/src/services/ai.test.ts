@@ -161,6 +161,23 @@ test('validateProposal：合法方案通过并算出 matched/missingLikes', () =
   assert.equal(first?.requiresManualReview, false);
 });
 
+test('validateProposal checks default combo contents for both requirements and exclusions', () => {
+  const combo = { ...PRODUCTS[0]!, id: 'combo', name: '默认套餐', hasMain: true, isCombo: true, includedCategories: ['burger', 'fries', 'drink'] };
+  const proposal = [{ memberId: 1, items: [{ productId: 'combo', quantity: 1 }] }, { memberId: 2, items: [{ productId: 'combo', quantity: 1 }] }];
+  const input = members(); input[0] = { ...input[0]!, requirement: 'fries', dislikes: [] };
+  input[1] = { ...input[1]!, requirement: 'none', dislikes: [] };
+  assert.equal(validateProposal(proposal, input, [combo]).ok, true);
+  const duplicated = structuredClone(proposal);
+  duplicated[0].items.push({ productId: 'extra-drink', quantity: 1 });
+  const duplicateResult = validateProposal(duplicated, input, [combo, { ...combo, id: 'extra-drink', category: 'drink', isCombo: false, includedCategories: ['drink'], priceCents: 1 }]);
+  assert.equal(duplicateResult.ok, false);
+  if (!duplicateResult.ok) assert.equal(duplicateResult.violation.code, 'model_duplicate_combo_side');
+  input[0].dislikes = ['drink'];
+  const result = validateProposal(proposal, input, [combo]);
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.violation.code, 'model_dislike_violation');
+});
+
 test('validateProposal：编造的商品 ID 被拦（model_unknown_product）', () => {
   const bad: ProposalAllocation[] = [
     { memberId: 1, items: [{ productId: 'fake-999', quantity: 1 }] },

@@ -5,12 +5,15 @@ import { createServer } from 'node:http';
 import { once } from 'node:events';
 import { handleApi } from '../src/routes/api.js';
 import { mcd } from '../src/services/mcd.js';
+import { defaultCombo } from '../src/mcp/default-combo.js';
 import type { UnifiedMenu, UnifiedPricing, UnifiedStore } from '../src/mcp/normalize.js';
-import { generateLivePlans, loadStores } from '../../web/src/services/live-service.js';
+import { generateLivePlans, loadStores, prepareRecovery } from '../../web/src/services/live-service.js';
 import { newMember } from '../../web/src/services/demo-data.js';
 import type { Party } from '../../web/src/types/demo.js';
 
 const menu = JSON.parse(readFileSync(new URL('../fixtures/normalized/menu.json', import.meta.url), 'utf8')) as UnifiedMenu;
+const details = JSON.parse(readFileSync(new URL('../fixtures/raw/meal-detail.json', import.meta.url), 'utf8')).details;
+for (const item of menu.items) if (item.isCombo && details[item.id]) item.combo = defaultCombo(details[item.id]);
 const stores = JSON.parse(readFileSync(new URL('../fixtures/normalized/stores.json', import.meta.url), 'utf8')) as UnifiedStore[];
 const original = { menu: mcd.menu, stores: mcd.stores, price: mcd.price, call: mcd.call };
 mcd.menu = async () => menu;
@@ -62,6 +65,17 @@ try {
   assert.equal(noSolution.plans.length, 0);
   assert.ok(noSolution.issues.some(issue => issue.kind === 'constraint'));
   console.log('PASS insufficient budget is no-solution, never a demo fallback');
+  assert.ok(noSolution.suggestions?.length);
+  const recovered = prepareRecovery(noSolution, low, noSolution.suggestions![0]);
+  assert.ok(recovered.result.plans.length);
+  assert.deepEqual(recovered.party.members[1], low.members[1]);
+  assert.ok(recovered.result.plans[0].allocations.every(member => member.totalCents <= recovered.party.members.find(person => person.id === member.memberId)!.budget! * 100));
+  console.log('PASS verified recovery survives HTTP serialization and applies without another model call');
+  const comboParty = structuredClone(party);
+  comboParty.members = comboParty.members.map(member => ({ ...member, hunger: 'faint', requirement: 'fries' }));
+  const comboResult = await generateLivePlans({ party: comboParty }, undefined, fetcher);
+  assert.ok(comboResult.plans.some(plan => plan.allocations.some(allocation => allocation.items.some(item => comboResult.products!.find(product => product.id === item.productId)!.isCombo))));
+  console.log('PASS default combo content is retained through HTTP route and browser client');
 } finally {
   Object.assign(mcd, original);
   server.closeAllConnections();

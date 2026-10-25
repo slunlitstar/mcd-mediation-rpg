@@ -7,6 +7,27 @@
 
 ## 0. 本轮确认的决定（2026-10-25）
 
+### 无解建议与默认套餐（本次增量）
+
+`plans: []` 仍表示原输入下无可行方案。可选 `suggestions[]` 最多两条，每条为：
+
+```ts
+{
+  id: string;
+  title: string;
+  summary: string;
+  verifiedAt: string; // ISO，前端五分钟后拒绝直接采用，提示重新生成
+  changes: { memberId: number; budget?: number; requirement?: 'none'; dislikes?: Category[] }[];
+  plan: MediatePlan; // 同一门店、按 changes 修改后的成员条件，已经真实计价
+}
+```
+
+原 `plans[]` 不放入调整后的方案，以免把「修改条件后可行」冒充「原条件已满足」。只有用户点击后才应用 `changes` 和预览方案。预算仅能明确提高到 1–200 元整数；食物必点可以明确取消，不喜欢类别每次只取消一项；忌辣／忌牛肉及自填要求不自动放宽。恢复建议按每人一份主餐起步，不承诺满足原份量偏好或最低全局价格。所有分摊不变量仍需通过。服务异常、预算未填或复议请求不生成这类建议。
+
+`products[]` 增加可选 `isCombo`、`hasMain`、`includedCategories[]`、`components[{id,name,quantity,category}]`。套餐必须有 `query-meal-detail` 明确标记的默认选择；缺少、冲突或解析失败时不参与推荐。默认子项参与硬排除与必点检查；食材推导仍保留来源和不确定性。服务端内部保留 `roundList` 并传给 `calculate-price`，前端不自行拼装子项或加总其价格。模型上下文与校验同步检查套餐组成，阻止套餐已有薯条／饮品再重复添加同类单品。
+
+网页本地草稿仅保存输入，24 小时失效；恢复后仍重新获取菜单与价格，不保存旧报价、接受状态或服务端凭据。
+
 | 议题 | 决定 |
 |---|---|
 | 饱腹数据 | 真实数据保留 `fullness: null`。页面保留「饥饿程度」，但只作**份量偏好**处理；示例权重仅留在 Demo，不套到真实商品，不宣称保证吃饱 |

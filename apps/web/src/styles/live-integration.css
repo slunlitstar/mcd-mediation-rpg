@@ -19,3 +19,14 @@
   .strategy-tabs small { display: block; grid-column: 1 / -1; font-size: 10px; line-height: 1.5; white-space: normal; }
 }
 @media (max-width: 359px) { .product-list .product-photo { width: 34px; height: 34px; } }
+.draft-resume { margin-block: 16px; }
+.draft-resume .button { min-height: 48px; }
+.recovery-options { display: grid; gap: 16px; width: 100%; margin-block: 24px; text-align: left; }
+.recovery-card { padding: 20px 16px; border: 1px solid var(--line, #dec6a6); border-radius: 16px; background: var(--cream, #fff8ec); min-width: 0; }
+.recovery-card p, .recovery-card li { font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
+.recovery-card ul { padding-left: 20px; margin-block: 12px; }
+.recovery-card .button { width: 100%; min-height: 48px; white-space: normal; }
+.recovery-total span { display: block; font-size: 13px; }
+.combo-label { display: inline-block; font-size: 11px; font-style: normal; padding: 2px 6px; margin-left: 6px; border-radius: 5px; background: #f6e5ba; color: #68492f; }
+.product-list .combo-contents { white-space: normal; overflow-wrap: anywhere; line-height: 1.6; font-size: 12px; margin-top: 4px; }
+@media (min-width: 960px) { .recovery-options { max-width: 720px; margin-inline: auto; } }

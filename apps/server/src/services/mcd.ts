@@ -13,8 +13,9 @@ import { loadMcpConfig } from '../config/env.js';
 import { McpClient } from '../mcp/client.js';
 import type { McpToolCallResult } from '../mcp/client.js';
 import { McpHttpError, McpRpcError, McpTransportError } from '../mcp/errors.js';
-import { normalizeMenu, normalizePricing, normalizeStores } from '../mcp/normalize.js';
+import { isComboFromDetail, normalizeMenu, normalizePricing, normalizeStores } from '../mcp/normalize.js';
 import type { UnifiedMenu, UnifiedPricing, UnifiedStore } from '../mcp/normalize.js';
+import { defaultCombo } from '../mcp/default-combo.js';
 
 /** 门店未营业时 MCP 返回的业务码。 */
 const STORE_CLOSED_CODE = 600057;
@@ -75,6 +76,7 @@ export interface MenuQuery {
 export interface PriceItem {
   productCode: string;
   quantity: number;
+  roundList?: NonNullable<import('../mcp/normalize.js').UnifiedMenuItem['combo']>['roundList'];
 }
 
 class McdGateway {
@@ -149,12 +151,31 @@ class McdGateway {
       beType,
     });
 
+    // Resolve defaults once per menu cache lifetime, with bounded concurrency.
+    const combos = menu.items.filter(item => item.isCombo);
+    for (let index = 0; index < combos.length; index += 3) {
+      await Promise.all(combos.slice(index, index + 3).map(async item => {
+        try {
+          let detail = await this.call('query-meal-detail', { ...base, code: item.id });
+          if (!detail.ok && shouldRetryWithReservation(detail)) detail = await this.call('query-meal-detail', { ...base, code: item.id, reservationDate: nextNoon() });
+          const verified = detail.ok ? isComboFromDetail(detail.data) : undefined;
+          if (verified !== undefined) { item.isCombo = verified; item.isComboSource = 'detail'; }
+          item.combo = detail.ok ? defaultCombo(detail.data) : undefined;
+        } catch { item.combo = undefined; }
+      }));
+    }
+    menu.meta.comboCount = menu.items.filter(item => item.isCombo).length;
+    menu.meta.comboVerifiedCount = menu.items.filter(item => item.isComboSource === 'detail').length;
+
     this.menuCache.set(cacheKey, { at: Date.now(), menu });
     return menu;
   }
 
   /** 菜单里没有门店名，退回一次门店查询补齐；拿不到就用 storeCode 顶着。 */
   private async storesByNameFallback(storeCode: string): Promise<UnifiedStore[]> {
+    for (const cached of this.storeCache.values()) {
+      if (Date.now() - cached.at < STORE_TTL_MS && cached.stores.some(store => store.id === storeCode)) return cached.stores;
+    }
     const cached = this.storeCache.get('北京\u0000麦当劳');
     if (cached) return cached.stores;
 

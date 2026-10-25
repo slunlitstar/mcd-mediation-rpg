@@ -5,7 +5,7 @@ import MediationEmptyState from './MediationEmptyState';
 import { Arrow, NpcNote, PageTitle } from './UI';
 import { categories, hungerLabel, memberRequirementLabel, money, products as demoProducts, roleFor, strategies } from '../services/demo-data';
 import { resultSourceLabel } from '../services/live-service';
-import type { MediationResult, Party, Product, Strategy } from '../types/demo';
+import type { MediationResult, Party, Product, RecoverySuggestion, Strategy } from '../types/demo';
 
 function ProductPicture({ product }: { product: Product }) {
   const [failed, setFailed] = useState(false);
@@ -28,9 +28,10 @@ interface Props {
   onEdit: (index: number) => void;
   onRetry: () => void;
   onRevise: () => void;
+  onSuggestion: (suggestion: RecoverySuggestion) => void;
 }
 
-export default function MealResults({ party, result, live, storeName, strategy, onStrategy, accepted, onAccept, reviewed, onReviewed, revisionCount, onEdit, onRetry, onRevise }: Props) {
+export default function MealResults({ party, result, live, storeName, strategy, onStrategy, accepted, onAccept, reviewed, onReviewed, revisionCount, onEdit, onRetry, onRevise, onSuggestion }: Props) {
   const plan = result?.plans.find(item => item.strategy === strategy) ?? result?.plans[0];
   const currentStrategy = strategies.find(item => item.id === plan?.strategy) ?? strategies[0];
   const pendingReview = Boolean(plan?.allocations.some(item => item.requiresManualReview) && !reviewed);
@@ -45,7 +46,7 @@ export default function MealResults({ party, result, live, storeName, strategy, 
   return <section className="page results-page">
     <PageTitle number="05" eyebrow="YOUR DINNER ENDING" title={accepted ? '这顿，就这么定了！' : '不同主张，也能一起开饭。'}>{result?.store?.name ?? storeName} · {party.members.length} 位成员 · 同一订单，分别分配{revisionCount > 0 ? ` · 已复议 ${revisionCount} 次` : ''}</PageTitle>
     <p className="source-label">{resultSourceLabel(result, live, plan?.strategy)}</p>
-    {!plan ? <MediationEmptyState party={party} issues={result?.issues ?? []} onEdit={onEdit} onRetry={onRetry} /> : <>
+    {!plan ? <MediationEmptyState party={party} issues={result?.issues ?? []} suggestions={result?.suggestions} onSuggestion={onSuggestion} onEdit={onEdit} onRetry={onRetry} /> : <>
       {notices.length > 0 && <div className="service-notice" role="status">{notices.map(text => <p key={text}>{text}</p>)}</div>}
       {result?.meta?.degraded && <p className="service-notice">部分模型结果暂不可用或未通过核对，已使用规则方案补充；菜单与金额仍按真实数据核对。</p>}
       {accepted && <div className="accepted-banner" role="status"><MediatorArtwork variant="note" /><div><strong>方案已确认，带着这份清单去点餐吧。</strong><p>接受推荐不会创建订单或扣款，实际价格以点餐时为准。</p></div><button className="text-button" onClick={() => onAccept(false)}>继续调整</button></div>}
@@ -66,10 +67,10 @@ export default function MealResults({ party, result, live, storeName, strategy, 
             <ul className="product-list">{allocation.items.map(item => {
               const product = catalog.find(product => product.id === item.productId)!;
               const unit = item.unitPriceCents ?? product.priceCents;
-              return <li key={product.id}><ProductPicture key={`${product.id}-${product.image}`} product={product} /><span>{product.name}<small>{money(unit)} / 份</small></span><span className="product-quantity">×{item.quantity}</span><b>{money(item.subtotalCents ?? unit * item.quantity)}</b></li>;
+              return <li key={product.id}><ProductPicture key={`${product.id}-${product.image}`} product={product} /><span>{product.name}{product.isCombo && <em className="combo-label">默认套餐</em>}<small>{money(unit)} / 份</small>{product.components?.length ? <small className="combo-contents">含：{product.components.map(component => `${component.name} ×${component.quantity}`).join('、')}</small> : null}</span><span className="product-quantity">×{item.quantity}</span><b>{money(item.subtotalCents ?? unit * item.quantity)}</b></li>;
             })}</ul>
             {live && <p className="allocation-pricing-note">个人实付已计入整单优惠分摊，可能与商品明细合计不同。</p>}
-            <div className="allocation-checks"><span>✓ 预算内</span>{allocation.requiresManualReview ? <span className="check-pending">自填要求待核对</span> : inferredDiet ? <span className="check-pending">已按名称／标签筛选</span> : <span>✓ {person.requirement === 'none' ? '已按份量偏好搭配' : memberRequirementLabel(person)}</span>}</div>
+            <div className="allocation-checks"><span>✓ 预算内</span>{allocation.requiresManualReview ? <span className="check-pending">自填要求待核对</span> : inferredDiet ? <span className="check-pending">已按名称／标签筛选</span> : <span>✓ {person.requirement === 'none' ? (live ? '主餐已安排' : '已按份量偏好搭配') : memberRequirementLabel(person)}</span>}</div>
             {inferredDiet && <p className="dietary-note">{memberRequirementLabel(person)}：依据商品名称与标签推导，非官方配料确认；请在点餐时核对配料。</p>}
             {allocation.requiresManualReview && <div className="custom-review-note"><strong>你的要求：{person.customRequirement.trim() || '请核对餐品与个人要求'}</strong><p>已记录，请核对上方餐品后再接受方案。</p></div>}
           </article>;

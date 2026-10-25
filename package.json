@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "麦门饭局调解所：轻 RPG、多人点餐协商与麦当劳 MCP 的 AI Web 应用（初始化骨架）",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "engines": {
     "node": ">=24.12.0 <25",
     "npm": ">=11 <12"
@@ -18,7 +21,7 @@
     "build": "npm run build --workspaces --if-present",
     "check": "npm run typecheck && npm run build",
     "test": "npm run test --workspace=@mcd/server && npm run test:web",
-    "test:web": "node --import tsx --test apps/web/src/services/demo-service.test.ts apps/web/src/services/budget-usage.test.ts apps/web/src/services/live-service.test.ts",
+    "test:web": "node --import tsx --test apps/web/src/services/demo-service.test.ts apps/web/src/services/budget-usage.test.ts apps/web/src/services/live-service.test.ts apps/web/src/services/party-draft.test.ts",
     "test:integration": "node --import tsx apps/server/scripts/frontend-smoke.ts"
   },
   "devDependencies": {

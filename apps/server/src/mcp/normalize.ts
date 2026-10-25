@@ -54,6 +54,7 @@ export interface UnifiedMenuItem {
   canWithOrder: boolean;
   tags: string[];
   image?: string;
+  combo?: { verified: boolean; components: { id: string; name: string; quantity: number }[]; roundList: { round: string; comboItemList: { code: string; quantity: number }[] }[] };
 }
 
 /** 菜单接口的统一返回。 */
