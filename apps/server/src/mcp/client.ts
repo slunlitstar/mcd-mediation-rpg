@@ -280,6 +280,17 @@ export class McpClient {
         throw new McpTransportError('timeout', `MCP 请求超时（${this.timeoutMs}ms）：${this.endpoint}`);
       }
       const message = error instanceof Error ? error.message : String(error);
+      const cause = error instanceof Error ? error.cause : undefined;
+      const failures = cause instanceof AggregateError ? cause.errors : [cause];
+      // Log only transport codes, never authorization headers or response bodies.
+      console.error('[mcp] connection failed', {
+        host: new URL(this.endpoint).hostname,
+        codes: failures.map((failure: unknown) =>
+          typeof failure === 'object' && failure !== null && 'code' in failure
+            ? String(failure.code)
+            : 'unknown',
+        ),
+      });
       throw new McpTransportError('network', `无法连接 ${this.endpoint}：${message}`);
     } finally {
       clearTimeout(timer);
