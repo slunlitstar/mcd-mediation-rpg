@@ -124,9 +124,12 @@ export function preferredStrategy(plans: Plan[], preferred: Strategy = 'peace'):
   return plans.find(plan => plan.strategy === preferred)?.strategy ?? plans[0]?.strategy ?? preferred;
 }
 
-export function resultSourceLabel(result: MediationResult | null, live = true): string {
+export function resultSourceLabel(result: MediationResult | null, live = true, strategy?: Strategy): string {
   if (!live || result?.source === 'demo') return '示例菜单 · 离线演示';
   if (!result) return '真实门店 · 正在核对';
   if (result.plans.length === 0) return '真实门店模式 · 本次未生成方案';
-  return result.meta?.reasoning === 'rules' ? '真实菜单与试算 · 规则推荐' : result.meta?.reasoning === 'llm' || result.meta?.llm === 'available' ? '真实菜单与试算 · 模型参与推荐' : '真实菜单与试算';
+  const attempt = strategy ? result.meta?.llmDetail?.find(item => item.strategy === strategy) : undefined;
+  if (attempt?.status === 'accepted') return '真实菜单与试算 · 模型参与推荐';
+  if (attempt || result.meta?.reasoning === 'rules' || result.meta?.reasoning === 'rules-fallback') return '真实菜单与试算 · 规则推荐';
+  return !strategy && result.meta?.reasoning === 'llm' ? '真实菜单与试算 · 模型参与推荐' : '真实菜单与试算';
 }

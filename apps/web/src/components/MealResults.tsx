@@ -44,10 +44,10 @@ export default function MealResults({ party, result, live, storeName, strategy, 
   }
   return <section className="page results-page">
     <PageTitle number="05" eyebrow="YOUR DINNER ENDING" title={accepted ? '这顿，就这么定了！' : '不同主张，也能一起开饭。'}>{result?.store?.name ?? storeName} · {party.members.length} 位成员 · 同一订单，分别分配{revisionCount > 0 ? ` · 已复议 ${revisionCount} 次` : ''}</PageTitle>
-    <p className="source-label">{resultSourceLabel(result, live)}</p>
+    <p className="source-label">{resultSourceLabel(result, live, plan?.strategy)}</p>
     {!plan ? <MediationEmptyState party={party} issues={result?.issues ?? []} onEdit={onEdit} onRetry={onRetry} /> : <>
       {notices.length > 0 && <div className="service-notice" role="status">{notices.map(text => <p key={text}>{text}</p>)}</div>}
-      {result?.meta?.degraded && <p className="service-notice">本次使用规则推荐，模型暂未参与；菜单和金额仍按真实数据核对。</p>}
+      {result?.meta?.degraded && <p className="service-notice">部分模型结果暂不可用或未通过核对，已使用规则方案补充；菜单与金额仍按真实数据核对。</p>}
       {accepted && <div className="accepted-banner" role="status"><MediatorArtwork variant="note" /><div><strong>方案已确认，带着这份清单去点餐吧。</strong><p>接受推荐不会创建订单或扣款，实际价格以点餐时为准。</p></div><button className="text-button" onClick={() => onAccept(false)}>继续调整</button></div>}
       <div className="strategy-tabs" role="tablist" aria-label="选择方案策略">{strategies.map(item => {
         const available = result!.plans.some(plan => plan.strategy === item.id);
@@ -78,7 +78,7 @@ export default function MealResults({ party, result, live, storeName, strategy, 
           <div className="receipt-line"><span>餐品合计</span><b>{money(plan.productSubtotalCents ?? plan.totalCents)}</b></div>
           <div className="receipt-line"><span>整单优惠</span><span>{money(plan.discountCents ?? 0)}</span></div>
           <div className="receipt-rule" /><div className="receipt-total"><span>总价</span><strong>{money(plan.totalCents)}</strong></div>
-          <p className="receipt-budget">每个人的分摊花费均已分别检查预算。</p><span className="receipt-demo">{resultSourceLabel(result, live)} · 非真实订单</span>
+          <p className="receipt-budget">每个人的分摊花费均已分别检查预算。</p><span className="receipt-demo">{resultSourceLabel(result, live, plan.strategy)} · 非真实订单</span>
           {!accepted && plan.allocations.some(item => item.requiresManualReview) && <label id="custom-review-confirm" className="custom-review-confirm"><input type="checkbox" checked={reviewed} onChange={event => onReviewed(event.target.checked)} />我已逐项核对所有自填要求</label>}
           {!accepted && <button className="button button-primary receipt-accept" disabled={pendingReview} onClick={accept}>{pendingReview ? '请先核对自填要求' : '接受这套方案'} ✓</button>}
           <button className="button button-outline" onClick={onRevise}>申请复议 ↻</button><button className="text-button receipt-edit" onClick={() => onEdit(0)}>返回修改成员属性 <Arrow left /></button>

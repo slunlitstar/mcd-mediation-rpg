@@ -74,7 +74,7 @@ export interface MediationResult {
   products?: Product[];
   store?: Store;
   hints?: { memberId?: number; level: 'info' | 'warn'; message: string }[];
-  meta?: { planner: string; pricingVerified: boolean; reasoning: string; llm?: string; degraded: boolean; strategiesDeduplicated?: Strategy[] };
+  meta?: { planner: string; pricingVerified: boolean; reasoning: string; llm?: string; degraded: boolean; strategiesDeduplicated?: Strategy[]; llmDetail?: { strategy: Strategy; status: 'accepted' | 'rejected' | 'skipped'; code?: string }[] };
 }
 
 export interface Store {

@@ -83,3 +83,17 @@ test('revision result cannot silently replace another member or reuse unchanged 
   const request = { party, revision: { memberId: 1, action: 'cheaper' as const }, excludePlan: previous };
   await assert.rejects(generateLivePlans(request, undefined, respond({ ok: true, data: fixture() })), /原方案已保留/);
 });
+
+test('model fixture passes the same catalog and money checks; source labels follow each strategy', () => {
+  const modelSample = JSON.parse(readFileSync(new URL('../../../server/fixtures/normalized/mediate.llm.sample.json', import.meta.url), 'utf8'));
+  const modelParty: Party = { storeId: modelSample.store.id, members: modelSample.plans[0].allocations.map((allocation: { memberId: number; budgetCents: number }) => ({ ...newMember(allocation.memberId), roleId: 'saver', budget: allocation.budgetCents / 100 })) };
+  const parsed = parseLiveResult(modelSample, modelParty);
+  assert.ok(parsed.plans.length > 0);
+  assert.match(resultSourceLabel(parsed, true, parsed.plans[0].strategy), /模型参与/);
+  const mixed = structuredClone(parsed);
+  mixed.meta!.degraded = true;
+  mixed.meta!.llmDetail = [{ strategy: 'saving', status: 'accepted' }, { strategy: 'peace', status: 'rejected' }, { strategy: 'happy', status: 'skipped' }];
+  assert.match(resultSourceLabel(mixed, true, 'saving'), /模型参与/);
+  assert.match(resultSourceLabel(mixed, true, 'peace'), /规则推荐/);
+  assert.match(resultSourceLabel(mixed, true, 'happy'), /规则推荐/);
+});
