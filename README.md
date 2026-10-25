@@ -17,6 +17,8 @@
 模型接入需要 `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` 三项齐全，只填 Key 不算接入。
 验证：`npm run ai:probe -w @mcd/server`。
 
+Vercel 前后端一体部署配置、服务端环境变量和线上验收见 [Vercel 部署](docs/vercel-deployment.md)。
+
 ## 技术结构
 
 采用 npm workspaces 管理前后端：前端为 React + Vite + TypeScript，服务端为

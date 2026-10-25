@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+!.env.example
+node_modules
+**/node_modules
+**/dist
+output
+coverage
+*.log
+apps/server/fixtures
+apps/server/scripts
+**/*.test.ts

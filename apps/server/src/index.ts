@@ -3,11 +3,11 @@ import { createServer } from 'node:http';
 import { handleApi } from './routes/api.js';
 import { mcd } from './services/mcd.js';
 
-const host = process.env.SERVER_HOST || '127.0.0.1';
-const port = Number(process.env.SERVER_PORT || 3001);
+const host = process.env.SERVER_HOST || (process.env.VERCEL ? '0.0.0.0' : '127.0.0.1');
+const port = Number(process.env.PORT || process.env.SERVER_PORT || 3001);
 
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  throw new Error('SERVER_PORT must be an integer between 1 and 65535.');
+  throw new Error('PORT / SERVER_PORT must be an integer between 1 and 65535.');
 }
 
 const server = createServer((request, response) => {
