@@ -4,6 +4,7 @@
     "web": {
       "root": "apps/web",
       "framework": "vite",
+      "installCommand": "cd ../.. && npm ci --include=dev",
       "buildCommand": "npm run build",
       "outputDirectory": "dist",
       "rewrites": [
@@ -13,6 +14,7 @@
     "server": {
       "root": "apps/server",
       "entrypoint": "src/index.ts",
+      "installCommand": "cd ../.. && npm ci --include=dev",
       "buildCommand": "npm run build",
       "functions": {
         "src/index.ts": {
