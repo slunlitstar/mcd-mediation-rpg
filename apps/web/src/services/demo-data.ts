@@ -35,7 +35,7 @@ export const stores = [
 ];
 
 // Entirely fictional products/prices. This catalog is intentionally separate from the UI.
-export const products: Product[] = [
+export const products: (Product & { fullness: number })[] = [
   { id: 'chicken-burger', name: '原味鸡肉堡（示例）', category: 'burger', priceCents: 1200, fullness: 2, emoji: '🍔' },
   { id: 'beef-burger', name: '芝士牛肉堡（示例）', category: 'burger', priceCents: 1600, fullness: 2, beef: true, emoji: '🍔' },
   { id: 'spicy-burger', name: '香辣鸡肉堡（示例）', category: 'burger', priceCents: 1400, fullness: 2, spicy: true, emoji: '🍔' },

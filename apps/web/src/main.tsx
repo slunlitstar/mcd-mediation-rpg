@@ -7,6 +7,7 @@ import './styles/character-creation.css';
 import './styles/cross-page.css';
 import './styles/theme.css';
 import './styles/motion.css';
+import './styles/live-integration.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -27,15 +27,17 @@ export interface Product {
   name: string;
   category: Category;
   priceCents: number;
-  fullness: number; // Demo weight, not nutrition information.
+  fullness: number | null; // Demo weight only; real products have no fullness data.
   spicy?: boolean;
   beef?: boolean;
   emoji: string;
+  image?: string | null;
+  dietary?: { spicy: { inferred: boolean; source: string; confidence: string }; beef: { inferred: boolean; source: string; confidence: string }; note: string };
 }
 
 export interface Allocation {
   memberId: number;
-  items: { productId: string; quantity: number }[];
+  items: { productId: string; quantity: number; unitPriceCents?: number; subtotalCents?: number }[];
   totalCents: number;
   matchedLikes: Category[];
   missingLikes: Category[];
@@ -44,10 +46,14 @@ export interface Allocation {
 }
 
 export interface Plan {
+  planId?: string;
   strategy: Strategy;
   allocations: Allocation[];
   totalCents: number;
   explanations: string[];
+  productSubtotalCents?: number;
+  discountCents?: number;
+  payableCents?: number;
 }
 
 export interface Revision {
@@ -62,7 +68,20 @@ export interface MediationRequest {
 }
 
 export interface MediationResult {
-  source: 'demo';
+  source: 'demo' | 'live';
   plans: Plan[];
-  issues: { memberId: number; message: string; kind?: 'input' | 'constraint' | 'unavailable' }[];
+  issues: { memberId?: number; message: string; kind?: 'input' | 'constraint' | 'unavailable'; code?: string; blocking?: boolean }[];
+  products?: Product[];
+  store?: Store;
+  hints?: { memberId?: number; level: 'info' | 'warn'; message: string }[];
+  meta?: { planner: string; pricingVerified: boolean; reasoning: string; llm?: string; degraded: boolean; strategiesDeduplicated?: Strategy[] };
+}
+
+export interface Store {
+  id: string;
+  name: string;
+  address?: string;
+  businessStatus?: boolean;
+  businessHours?: string;
+  distance?: number | string;
 }

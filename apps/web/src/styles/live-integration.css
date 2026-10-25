@@ -1,0 +1,21 @@
+/* New data controls keep the existing mobile-first visual standard. */
+.store-search { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); gap: 10px; margin: 0 0 16px; }
+.store-search label { display: grid; gap: 6px; min-width: 0; font-size: 13px; color: var(--ink); }
+.store-search input { width: 100%; min-width: 0; min-height: 46px; padding: 9px 10px; border: 1px solid var(--line, #d8c8aa); border-radius: 9px; background: var(--surface, #fffbf3); color: var(--ink); font: inherit; font-size: 16px; }
+.store-search button { grid-column: 1 / -1; min-height: 46px; }
+.service-notice { margin: 12px 0 18px; padding: 12px 14px; border: 1px solid #dfc9a7; border-radius: 10px; background: #fff0cd; color: var(--ink); font-size: 13px; line-height: 1.75; overflow-wrap: anywhere; }
+.service-notice p { margin: 4px 0; }
+.strategy-notice, .allocation-pricing-note, .dietary-note { font-size: 12px; line-height: 1.7; color: #80654c; overflow-wrap: anywhere; }
+.strategy-notice { margin: 0 0 16px; }
+.allocation-pricing-note, .dietary-note { margin: 10px 0 0; }
+.product-list .product-photo { display: block; width: 44px; height: 44px; border-radius: 8px; object-fit: contain; background: #fffbf3; flex-shrink: 0; }
+.product-list li > span:not(.product-emoji) { min-width: 0; overflow-wrap: anywhere; }
+.strategy-tabs button:disabled { opacity: .6; cursor: default; }
+.results-page > .source-label { margin-bottom: 16px; }
+@media (max-width: 959px) {
+  .strategy-tabs button { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 4px; padding: 9px 6px; min-width: 0; text-align: left; }
+  .strategy-tabs button > span { font-size: 18px; }
+  .strategy-tabs strong { font-size: 14px; }
+  .strategy-tabs small { display: block; grid-column: 1 / -1; font-size: 10px; line-height: 1.5; white-space: normal; }
+}
+@media (max-width: 359px) { .product-list .product-photo { width: 34px; height: 34px; } }

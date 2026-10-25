@@ -8,6 +8,7 @@
 | [UI 配色](ui-theme.md) | 全站颜色与维护位置 |
 | [动态与可视化](ui-motion.md) | 角色姿态、仲裁阶段与预算条 |
 | [联调交接](integration-handoff.md) | 前后端分支与工作范围 |
+| [前端接口联调](frontend-live-integration.md) | 真实模式、离线模式、测试及模型后续接入 |
 | [接口](api.md) | 门店、菜单、方案等 HTTP 接口 |
 | [推荐与复议契约](mediate-contract.md) | 已实现的 /api/mediate、金额、限制与模型接入边界 |
 | [MCP 工具](mcp-tools.md) | 工具清单与能力 |

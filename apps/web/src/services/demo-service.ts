@@ -44,7 +44,7 @@ function candidatesFor(member: Member): Candidate[] {
     for (let index = start; index < allowed.length; index++) {
       const product = allowed[index];
       if (selected.filter(item => item.category === product.category).length >= (product.category === 'burger' ? 2 : 1)) continue;
-      visit(index, [...selected, product], cost + product.priceCents, fullness + product.fullness);
+      visit(index, [...selected, product], cost + product.priceCents, fullness + (product.fullness ?? 0));
     }
   };
   visit(0, [], 0, 0);

@@ -70,7 +70,7 @@ cp .env.example .env
 npm run dev
 ```
 
-前端地址为 `http://127.0.0.1:5173`，可独立运行五页面 Demo；首页可载入三人示例。
+前端地址为 `http://127.0.0.1:5173`。「开始饭局」调用真实后端；「体验三人示例」独立运行离线演示。
 服务端默认监听 `http://127.0.0.1:3001`，提供 `/api/health`、`/api/stores`、`/api/menu`、`/api/plan` 和 `/api/mediate`。
 Vite 已预留 `/api` 开发代理，目标随根目录 `.env` 中的服务端地址和端口调整。
 
@@ -110,7 +110,7 @@ npm run start --workspace=@mcd/server
 ```
 
 CI 在 `main` 的推送和面向 `main` 的 PR 上运行 `npm ci` 与 `npm run check`。
-前端示例方案的约束检查可单独运行：`node --import tsx --test apps/web/src/services/demo-service.test.ts`。
+前后端离线测试：`npm test`。浏览器 API 客户端与真实 HTTP 路由的隔离联调：`npm run test:integration`，后者只调用本机临时服务，MCP 依赖使用样例替换。
 
 ## 环境变量与凭据
 
@@ -125,6 +125,7 @@ CI 在 `main` 的推送和面向 `main` 的 PR 上运行 `npm ci` 与 `npm run c
 建议 A 负责前端，B 负责服务端 MCP / AI，双方共同维护接口契约和工程配置。
 详细流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 本轮分支提交与前后端联调交接见 [联调交接](docs/integration-handoff.md)。
+前端真实接口接入、验证范围与模型交接见 [前端接口联调](docs/frontend-live-integration.md)。
 
 ## GitHub 首次发布（需要本机授权）
 

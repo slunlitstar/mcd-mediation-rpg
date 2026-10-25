@@ -16,7 +16,10 @@
     "dev:server": "npm run dev --workspace=@mcd/server",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
-    "check": "npm run typecheck && npm run build"
+    "check": "npm run typecheck && npm run build",
+    "test": "npm run test --workspace=@mcd/server && npm run test:web",
+    "test:web": "node --import tsx --test apps/web/src/services/demo-service.test.ts apps/web/src/services/budget-usage.test.ts apps/web/src/services/live-service.test.ts",
+    "test:integration": "node --import tsx apps/server/scripts/frontend-smoke.ts"
   },
   "devDependencies": {
     "concurrently": "^9.0.0",

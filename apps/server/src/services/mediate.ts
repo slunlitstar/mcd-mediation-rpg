@@ -444,7 +444,7 @@ function selectForMember(
         member,
         strategy,
         budgetCents,
-        (entry) => entry.product.category === 'burger' && entry.product.priceCents <= budgetCents,
+        (entry) => entry.product.category === 'burger' && entry.product.priceCents <= remaining(),
       );
       if (candidate !== undefined) {
         take(candidate, '主食');
@@ -540,6 +540,23 @@ async function buildPlan(
   traceId: string,
   sequence: number,
 ): Promise<BuiltPlan | { error: MediateIssue }> {
+  // A priced basket is not a feasible group meal if someone received no main,
+  // or a required food was silently skipped while choosing affordable items.
+  for (const selection of selections) {
+    const member = members.find(entry => entry.id === selection.memberId);
+    if (!member) continue;
+    const required = requiredCategory(member);
+    const hasMain = selection.items.some(entry => entry.candidate.product.category === 'burger');
+    const meetsRequirement = required === undefined || selection.items.some(entry => entry.candidate.product.category === required);
+    if (!hasMain || !meetsRequirement) {
+      return { error: {
+        memberId: member.id,
+        code: !hasMain ? 'no_main_within_budget' : 'required_food_unavailable',
+        kind: 'constraint', blocking: true,
+        message: !hasMain ? `成员${member.id}的预算与限制下没有可行主食，请调整设置。` : `成员${member.id}的不可退让要求暂时无法满足，请调整设置。`,
+      } };
+    }
+  }
   const basketMap = new Map<string, PriceItem>();
   for (const selection of selections) {
     for (const entry of selection.items) {
@@ -691,7 +708,7 @@ function applyRevision(
   action: RevisionAction,
   pool: Candidate[],
 ): { selection: MemberSelection; note?: MediateIssue } {
-  const hard = hardFilter(pool, member);
+  const hard = hardFilter(pool, member).filter(candidate => !isNonMeal(candidate));
   const currentIds = new Set(selection.items.map((entry) => entry.candidate.product.id));
   const currentTotal = selection.items.reduce((sum, entry) => sum + entry.candidate.product.priceCents, 0);
   const budgetCents = Math.round((member.budget ?? 0) * 100);
