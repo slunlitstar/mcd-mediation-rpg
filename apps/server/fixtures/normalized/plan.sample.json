@@ -1,0 +1,286 @@
+{
+  "_note": "方案结果样例（planner=rule-based-v2）：全部金额来自 calculate-price 真实试算，已按整数分分摊。前端第三页/第五页可直接照此铺版。",
+  "_source": {
+    "api": "POST /api/plan",
+    "storeId": "1950212",
+    "generatedAt": "2026-10-25T01:58:53.166Z",
+    "regenerate": "npm run dev:server 后重新 POST 即可"
+  },
+  "planId": "plan_1792893533166_1",
+  "createdAt": "2026-10-25T01:58:53.166Z",
+  "status": "awaiting_confirm",
+  "planner": {
+    "engine": "rule-based-v2",
+    "note": "确定性规则协商：预算为硬约束，预算内无主食则整体无解；金额以 calculate-price 试算为准，按整数分等额分摊并复验个人预算。AI 排序待 AI_API_KEY 配置后接入，输出契约不变。"
+  },
+  "store": {
+    "id": "1950212",
+    "name": "麦当劳北京前门西街餐厅"
+  },
+  "orderType": 1,
+  "beType": 1,
+  "takeWay": {
+    "code": "eat-in",
+    "title": "堂食"
+  },
+  "strategy": {
+    "id": "budget-first",
+    "name": "预算优先 · 独立组餐",
+    "summary": "按每人预算上限与忌口拆成 3 份独立组餐，不做份量共享，最后合并成一单试算并按真实应付分摊。",
+    "rationale": [
+      "预算合计 ¥105，实付 ¥84，剩余 ¥21。",
+      "该门店当前无可用券且试算无优惠，无法靠满减凑单，因此不为了凑单额外加购。",
+      "预算按硬约束处理：预算内买不到主食的成员会让整体直接无解，不会给出超预算方案。"
+    ],
+    "rejectedAlternatives": [
+      {
+        "id": "combo-first",
+        "name": "全部选套餐",
+        "reason": "部分最便宜套餐含辣，忌口成员无法食用；非辣套餐涨价后总额更高。"
+      },
+      {
+        "id": "share-big-combo",
+        "name": "多人分享餐均摊",
+        "reason": "分享餐需按人数整除，第三人的口味诉求无法单独满足，人均不可控。"
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "m1",
+      "name": "小王",
+      "budget": 35,
+      "budgetFen": 3500,
+      "preferences": {
+        "spicy": false,
+        "lightEater": false,
+        "wantChicken": false,
+        "wantVegetable": false
+      },
+      "items": [
+        {
+          "itemId": "9900011872",
+          "name": "芝芝火腿扒堡组合",
+          "quantity": 1,
+          "unitPrice": 25,
+          "unitPriceFen": 2500,
+          "subtotal": 25,
+          "subtotalFen": 2500,
+          "isCombo": true,
+          "category": "早餐汉堡"
+        }
+      ],
+      "cost": 25,
+      "costFen": 2500,
+      "rawSubtotal": 25,
+      "rawSubtotalFen": 2500,
+      "budgetOverBy": 0,
+      "budgetOverFen": 0,
+      "budgetCheck": "passed",
+      "preferenceMatch": {
+        "score": 1,
+        "matched": [
+          "主食「芝芝火腿扒堡组合」¥25（套餐，含配餐/饮料）",
+          "全单已排除辣味商品"
+        ],
+        "unmet": []
+      }
+    },
+    {
+      "id": "m2",
+      "name": "小李",
+      "budget": 30,
+      "budgetFen": 3000,
+      "preferences": {
+        "spicy": true,
+        "lightEater": false,
+        "wantChicken": true,
+        "wantVegetable": false
+      },
+      "items": [
+        {
+          "itemId": "514700",
+          "name": "原味板烧鸡腿炒双蛋堡",
+          "quantity": 1,
+          "unitPrice": 19.5,
+          "unitPriceFen": 1950,
+          "subtotal": 19.5,
+          "subtotalFen": 1950,
+          "isCombo": false,
+          "category": "炒双蛋堡·系列"
+        }
+      ],
+      "cost": 19.5,
+      "costFen": 1950,
+      "rawSubtotal": 19.5,
+      "rawSubtotalFen": 1950,
+      "budgetOverBy": 0,
+      "budgetOverFen": 0,
+      "budgetCheck": "passed",
+      "preferenceMatch": {
+        "score": 1,
+        "matched": [
+          "主食「原味板烧鸡腿炒双蛋堡」¥19.5"
+        ],
+        "unmet": []
+      }
+    },
+    {
+      "id": "m3",
+      "name": "小张",
+      "budget": 40,
+      "budgetFen": 4000,
+      "preferences": {
+        "spicy": false,
+        "lightEater": true,
+        "wantChicken": false,
+        "wantVegetable": true
+      },
+      "items": [
+        {
+          "itemId": "9900011872",
+          "name": "芝芝火腿扒堡组合",
+          "quantity": 1,
+          "unitPrice": 25,
+          "unitPriceFen": 2500,
+          "subtotal": 25,
+          "subtotalFen": 2500,
+          "isCombo": true,
+          "category": "早餐汉堡"
+        },
+        {
+          "itemId": "4437",
+          "name": "小杯玉米杯",
+          "quantity": 1,
+          "unitPrice": 14.5,
+          "unitPriceFen": 1450,
+          "subtotal": 14.5,
+          "subtotalFen": 1450,
+          "isCombo": false,
+          "category": "小食甜品/其他"
+        }
+      ],
+      "cost": 39.5,
+      "costFen": 3950,
+      "rawSubtotal": 39.5,
+      "rawSubtotalFen": 3950,
+      "budgetOverBy": 0,
+      "budgetOverFen": 0,
+      "budgetCheck": "passed",
+      "preferenceMatch": {
+        "score": 1,
+        "matched": [
+          "主食「芝芝火腿扒堡组合」¥25（套餐，含配餐/饮料）",
+          "蔬菜/粗粮诉求由「玉米杯」¥14.5 满足",
+          "全单已排除辣味商品"
+        ],
+        "unmet": []
+      }
+    }
+  ],
+  "totals": {
+    "currency": "CNY",
+    "itemCount": 4,
+    "productOriginalPrice": 84,
+    "productOriginalPriceFen": 8400,
+    "productPrice": 84,
+    "productPriceFen": 8400,
+    "discount": 0,
+    "discountFen": 0,
+    "payable": 84,
+    "payableFen": 8400,
+    "perPersonAvg": 28,
+    "perPersonAvgFen": 2800,
+    "budgetTotal": 105,
+    "budgetTotalFen": 10500,
+    "budgetRemaining": 21,
+    "budgetRemainingFen": 2100,
+    "verifiedBy": "calculate-price",
+    "takeWayOptions": [
+      {
+        "code": "eat-in",
+        "title": "堂食"
+      },
+      {
+        "code": "locker-in",
+        "title": "外带"
+      }
+    ]
+  },
+  "allocation": {
+    "method": "proportional-largest-remainder",
+    "payableFen": 8400,
+    "productPriceFen": 8400,
+    "allocatedFenSum": 8400,
+    "roundingAdjustmentFen": 0,
+    "budgetCheck": "passed"
+  },
+  "coupons": {
+    "availableCount": 0,
+    "source": "query-store-coupons",
+    "applied": [],
+    "note": "该门店 + 当前取餐方式下无可用券，且试算无优惠，折后价等于原价。"
+  },
+  "preferenceMatch": {
+    "score": 0.92,
+    "dimensions": [
+      {
+        "key": "budget",
+        "label": "预算",
+        "score": 1,
+        "detail": "3/3 人在预算内"
+      },
+      {
+        "key": "taste",
+        "label": "口味",
+        "score": 1,
+        "detail": "忌辣成员的商品池已整体排除辣味项"
+      },
+      {
+        "key": "health",
+        "label": "健康",
+        "score": 1,
+        "detail": "1/1 人拿到蔬果类商品"
+      },
+      {
+        "key": "value",
+        "label": "性价比",
+        "score": 0.67,
+        "detail": "共选 2 份套餐，套餐自带配餐通常比单点便宜"
+      }
+    ]
+  },
+  "tradeoffs": [],
+  "unsatisfiable": [
+    {
+      "id": "u1",
+      "memberIds": [
+        "m1",
+        "m2",
+        "m3"
+      ],
+      "request": "用优惠券降低总价",
+      "reason": "query-store-coupons 在当前门店与取餐方式下返回空数组，且试算未产生任何优惠。",
+      "suggestion": "换一家有券的门店，或等账号领到券后重试。",
+      "severity": "blocked"
+    }
+  ],
+  "nextActions": [
+    {
+      "key": "confirm",
+      "label": "确认下单",
+      "enabled": true,
+      "requiresSecondConfirm": true
+    },
+    {
+      "key": "adjust",
+      "label": "调整份量/换品",
+      "enabled": true
+    },
+    {
+      "key": "reselect_store",
+      "label": "换一家门店",
+      "enabled": true
+    }
+  ]
+}

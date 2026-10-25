@@ -1,0 +1,121 @@
+{
+  "capturedAt": "2026-10-24T19:11:05.004Z",
+  "tool": "query-nearby-stores",
+  "args": {
+    "beType": 1,
+    "searchType": 2,
+    "city": "北京",
+    "keyword": "麦当劳"
+  },
+  "data": [
+    {
+      "storeCode": "1950059",
+      "storeName": "麦当劳北京新王府井餐厅",
+      "address": "王府井大街200号北京工艺美术世界",
+      "distance": 2,
+      "businessStatus": false,
+      "businessStartTime": "06:00",
+      "businessEndTime": "22:00",
+      "longitude": 0,
+      "latitude": 0,
+      "reservation": true,
+      "reservationTimeOptions": [
+        {
+          "date": "2026-10-25",
+          "today": true,
+          "reservationOptionText": "早餐(06:14至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)"
+        },
+        {
+          "date": "2026-10-26",
+          "today": false,
+          "reservationOptionText": "早餐(06:14至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)"
+        }
+      ]
+    },
+    {
+      "storeCode": "1950900",
+      "storeName": "麦当劳北京东长安街东方新天地餐厅",
+      "address": "东方广场B1层CC01A商铺",
+      "distance": 338,
+      "businessStatus": false,
+      "businessStartTime": "07:00",
+      "businessEndTime": "22:00",
+      "longitude": 0,
+      "latitude": 0,
+      "reservation": true,
+      "reservationTimeOptions": [
+        {
+          "date": "2026-10-25",
+          "today": true,
+          "reservationOptionText": "早餐(07:14至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)"
+        },
+        {
+          "date": "2026-10-26",
+          "today": false,
+          "reservationOptionText": "早餐(07:14至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)"
+        }
+      ]
+    },
+    {
+      "storeCode": "1950526",
+      "storeName": "麦当劳北京新东安二号餐厅",
+      "address": "王府井大街138号新东安广场地下一层",
+      "distance": 403,
+      "businessStatus": false,
+      "businessStartTime": "08:00",
+      "businessEndTime": "22:00",
+      "longitude": 0,
+      "latitude": 0,
+      "reservation": true,
+      "reservationTimeOptions": [
+        {
+          "date": "2026-10-25",
+          "today": true,
+          "reservationOptionText": "早餐(08:14至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)"
+        },
+        {
+          "date": "2026-10-26",
+          "today": false,
+          "reservationOptionText": "早餐(08:14至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)"
+        }
+      ]
+    },
+    {
+      "storeCode": "1950482",
+      "storeName": "麦当劳北京王府井东街(澳门中心)餐厅",
+      "address": "王府井大街东街8号",
+      "distance": 504,
+      "businessStatus": false,
+      "businessStartTime": "07:00",
+      "businessEndTime": "22:00",
+      "longitude": 0,
+      "latitude": 0,
+      "reservation": false,
+      "reservationTimeOptions": []
+    },
+    {
+      "storeCode": "1951035",
+      "storeName": "麦当劳北京东单北大街餐厅",
+      "address": "东单北大街112、114号",
+      "distance": 556,
+      "businessStatus": false,
+      "businessStartTime": "06:30",
+      "businessEndTime": "22:30",
+      "longitude": 0,
+      "latitude": 0,
+      "reservation": true,
+      "reservationTimeOptions": [
+        {
+          "date": "2026-10-25",
+          "today": true,
+          "reservationOptionText": "早餐(06:44至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)，宵夜(22:14至22:16)"
+        },
+        {
+          "date": "2026-10-26",
+          "today": false,
+          "reservationOptionText": "早餐(06:44至10:15)，午餐(10:44至14:15)，下午茶(14:44至16:45)，夜市(17:14至21:45)，宵夜(22:14至22:16)"
+        }
+      ]
+    }
+  ]
+}
