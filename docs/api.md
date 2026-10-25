@@ -161,8 +161,24 @@
 策略：`saving`（最低实际应付）/ `peace`（均衡）/ `happy`（偏好匹配），
 结果相同则去重并记录在 `meta.strategiesDeduplicated`。
 
-实测（2026-10-25，真实 MCP，3 人）：返回 2 个方案，`strategiesDeduplicated: ["happy"]`，
-分摊合计与应付一致、无人超预算、人工核对为非阻塞提示。
+### `meta` 里的模型信息
+
+| 字段 | 含义 |
+|---|---|
+| `planner` | `rule-based-v2`（规则版）或 `llm-validated-v1`（模型提方案 + 程序校验通过） |
+| `reasoning` | `rules` / `llm` / `rules-fallback`（模型被调用了，但方案被拦或调用失败） |
+| `degraded` | `true` 表示这一次模型没顶上、已回退规则版；**不要据此报错**，方案仍然有效 |
+| `llm` | 模型标识，未配置时为 `not_configured` |
+| `llmDetail[]` | 逐策略记录 `{ strategy, status: accepted\|rejected\|skipped, model, code, message, latencyMs }` |
+
+> 模型被拦只会体现在 `hints[]`（非阻塞）与 `meta`，**不会**变成 `blocking: true` 的 issue，
+> 更不会让整页无解。
+
+实测（2026-10-25，真实 MCP，3 人）：
+
+- 规则版：返回 2 个方案，`strategiesDeduplicated: ["happy"]`，分摊合计与应付一致；
+- 模型版（`npm run ai:probe`）：`planner: llm-validated-v1`、`reasoning: llm`、`degraded: false`，
+  模型选品经校验后走 `calculate-price` 重算，应付 3200 分、分摊 1400+850+950=3200 分。
 
 ## 验证
 
@@ -172,6 +188,9 @@ npm run test --workspace=@mcd/server
 
 # 真实接口冒烟（需先启动 dev:server）
 npm run smoke --workspace=@mcd/server
+
+# 真实模型探测（需要 AI_BASE_URL / AI_API_KEY / AI_MODEL）
+npm run ai:probe --workspace=@mcd/server
 ```
 
 前端形状的适配层契约（`/api/mediate`，尚未实现）见 [`mediate-contract.md`](./mediate-contract.md)。

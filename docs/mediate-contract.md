@@ -276,7 +276,9 @@ Content-Type: application/json
     "degraded": false,
     "reasoning": "rules",
     "strategiesReturned": ["saving"],
-    "strategiesDeduplicated": ["peace", "happy"]
+    "strategiesDeduplicated": ["peace", "happy"],
+    "llm": "not_configured",
+    "llmDetail": []
   }
 }
 ```
@@ -414,52 +416,79 @@ Content-Type: application/json
 
 ---
 
-## 7. 模型接入步骤（填 Key 不算完成）
+## 7. 模型接入（已实现，`llm-validated-v1`）
 
-当前 `meta.reasoning = "rules"`、`planner = "rule-based-v2"`。接入真实模型须完成四步，缺一步都不算：
+> 状态：**已接入并真实验证**。`meta.planner` 会在 `rule-based-v2` 与 `llm-validated-v1` 之间如实切换，
+> 不会把规则结果冒充成 AI 结果。
 
-### 第 1 步：配置与探测
+### 7.1 判定口径：什么才算「接入了模型」
 
-- 读取 `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL`；
-- 启动时做一次最小连通性探测，失败则 `meta.llm = "unavailable"`，planner 保持规则版；
-- **只填 Key 不算接入**，必须有真实请求与响应日志。
+只有同时满足下面四条才算接入，缺一条都按未接入处理：
 
-### 第 2 步：喂真实上下文
+1. `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` **三项齐全**（只填 Key → `meta.llm = "not_configured"`）；
+2. 真实菜单与真实成员需求被发到模型；
+3. 模型返回的选品被**程序逐条校验**（见 7.3），且金额由 `calculate-price` 重算；
+4. `npm run ai:probe` 能产出一次 `planner: llm-validated-v1` 的真实返回。
+
+### 7.2 一次请求覆盖全部策略
+
+早期实现是「每个策略各发一次」，实测第三方网关的免费额度按**每分钟共享配额**限流，
+三次连发直接 429。现改为**一次请求返回全部策略**：
 
 ```json
-{
-  "store": { "id": "1950212", "name": "..." },
-  "members": [
-    { "id": 1, "budget": 35, "requirement": "no-spicy", "likes": ["burger"], "dislikes": [], "hunger": "hungry" },
-    { "id": 2, "budget": 30, "requirement": "none", "likes": ["fries"], "dislikes": ["drink"], "hunger": "faint" }
-  ],
-  "candidates": [
-    { "id": "1100", "name": "巨无霸", "priceCents": 2600, "category": "burger",
-      "dietary": { "spicy": false, "beef": true } }
-  ]
-}
+{ "plans": [ { "strategy": "saving", "allocations": [ ... ] } ] }
 ```
 
-模型只输出**结构化 JSON**：每位成员选了哪些 `productId`、数量、一句话理由。
-**不允许模型输出金额。**
+好处：请求数 1/3、三种策略基于同一批硬约束比较、限流风险直线下降。
+模型漏给某个策略 → 该策略记 `model_missing_strategy` 并单独降级，不影响其他策略。
 
-### 第 3 步：程序侧强制核对（不可省）
+### 7.3 程序侧强制核对（不可省）
 
-| 校验项 | 不通过时 |
-|---|---|
-| `productId` 必须在本次菜单内 | 丢弃该条并记 `issues` |
-| 数量为正整数且 ≤ 5 | 丢弃该条 |
-| `requirement` / `dislikes` 硬约束 | 丢弃该条 |
-| 每人分摊 ≤ 预算 | 该方案不可行 |
-| **金额一律用 `calculate-price` 重算**，模型给的价格全部忽略 | 以试算为准 |
-| 分摊后 `Σ === payable` | 不成立则拒绝该方案 |
-| `customRequirement` 是否可验证 | 不可验证 → `requiresManualReview: true`，**不得默认满足** |
+模型只负责「选哪些商品」，**不参与任何金额**。`apps/server/src/services/ai.ts` 的
+`parseProposal` 会把模型返回的 `price` / `totalCents` 等字段直接丢弃，`validateProposal`
+再逐条核对：
 
-### 第 4 步：降级与可观测
+| 校验项 | 不通过时 | code |
+|---|---|---|
+| 商品 ID 必须在本次菜单内 | 整份方案拒绝 | `model_unknown_product` |
+| 不能是蘸酱/周边等非餐品 | 整份方案拒绝 | `model_non_meal_product` |
+| 命中 `dislikes`（硬排除） | 整份方案拒绝 | `model_dislike_violation` |
+| `no-spicy` / `no-beef` 食材要求 | 整份方案拒绝 | `model_requirement_violation` |
+| 明确要 `burger/fries/drink` 却没给 | 整份方案拒绝 | `model_missing_required_category` |
+| 数量必须是 1–3 的整数 | 整份方案拒绝 | `model_invalid_quantity` |
+| 按菜单价预检不超个人预算 | 整份方案拒绝 | `model_budget_exceeded` |
+| 必须覆盖全部成员、且不能动被锁定成员 | 整份方案拒绝 | `model_missing_member` / `model_locked_member` |
+| 金额一律用 `calculate-price` 重算 | 模型价格全部忽略 | — |
+| 分摊后 `Σ === payable` 且每人 ≤ 预算 | 该方案不出现，降级规则版 | `allocation_exceeds_budget` |
+| `customRequirement` 是否可验证 | 保持 `requiresManualReview: true`，**不默认满足** | `custom_requirement_unverified` |
 
-- 超时 / 非 JSON / 校验失败率过高 → 回退 `rule-based-v2`，`meta.degraded = true`；
-- 记录请求摘要、响应摘要、token 用量、校验失败条数；
-- 验收：**至少一次真实模型调用**，且有「模型给出非法 `productId` 被拦下」的测试通过。
+**不做「部分采纳」**：只要一条不通过就整份拒绝。部分采纳会让「模型说选了 A、程序悄悄换成 B」，
+前端展示的取舍说明就变成假话。
+
+### 7.4 降级与可观测
+
+- 超时 / 非 JSON / 非法 ID / HTTP 429 → 回退 `rule-based-v2`，
+  `meta.degraded = true`、`meta.reasoning = "rules-fallback"`；
+- 429、5xx 只重试一次（等 `Retry-After` 或 ~1.2s），**重试失败仍然降级，不让整页无解**；
+- `meta.llmDetail[]` 逐策略记录 `{ strategy, status: accepted|rejected|skipped, model, code, message, latencyMs }`；
+- 模型被拦只产生**非阻塞 `hints`**，永不写成 `blocking: true` 的 issue；
+- 复议（`revision`）**不调用模型**：动作语义明确（更便宜 / 加一份薯条），且其他成员必须一动不动，
+  模型容易误解成整单重排 → `llmDetail.status = "skipped"`。
+
+### 7.5 验证方式
+
+```bash
+# 离线：模型层与规则层的全部单测（含本地假网关验证真 fetch）
+npm run test --workspace=@mcd/server
+
+# 真实：MCP 真菜单 + 真模型 + 真计价，产出 fixtures/normalized/mediate.llm.sample.json
+npm run ai:probe --workspace=@mcd/server
+```
+
+`ai:probe` 额外做一次「投毒验证」：把模型给出的商品 ID 改成不存在的值，确认守卫拦得住
+（`model_unknown_product`）——证明拦截靠代码，不靠提示词。
+
+### 边界
 
 ### 边界
 

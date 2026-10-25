@@ -111,6 +111,8 @@ function deps(menu: UnifiedMenu, discountFen = 0): MediateDependencies {
     menu: async () => menu,
     price: fakePrice(menu, discountFen),
     couponCount: async () => 0,
+    // 这一组测试只验证规则版契约，必须显式关掉模型，否则本机填了 AI_* 就会真打网络。
+    proposals: null,
   };
 }
 

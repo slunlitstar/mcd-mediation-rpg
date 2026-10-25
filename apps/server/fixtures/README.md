@@ -21,6 +21,7 @@ fixtures/
     ├── menu.json            # 菜单（统一格式）
     ├── pricing.json         # 计价（统一格式）
     ├── mediate.sample.json  # ★ /api/mediate 前端适配层样例（plans / issues / hints）
+    ├── mediate.llm.sample.json  # ★ 真模型产出的 mediate 结果（planner: llm-validated-v1）
     ├── plan.sample.json     # ★ 方案结果样例（第三页 / 第五页用）
     └── plan.no-solution.sample.json  # ★ 无解样例（预算不足，前端无解态用）
 ```
@@ -29,6 +30,12 @@ fixtures/
 
 ```powershell
 npm run mcp:fixtures -w @mcd/server
+```
+
+`mediate.llm.sample.json` 由真实模型链路生成（需要 `AI_*` 三项齐全）：
+
+```powershell
+npm run ai:probe -w @mcd/server
 ```
 
 ---
@@ -221,6 +228,22 @@ npm run mcp:fixtures -w @mcd/server
   —— 三种策略里有两个结果不同，第三个与已有方案重复，如实记录而不是重复返回；
 - `issues[0]` 是 `custom_requirement_unverified` 且 `blocking: false`
   —— **人工核对不会让整页变成无解**。
+
+## 5.3 `mediate.llm.sample.json` —— 真模型产出
+
+和 `mediate.sample.json` 同一套字段，区别只在 `meta`：
+
+| 字段 | 规则版 | 真模型版 |
+|---|---|---|
+| `meta.planner` | `rule-based-v2` | `llm-validated-v1` |
+| `meta.reasoning` | `rules` | `llm` |
+| `meta.degraded` | `false` | `false`（模型真的顶上了；被拦下时才是 `true`） |
+| `meta.llm` | `not_configured` | 模型标识，例如 `gpt-6.1-sol` |
+| `meta.llmDetail` | `[]` | 逐策略 `accepted/rejected/skipped` 及耗时 |
+
+**前端不需要为模型版写第二套渲染**：`plans[]` / `issues[]` / `hints[]` 的形状完全一致，
+金额仍然全部来自 `calculate-price`，`Σ allocations[].totalCents === payableCents` 照样成立。
+模型被拦时前端只会看到 `meta.degraded: true` 加一条非阻塞 hint，**不会**看到无解页。
 
 ---
 

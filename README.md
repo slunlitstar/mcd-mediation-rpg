@@ -5,10 +5,18 @@
 **当前阶段：服务端已打通真实麦当劳 MCP，前端待开发。**
 
 已完成：MCP 接入层（握手 / 错误映射 / 缓存）、35 个工具盘点、数据形状基线、写链路空跑验证、
-统一格式转换层、HTTP 接口（门店 / 菜单 / 方案生成）、前端样例 fixtures。
+统一格式转换层、HTTP 接口（门店 / 菜单 / 方案生成 / 前端适配层 `/api/mediate`）、前端样例 fixtures。
 
 未完成：前端页面（仍是占位）、下单链路（`create-order` + 支付）、多人房间与 RPG 玩法。
-方案生成目前是**确定性规则版**（`rule-based-v1`），未接入大模型 —— `.env` 里的 `AI_*` 仍为空。
+
+方案生成有两条路径，`meta.planner` 会如实标注是哪一条：
+
+- `rule-based-v2`：确定性规则版，预算硬约束、真实 `calculate-price`、整数分摊；
+- `llm-validated-v1`：模型提方案（只给商品 ID 与数量，**不给金额**），程序逐条校验商品、
+  硬约束与预算，再走真实计价与整数分摊；模型超时/被拦自动回退规则版（`meta.degraded = true`）。
+
+模型接入需要 `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` 三项齐全，只填 Key 不算接入。
+验证：`npm run ai:probe -w @mcd/server`。
 
 ## 技术结构
 

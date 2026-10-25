@@ -1,0 +1,2711 @@
+{
+  "source": "live",
+  "traceId": "med_1792898704199",
+  "store": {
+    "id": "1950059",
+    "name": "麦当劳北京新王府井餐厅"
+  },
+  "products": [
+    {
+      "id": "1100",
+      "name": "巨无霸",
+      "category": "burger",
+      "priceCents": 2600,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_1100_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1106",
+      "name": "培根蔬萃双层牛堡",
+      "category": "burger",
+      "priceCents": 2500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_1106_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1120",
+      "name": "双层吉士汉堡",
+      "category": "burger",
+      "priceCents": 2300,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_1120_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1401",
+      "name": "麦乐鸡",
+      "category": "snack",
+      "priceCents": 1400,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260529/product/MS_G1401_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1406",
+      "name": "板烧鸡腿堡",
+      "category": "burger",
+      "priceCents": 2350,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20241008/product/MS_1406_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1440",
+      "name": "麦辣鸡腿汉堡",
+      "category": "burger",
+      "priceCents": 2250,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260325/product/MS_1440_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1450",
+      "name": "麦香鸡",
+      "category": "burger",
+      "priceCents": 1700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_1450_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1600",
+      "name": "麦香鱼",
+      "category": "burger",
+      "priceCents": 2300,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260101/product/MS_1600_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "1700",
+      "name": "麦辣鸡翅",
+      "category": "snack",
+      "priceCents": 1500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260325/product/MS_G1700_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "2430",
+      "name": "【美汁源】“黄金橙橙”",
+      "category": "drink",
+      "priceCents": 1300,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20240904/product/MS_2430_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "3010",
+      "name": "雪碧",
+      "category": "drink",
+      "priceCents": 950,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G3010_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "3505",
+      "name": "锡兰红茶",
+      "category": "drink",
+      "priceCents": 1150,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_3505_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "3755",
+      "name": "纯牛奶(盒装)",
+      "category": "drink",
+      "priceCents": 1100,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20240731/product/MS_3755_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "4437",
+      "name": "玉米杯",
+      "category": "snack",
+      "priceCents": 1300,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G4437_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "4648",
+      "name": "不素之霸双层牛堡",
+      "category": "burger",
+      "priceCents": 2700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_4648_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "4810",
+      "name": "薯条",
+      "category": "fries",
+      "priceCents": 1450,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20250523/product/MS_G4810_320_1747877491921.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "6102",
+      "name": "苹果片",
+      "category": "snack",
+      "priceCents": 700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_6102_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "6352",
+      "name": "阳光橙麦炫酷",
+      "category": "drink",
+      "priceCents": 1250,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_6352_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "6362",
+      "name": "100% 苹果汁(盒装)",
+      "category": "drink",
+      "priceCents": 1200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20250430/product/MS_6362_320_1745552987716.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "507387",
+      "name": "卡布奇诺",
+      "category": "drink",
+      "priceCents": 2100,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20250324/product/MS_G507388_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "507389",
+      "name": "浓缩咖啡",
+      "category": "drink",
+      "priceCents": 1500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20250324/product/MS_507389_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "507394",
+      "name": "牛奶",
+      "category": "drink",
+      "priceCents": 1900,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G5073941_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "507409",
+      "name": "麦咖啡™奶铁",
+      "category": "drink",
+      "priceCents": 1390,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260422/product/MS_G507372_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "507411",
+      "name": "麦咖啡™美式",
+      "category": "drink",
+      "priceCents": 1190,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260422/product/MS_G507374_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "510479",
+      "name": "燕麦奶铁",
+      "category": "drink",
+      "priceCents": 990,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260422/product/MS_G510481_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "510488",
+      "name": "燕麦奶",
+      "category": "drink",
+      "priceCents": 2100,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G510489_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "511781",
+      "name": "培根安格斯厚牛堡",
+      "category": "burger",
+      "priceCents": 3450,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_511781_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "511782",
+      "name": "芝士安格斯厚牛堡",
+      "category": "burger",
+      "priceCents": 3150,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_511782_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "512937",
+      "name": "浓浓抹茶牛奶",
+      "category": "drink",
+      "priceCents": 2300,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260422/product/MS_G512941_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "515280",
+      "name": "阳光柠檬红茶",
+      "category": "drink",
+      "priceCents": 950,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G515280_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "515520",
+      "name": "怡泉+C",
+      "category": "drink",
+      "priceCents": 1150,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G515520_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "515837",
+      "name": "圆筒冰淇淋",
+      "category": "dessert",
+      "priceCents": 500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G515837_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "515946",
+      "name": "浓浓黑巧（冰/热）",
+      "category": "snack",
+      "priceCents": 1390,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_G515945_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "515955",
+      "name": "浓浓燕麦黑巧（冰/热）",
+      "category": "drink",
+      "priceCents": 1590,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_G515954_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "520445",
+      "name": "薄皮焦香V翅",
+      "category": "snack",
+      "priceCents": 1600,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20241202/product/MS_520445_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "520689",
+      "name": "鲜萃咖啡",
+      "category": "drink",
+      "priceCents": 950,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20250324/product/MS_G520688_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521156",
+      "name": "那么大鸡排（椒盐风味）",
+      "category": "snack",
+      "priceCents": 1400,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260101/product/MS_521156_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521316",
+      "name": "高达吉士双牛堡",
+      "category": "burger",
+      "priceCents": 2250,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_521316_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521730",
+      "name": "枫糖风味厚松饼猪柳蛋堡",
+      "category": "burger",
+      "priceCents": 2200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_521730_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521731",
+      "name": "枫糖风味厚松饼猪柳堡",
+      "category": "burger",
+      "priceCents": 1800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_521731_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521741",
+      "name": "脆薯饼",
+      "category": "fries",
+      "priceCents": 850,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_521741_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521750",
+      "name": "泷盐星星麦旋风",
+      "category": "dessert",
+      "priceCents": 1650,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521750_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521817",
+      "name": "【美汁源】“多汁柠柠”",
+      "category": "drink",
+      "priceCents": 1200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260807/product/MS_521817_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521901",
+      "name": "月下相思扭扭薯",
+      "category": "snack",
+      "priceCents": 1600,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_521901_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521914",
+      "name": "“葱不求人“按摩捶痒痒挠",
+      "category": "snack",
+      "priceCents": 1490,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_521914_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521917",
+      "name": "泷愿成真麦旋风——大米风味",
+      "category": "dessert",
+      "priceCents": 1650,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521917_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521929",
+      "name": "旋旋水手帽",
+      "category": "snack",
+      "priceCents": 4880,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260916/product/MS_521929_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521950",
+      "name": "蓝莓爆爆珠麦旋风",
+      "category": "dessert",
+      "priceCents": 1650,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521950_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521951",
+      "name": "灰焰圆筒",
+      "category": "dessert",
+      "priceCents": 500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521951_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521952",
+      "name": "龙焰鸡腿堡",
+      "category": "burger",
+      "priceCents": 1590,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_521952_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521953",
+      "name": "龙焰芝士棒鸡腿堡",
+      "category": "burger",
+      "priceCents": 2700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_521953_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521956",
+      "name": "麦当劳限定丝巾",
+      "category": "snack",
+      "priceCents": 3490,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261023/product/MS_G521955_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521966",
+      "name": "韩式烟熏芝士风味酱",
+      "category": "snack",
+      "priceCents": 300,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_521966_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "521986",
+      "name": "马苏里拉拉丝芝士条",
+      "category": "snack",
+      "priceCents": 1100,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521986_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005456",
+      "name": "麦辣鸡腿汉堡三件套",
+      "category": "burger",
+      "priceCents": 3350,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005456_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900011056",
+      "name": "全明星双人分享餐八件套",
+      "category": "snack",
+      "priceCents": 4990,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_9900011056_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016076",
+      "name": "“我就喜欢”鸡薯双全盒",
+      "category": "snack",
+      "priceCents": 1590,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016076_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016075",
+      "name": "龙焰芝士棒鸡腿堡三件套",
+      "category": "burger",
+      "priceCents": 2990,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016075_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016073",
+      "name": "龙焰鸡腿堡三件套",
+      "category": "burger",
+      "priceCents": 2690,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016073_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005460",
+      "name": "麦香鱼套餐",
+      "category": "burger",
+      "priceCents": 3400,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504968_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005462",
+      "name": "板烧鸡腿堡三件套",
+      "category": "burger",
+      "priceCents": 3450,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005462_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005464",
+      "name": "双层吉士汉堡套餐",
+      "category": "burger",
+      "priceCents": 3400,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504966_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900004236",
+      "name": "人气超值四件套随心选",
+      "category": "burger",
+      "priceCents": 2800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900004236_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005466",
+      "name": "巨无霸三件套",
+      "category": "burger",
+      "priceCents": 3700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005466_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900014838",
+      "name": "枫糖风味厚松饼猪柳蛋堡三件套",
+      "category": "burger",
+      "priceCents": 2790,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_9900014838_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005449",
+      "name": "吉士汉堡包套餐",
+      "category": "burger",
+      "priceCents": 2650,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504971_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900014837",
+      "name": "枫糖风味厚松饼猪柳蛋堡三件套",
+      "category": "burger",
+      "priceCents": 2790,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_9900014837_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900010110",
+      "name": "鱼牛汉堡四件套随心选",
+      "category": "burger",
+      "priceCents": 3200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900010110_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005453",
+      "name": "麦香鸡套餐",
+      "category": "burger",
+      "priceCents": 2800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504967_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900008746",
+      "name": "鸡肉堡单品精选",
+      "category": "burger",
+      "priceCents": 2350,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260624/product/MS_9900008746_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900008745",
+      "name": "新地",
+      "category": "dessert",
+      "priceCents": 1250,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G9900008745_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900008747",
+      "name": "牛肉堡单品精选",
+      "category": "burger",
+      "priceCents": 1400,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_9900008747_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900008751",
+      "name": "可乐",
+      "category": "drink",
+      "priceCents": 950,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900008751_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900006332",
+      "name": "薄皮V翅双拼十翅",
+      "category": "snack",
+      "priceCents": 4990,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260610/product/MS_9900006332_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900008752",
+      "name": "派",
+      "category": "dessert",
+      "priceCents": 800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G9900008752_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900008754",
+      "name": "经典麦旋风",
+      "category": "dessert",
+      "priceCents": 1550,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G9900008754_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005468",
+      "name": "培根蔬萃双层牛堡三件套",
+      "category": "burger",
+      "priceCents": 3600,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005468_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900006957",
+      "name": "安格斯厚牛堡四件套随心选",
+      "category": "burger",
+      "priceCents": 3700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900006957_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900014974",
+      "name": "枫糖风味厚松饼猪柳堡三件套",
+      "category": "burger",
+      "priceCents": 2390,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20261008/product/MS_9900014974_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900015151",
+      "name": "麦麦周末双人餐",
+      "category": "snack",
+      "priceCents": 4990,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900015151_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016082",
+      "name": "心形薯饼5块",
+      "category": "fries",
+      "priceCents": 1550,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016082_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005413",
+      "name": "双层深海鳕鱼堡三件套",
+      "category": "burger",
+      "priceCents": 3600,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005413_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016309",
+      "name": "龙焰鸡腿堡四件套",
+      "category": "burger",
+      "priceCents": 2900,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016309_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900015730",
+      "name": "BFF四宫格小食盘",
+      "category": "snack",
+      "priceCents": 3880,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900015730_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016310",
+      "name": "龙焰芝士棒鸡腿堡四件套",
+      "category": "burger",
+      "priceCents": 3200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016310_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900004835",
+      "name": "麦乐鸡套餐",
+      "category": "snack",
+      "priceCents": 2500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504969_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005421",
+      "name": "鱼排堡开心乐园餐",
+      "category": "burger",
+      "priceCents": 2400,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20250430/product/MS_9900005421_320_1745810420363.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900003586",
+      "name": "双层深海鳕鱼堡",
+      "category": "burger",
+      "priceCents": 2500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900003586_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005422",
+      "name": "汉堡开心乐园餐",
+      "category": "burger",
+      "priceCents": 2350,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20240828/product/MS_9900005422_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000890",
+      "name": "板烧鸡腿堡四件套",
+      "category": "burger",
+      "priceCents": 2800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000890_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900015729",
+      "name": "蘸酱BFF四宫格小食盘",
+      "category": "snack",
+      "priceCents": 4180,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900015729_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900013304",
+      "name": "人气经典随心配",
+      "category": "snack",
+      "priceCents": 1490,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900013304_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900015602",
+      "name": "大堡口福三件套",
+      "category": "burger",
+      "priceCents": 2290,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900015602_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900011128",
+      "name": "“堡”你欢乐套餐",
+      "category": "burger",
+      "priceCents": 2800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900011128_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900011121",
+      "name": "“苹”水相“鱼”套餐",
+      "category": "snack",
+      "priceCents": 3600,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900011121_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900015568",
+      "name": "精选超值随心配",
+      "category": "snack",
+      "priceCents": 1390,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900015568_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900011123",
+      "name": "“辣”么快乐套餐",
+      "category": "snack",
+      "priceCents": 2400,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900011123_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016301",
+      "name": "枫糖风味厚松饼猪柳蛋堡四件套",
+      "category": "burger",
+      "priceCents": 2800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016301_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000888",
+      "name": "巨无霸四件套",
+      "category": "burger",
+      "priceCents": 3200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000888_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000886",
+      "name": "不素之霸双层牛堡四件套",
+      "category": "burger",
+      "priceCents": 3200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000886_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000885",
+      "name": "培根蔬萃双层牛堡四件套",
+      "category": "burger",
+      "priceCents": 3200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000885_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000882",
+      "name": "芝士安格斯厚牛堡四件套",
+      "category": "burger",
+      "priceCents": 3700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000882_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005411",
+      "name": "不素之霸双层牛堡三件套",
+      "category": "burger",
+      "priceCents": 3800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005411_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000881",
+      "name": "培根安格斯厚牛堡四件套",
+      "category": "burger",
+      "priceCents": 3700,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000881_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900004066",
+      "name": "堡堡随心拼（7件任选）",
+      "category": "burger",
+      "priceCents": 7300,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260624/product/MS_9900004066_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900004064",
+      "name": "精选单人餐三件套",
+      "category": "snack",
+      "priceCents": 3450,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900004064_320.gif",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005439",
+      "name": "开心亲子双人餐",
+      "category": "snack",
+      "priceCents": 5950,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20240904/product/MS_9900005439_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900016566",
+      "name": "心形薯饼8块",
+      "category": "fries",
+      "priceCents": 990,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016566_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900009242",
+      "name": "“苹板”支撑Pro套餐",
+      "category": "snack",
+      "priceCents": 3950,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900009242_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900009245",
+      "name": "牛气满满套餐",
+      "category": "snack",
+      "priceCents": 3450,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900009245_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000893",
+      "name": "双层深海鳕鱼堡四件套",
+      "category": "burger",
+      "priceCents": 3200,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000893_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005321",
+      "name": "BFF四宫格小食盘双人餐",
+      "category": "snack",
+      "priceCents": 6290,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260304/product/MS_9900005321_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900000891",
+      "name": "麦辣鸡腿堡四件套",
+      "category": "burger",
+      "priceCents": 2800,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900000891_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": true,
+          "source": "name",
+          "confidence": "medium"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005423",
+      "name": "麦乐鸡开心乐园餐",
+      "category": "snack",
+      "priceCents": 2500,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20240904/product/MS_9900005423_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005428",
+      "name": "培根安格斯厚牛堡三件套",
+      "category": "burger",
+      "priceCents": 4550,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005428_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    },
+    {
+      "id": "9900005430",
+      "name": "芝士安格斯厚牛堡三件套",
+      "category": "burger",
+      "priceCents": 4250,
+      "image": "https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005430_320.png",
+      "fullness": null,
+      "fullnessSource": "unknown",
+      "dietary": {
+        "spicy": {
+          "inferred": false,
+          "source": "name",
+          "confidence": "low"
+        },
+        "beef": {
+          "inferred": true,
+          "source": "tag",
+          "confidence": "high"
+        },
+        "note": "由名称/标签推导，不代表官方成分确认；未出现关键词 ≠ 确认不含"
+      }
+    }
+  ],
+  "plans": [
+    {
+      "planId": "med_1792898704199_1_saving",
+      "strategy": "saving",
+      "allocations": [
+        {
+          "memberId": 1,
+          "items": [
+            {
+              "productId": "9900008747",
+              "quantity": 1,
+              "unitPriceCents": 1400,
+              "subtotalCents": 1400
+            }
+          ],
+          "subtotalCents": 1400,
+          "totalCents": 1400,
+          "budgetCents": 4000,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "burger"
+          ],
+          "missingLikes": [],
+          "reason": "选择最低价汉堡，满足想吃汉堡的偏好。",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 2,
+          "items": [
+            {
+              "productId": "521741",
+              "quantity": 1,
+              "unitPriceCents": 850,
+              "subtotalCents": 850
+            }
+          ],
+          "subtotalCents": 850,
+          "totalCents": 850,
+          "budgetCents": 3500,
+          "budgetOverCents": 0,
+          "matchedLikes": [
+            "fries"
+          ],
+          "missingLikes": [],
+          "reason": "选择非辣薯饼，满足想吃薯条类且避开甜品。",
+          "requiresManualReview": false
+        },
+        {
+          "memberId": 3,
+          "items": [
+            {
+              "productId": "3010",
+              "quantity": 1,
+              "unitPriceCents": 950,
+              "subtotalCents": 950
+            }
+          ],
+          "subtotalCents": 950,
+          "totalCents": 950,
+          "budgetCents": 3000,
+          "budgetOverCents": 0,
+          "matchedLikes": [],
+          "missingLikes": [],
+          "reason": "选择不含洋葱的饮品，满足饮料要求。",
+          "requiresManualReview": true
+        }
+      ],
+      "productSubtotalCents": 3200,
+      "discountCents": 0,
+      "payableCents": 3200,
+      "totalCents": 3200,
+      "explanations": [
+        "3 人预算合计 ¥105，实付 ¥32，未为了花满预算加购",
+        "无优惠，按原值分摊；1400+850+950 = 3200"
+      ],
+      "allocationAudit": {
+        "method": "proportional-largest-remainder",
+        "payableCents": 3200,
+        "allocatedCentsSum": 3200,
+        "roundingAdjustmentCents": 0,
+        "budgetCheck": "passed"
+      },
+      "tradeoffs": [
+        {
+          "memberId": 3,
+          "issue": "存在自填要求，无法自动验证",
+          "chosen": "保留当前方案",
+          "reason": "当前只做人工核对，接入模型后再解析为结构化要求",
+          "costDeltaCents": 0
+        }
+      ],
+      "requiresManualReview": true
+    }
+  ],
+  "issues": [
+    {
+      "memberId": 3,
+      "code": "custom_requirement_unverified",
+      "kind": "input",
+      "blocking": false,
+      "message": "自填要求「不要洋葱」需要人工核对，系统未自动处理",
+      "detail": {
+        "customRequirement": "不要洋葱"
+      }
+    }
+  ],
+  "hints": [
+    {
+      "memberId": 3,
+      "level": "info",
+      "message": "该成员有自填要求，下单前请自行确认配料"
+    }
+  ],
+  "meta": {
+    "planner": "llm-validated-v1",
+    "pricingVerified": true,
+    "menuCapturedAt": "2026-10-25T03:25:05.576Z",
+    "couponCount": 1,
+    "degraded": false,
+    "reasoning": "llm",
+    "strategiesReturned": [
+      "saving"
+    ],
+    "strategiesDeduplicated": [
+      "peace",
+      "happy"
+    ],
+    "llm": "gpt-6.1-sol",
+    "llmDetail": [
+      {
+        "strategy": "saving",
+        "status": "accepted",
+        "model": "gpt-6.1-sol",
+        "latencyMs": 29594
+      },
+      {
+        "strategy": "peace",
+        "status": "accepted",
+        "model": "gpt-6.1-sol",
+        "latencyMs": 29594
+      },
+      {
+        "strategy": "happy",
+        "status": "accepted",
+        "model": "gpt-6.1-sol",
+        "latencyMs": 29594
+      }
+    ]
+  }
+}

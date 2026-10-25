@@ -13,6 +13,8 @@
  * - **复议只动指定成员**，其他人餐品保持不变，整单重算，**不挪用别人预算**。
  */
 
+import { createProposalProvider, validateProposal } from './ai.js';
+import type { ProposalCandidate, ProposalProvider, ValidatableProduct } from './ai.js';
 import { mcd } from './mcd.js';
 import type { PriceItem } from './mcd.js';
 import { allocateCents } from './plan.js';
@@ -162,6 +164,22 @@ export interface MediateHint {
   message: string;
 }
 
+/**
+ * 一份方案到底是谁出的。前端可以据此显示「AI 推荐」还是「规则兜底」，
+ * 也必须能在模型被拒时如实说明——不能把规则结果冒充成 AI 结果。
+ */
+export type PlannerKind = 'rule-based-v2' | 'llm-validated-v1';
+
+export interface LlmAttempt {
+  strategy: Strategy;
+  /** accepted = 模型方案通过校验且完成真实计价；rejected = 被拦下；skipped = 本轮不适用。 */
+  status: 'accepted' | 'rejected' | 'skipped';
+  model: string;
+  code?: string;
+  message?: string;
+  latencyMs?: number;
+}
+
 export interface MediateResult {
   source: 'live';
   traceId: string;
@@ -171,15 +189,17 @@ export interface MediateResult {
   issues: MediateIssue[];
   hints: MediateHint[];
   meta: {
-    planner: 'rule-based-v2';
+    planner: PlannerKind;
     pricingVerified: boolean;
     menuCapturedAt: string;
     couponCount: number;
     degraded: boolean;
-    reasoning: 'rules';
+    reasoning: 'rules' | 'llm' | 'rules-fallback';
     strategiesReturned: Strategy[];
     strategiesDeduplicated: Strategy[];
     llm: string;
+    /** 逐策略的模型调用记录，便于排查「为什么这次没用 AI」。可选，前端忽略也不影响。 */
+    llmDetail?: LlmAttempt[];
   };
 }
 
@@ -192,6 +212,8 @@ export interface MediateDependencies {
     beType?: number,
   ) => Promise<UnifiedPricing>;
   couponCount: (storeCode: string, orderType: number, beType: number) => Promise<number>;
+  /** 模型方案来源。`null` 表示未配置模型，直接走规则版。测试里必须显式注入。 */
+  proposals?: ProposalProvider | null;
 }
 
 const defaultDependencies: MediateDependencies = {
@@ -205,6 +227,7 @@ const defaultDependencies: MediateDependencies = {
       return 0;
     }
   },
+  proposals: createProposalProvider(),
 };
 
 // ---------------------------------------------------------------- 商品分类与食材推导
@@ -300,6 +323,9 @@ interface Candidate {
   item: UnifiedMenuItem;
   product: MediateProduct;
 }
+
+/** 对外暴露别名，供模型校验层与测试复用，避免结构漂移。 */
+export type MediateCandidate = Candidate;
 
 function violatesDislikes(candidate: Candidate, member: MemberInput): boolean {
   const dislikes = member.dislikes ?? [];
@@ -501,6 +527,163 @@ function selectForMember(
     requiresManualReview: (member.customRequirement ?? '').trim() !== '',
     reasons,
   };
+}
+
+// ---------------------------------------------------------------- 模型方案（只提议，不决定金额）
+
+/** 候选上限：96 个商品全给也就 2k 左右 token，超过这个数才截断，按价格升序保留。 */
+const MAX_MODEL_CANDIDATES = 120;
+
+function toValidatable(candidate: Candidate): ValidatableProduct {
+  return {
+    id: candidate.product.id,
+    name: candidate.product.name,
+    category: candidate.product.category,
+    priceCents: candidate.product.priceCents,
+    spicy: candidate.product.dietary.spicy.inferred,
+    beef: candidate.product.dietary.beef.inferred,
+    nonMeal: isNonMeal(candidate),
+  };
+}
+
+function modelCandidates(pool: Candidate[]): ProposalCandidate[] {
+  return pool
+    .filter((candidate) => !isNonMeal(candidate))
+    .slice()
+    .sort((a, b) => a.product.priceCents - b.product.priceCents)
+    .slice(0, MAX_MODEL_CANDIDATES)
+    .map((candidate) => ({
+      id: candidate.product.id,
+      name: candidate.product.name,
+      category: candidate.product.category,
+      priceCents: candidate.product.priceCents,
+    }));
+}
+/** 一次请求覆盖全部策略：通过校验的进 `selections`，被拦的进 `failures`。 */
+interface ModelRun {
+  selections: Map<Strategy, MemberSelection[]>;
+  failures: Map<Strategy, { code: string; message: string }>;
+  latencyMs?: number;
+}
+
+/**
+ * 只发**一次**请求，让模型同时给出全部策略，然后逐份校验。
+ *
+ * 为什么不按策略各发一次：一是三次调用直接撞上免费额度的每分钟限流，
+ * 二是三种策略本来就该在同一批硬约束下比较，分开问反而容易得到三套互相矛盾的假设。
+ *
+ * 这里不产出任何金额：即使模型返回了 `price` 字段也会被 `parseProposal` 丢掉，
+ * 最终金额一律由调用方走 `calculate-price` 计算。
+ */
+async function planWithModel(
+  provider: ProposalProvider,
+  pool: Candidate[],
+  members: MemberInput[],
+  strategies: Strategy[],
+  storeName: string,
+): Promise<ModelRun> {
+  const selections = new Map<Strategy, MemberSelection[]>();
+  const failures = new Map<Strategy, { code: string; message: string }>();
+
+  const failAll = (code: string, message: string): ModelRun => {
+    for (const strategy of strategies) failures.set(strategy, { code, message });
+    return { selections, failures };
+  };
+
+  if (strategies.length === 0) return { selections, failures };
+
+  const candidates = modelCandidates(pool);
+  if (candidates.length === 0) {
+    return failAll('model_no_candidates', '该门店没有可交给模型的候选商品');
+  }
+
+  const memberViews = members.map((member) => ({
+    id: member.id,
+    budgetCents: Math.round((member.budget ?? 0) * 100),
+    hunger: member.hunger ?? 'hungry',
+    likes: [...(member.likes ?? [])],
+    dislikes: [...(member.dislikes ?? [])],
+    requirement: member.requirement ?? 'none',
+    customRequirement: member.customRequirement ?? '',
+  }));
+
+  let result;
+  try {
+    result = await provider.propose({
+      storeName,
+      strategies,
+      members: memberViews,
+      candidates,
+      lockedMemberIds: [],
+    });
+  } catch (error) {
+    const code =
+      typeof (error as { code?: unknown }).code === 'string'
+        ? (error as { code: string }).code
+        : 'model_failed';
+    const message = error instanceof Error ? error.message : '模型调用失败';
+    return failAll(code, message);
+  }
+
+  const byId = new Map(pool.map((candidate) => [candidate.product.id, candidate]));
+  const products = pool.map(toValidatable);
+  const handled = new Set<Strategy>();
+
+  for (const plan of result.proposal.plans) {
+    const strategy = plan.strategy as Strategy;
+
+    // 模型可能多给（未知策略）或重复给（同一策略两份）：前者忽略，后者取第一份。
+    if (!isStrategy(strategy) || !strategies.includes(strategy)) continue;
+    if (handled.has(strategy)) continue;
+    handled.add(strategy);
+
+    const validation = validateProposal(plan.allocations, memberViews, products);
+    if (!validation.ok) {
+      failures.set(strategy, {
+        code: validation.violation.code,
+        message: validation.violation.message,
+      });
+      continue;
+    }
+
+    const mapped: MemberSelection[] = [];
+    let broken: { code: string; message: string } | undefined;
+
+    for (const selection of validation.selections) {
+      const items = selection.items.flatMap((item) => {
+        const candidate = byId.get(item.product.id);
+        return candidate === undefined ? [] : [{ candidate, quantity: item.quantity }];
+      });
+
+      if (items.length !== selection.items.length) {
+        broken = { code: 'model_unknown_product', message: '模型给出的商品无法映射回菜单' };
+        break;
+      }
+
+      mapped.push({
+        memberId: selection.memberId,
+        items,
+        matchedLikes: selection.matchedLikes as Category[],
+        missingLikes: selection.missingLikes as Category[],
+        requiresManualReview: selection.requiresManualReview,
+        reasons: [selection.reason],
+      });
+    }
+
+    if (broken !== undefined) failures.set(strategy, broken);
+    else selections.set(strategy, mapped);
+  }
+
+  for (const strategy of strategies) {
+    if (!handled.has(strategy)) {
+      failures.set(strategy, {
+        code: 'model_missing_strategy',
+        message: `模型没有给出 ${strategy} 策略的方案`,
+      });
+    }
+  }
+
+  return { selections, failures, latencyMs: result.latencyMs };
 }
 
 // ---------------------------------------------------------------- 结果组装
@@ -770,6 +953,42 @@ function applyRevision(
   return { selection: revised };
 }
 
+// ---------------------------------------------------------------- meta
+
+interface MetaInput {
+  provider: ProposalProvider | null;
+  menuCapturedAt: string;
+  couponCount: number;
+  pricingVerified: boolean;
+  strategiesReturned: Strategy[];
+  strategiesDeduplicated: Strategy[];
+  llmDetail: LlmAttempt[];
+}
+
+/**
+ * `planner` / `reasoning` / `degraded` 必须能被追责：
+ * - 只要有一个方案真由模型提出并通过校验 → `llm-validated-v1` + `reasoning: llm`；
+ * - 模型被调用了但全被拦下 → `rule-based-v2` + `rules-fallback` + `degraded: true`；
+ * - 模型未配置或本轮不适用（复议）→ `rule-based-v2` + `rules`，**不谎称降级**。
+ */
+function buildMeta(input: MetaInput): MediateResult['meta'] {
+  const accepted = input.llmDetail.some((entry) => entry.status === 'accepted');
+  const attempted = input.llmDetail.some((entry) => entry.status === 'rejected');
+
+  return {
+    planner: accepted ? 'llm-validated-v1' : 'rule-based-v2',
+    pricingVerified: input.pricingVerified,
+    menuCapturedAt: input.menuCapturedAt,
+    couponCount: input.couponCount,
+    degraded: attempted,
+    reasoning: accepted ? 'llm' : attempted ? 'rules-fallback' : 'rules',
+    strategiesReturned: input.strategiesReturned,
+    strategiesDeduplicated: input.strategiesDeduplicated,
+    llm: input.provider?.label ?? 'not_configured',
+    llmDetail: input.llmDetail,
+  };
+}
+
 // ---------------------------------------------------------------- 主入口
 
 export async function mediate(
@@ -777,6 +996,8 @@ export async function mediate(
   overrides: Partial<MediateDependencies> = {},
 ): Promise<MediateResult> {
   const deps: MediateDependencies = { ...defaultDependencies, ...overrides };
+  const provider = deps.proposals ?? null;
+  const llmDetail: LlmAttempt[] = [];
   const orderType = request.orderType ?? 1;
   const beType = request.beType ?? 1;
   const traceId = `med_${String(Date.now())}`;
@@ -817,17 +1038,15 @@ export async function mediate(
       plans: [],
       issues,
       hints,
-      meta: {
-        planner: 'rule-based-v2',
-        pricingVerified: false,
+      meta: buildMeta({
+        provider,
         menuCapturedAt: menu.capturedAt,
         couponCount: 0,
-        degraded: false,
-        reasoning: 'rules',
+        pricingVerified: false,
         strategiesReturned: [],
         strategiesDeduplicated: [],
-        llm: 'not_configured',
-      },
+        llmDetail,
+      }),
     };
   }
 
@@ -906,21 +1125,48 @@ export async function mediate(
       plans: [],
       issues,
       hints,
-      meta: {
-        planner: 'rule-based-v2',
-        pricingVerified: false,
+      meta: buildMeta({
+        provider,
         menuCapturedAt: menu.capturedAt,
         couponCount: 0,
-        degraded: false,
-        reasoning: 'rules',
+        pricingVerified: false,
         strategiesReturned: [],
         strategiesDeduplicated: [],
-        llm: 'not_configured',
-      },
+        llmDetail,
+      }),
     };
   }
 
   const maxPlans = Math.min(3, Math.max(1, request.options?.maxPlans ?? 3));
+
+  // 先算出这轮真正要产出的策略，再一次请求让模型全部给出。
+  // 复议（revision）一律走规则版：动作语义明确（更便宜 / 加一份薯条…），
+  // 其他成员还必须一动不动，模型很容易误解成整单重排。
+  const requestedStrategies: Strategy[] = [];
+  for (const strategy of STRATEGIES) {
+    if (requestedStrategies.length >= maxPlans) break;
+    if (request.excludePlan !== undefined && request.excludePlan.strategy === strategy && request.revision === undefined) {
+      continue;
+    }
+    requestedStrategies.push(strategy);
+  }
+
+  let modelRun: ModelRun | undefined;
+  if (provider !== null) {
+    if (request.revision !== undefined) {
+      for (const strategy of requestedStrategies) {
+        llmDetail.push({
+          strategy,
+          status: 'skipped',
+          model: provider.label,
+          code: 'revision_uses_rules',
+          message: '复议动作由规则版处理，不调用模型',
+        });
+      }
+    } else {
+      modelRun = await planWithModel(provider, pool, request.members, requestedStrategies, menu.store.name);
+    }
+  }
 
   for (const strategy of STRATEGIES) {
     if (builtPlans.length >= maxPlans) break;
@@ -929,44 +1175,93 @@ export async function mediate(
       continue;
     }
 
-    const selections: MemberSelection[] = [];
-    for (const member of request.members) {
-      const fixed = fixedByMember.get(member.id);
+    /** 规则版选品：模型不可用、被拦下、或复议时都走这里。 */
+    const buildRuleSelections = (): MemberSelection[] => {
+      const selections: MemberSelection[] = [];
+      for (const member of request.members) {
+        const fixed = fixedByMember.get(member.id);
 
-      if (request.revision !== undefined && member.id === targetMemberId) {
-        const base = fixedByMember.get(member.id);
-        const seed =
-          base ??
-          selectForMember(pool, member, strategy, true);
+        if (request.revision !== undefined && member.id === targetMemberId) {
+          const seed = fixed ?? selectForMember(pool, member, strategy, true);
+          const { selection, note } = applyRevision(seed, member, request.revision.action, pool);
+          // 不要覆盖更早、更根本的错误（例如 excludePlan 缺失）。
+          if (note !== undefined && revisionIssue === undefined) revisionIssue = note;
+          selections.push(selection);
+          continue;
+        }
 
-        const { selection, note } = applyRevision(seed, member, request.revision.action, pool);
-        // 不要覆盖更早、更根本的错误（例如 excludePlan 缺失）。
-        if (note !== undefined && revisionIssue === undefined) revisionIssue = note;
-        selections.push(selection);
-        continue;
+        if (fixed !== undefined) {
+          selections.push(fixed);
+          continue;
+        }
+
+        selections.push(selectForMember(pool, member, strategy, true));
       }
+      return selections;
+    };
 
-      if (fixed !== undefined) {
-        selections.push(fixed);
-        continue;
+    let built: BuiltPlan | { error: MediateIssue } | undefined;
+
+    const modelSelections = modelRun?.selections.get(strategy);
+    if (modelSelections !== undefined) {
+      built = await buildPlan(
+        request.storeId,
+        strategy,
+        request.members,
+        modelSelections,
+        orderType,
+        beType,
+        deps,
+        traceId,
+        builtPlans.length + 1,
+      );
+
+      if ('error' in built) {
+        // 校验过了但真实计价/分摊不过（例如优惠后仍超预算）：降级，不硬塞。
+        llmDetail.push({
+          strategy,
+          status: 'rejected',
+          model: provider?.label ?? 'unknown',
+          code: built.error.code,
+          message: built.error.message,
+        });
+      } else {
+        llmDetail.push({
+          strategy,
+          status: 'accepted',
+          model: provider?.label ?? 'unknown',
+          latencyMs: modelRun?.latencyMs,
+        });
       }
-
-      selections.push(selectForMember(pool, member, strategy, true));
+    } else if (modelRun !== undefined) {
+      const failure = modelRun.failures.get(strategy);
+      llmDetail.push({
+        strategy,
+        status: 'rejected',
+        model: provider?.label ?? 'unknown',
+        code: failure?.code ?? 'model_no_plan',
+        message: failure?.message ?? '模型没有给出该策略的方案',
+      });
     }
 
     if (revisionIssue !== undefined) break;
 
-    const built = await buildPlan(
-      request.storeId,
-      strategy,
-      request.members,
-      selections,
-      orderType,
-      beType,
-      deps,
-      traceId,
-      builtPlans.length + 1,
-    );
+    if (built === undefined || 'error' in built) {
+      const selections = buildRuleSelections();
+      if (revisionIssue !== undefined) break;
+
+      built = await buildPlan(
+        request.storeId,
+        strategy,
+        request.members,
+        selections,
+        orderType,
+        beType,
+        deps,
+        traceId,
+        builtPlans.length + 1,
+      );
+    }
 
     if ('error' in built) {
       issues.push({ ...built.error, memberId: built.error.memberId });
@@ -996,17 +1291,15 @@ export async function mediate(
       plans: [],
       issues,
       hints,
-      meta: {
-        planner: 'rule-based-v2',
-        pricingVerified: false,
+      meta: buildMeta({
+        provider,
         menuCapturedAt: menu.capturedAt,
         couponCount: 0,
-        degraded: false,
-        reasoning: 'rules',
+        pricingVerified: false,
         strategiesReturned: [],
         strategiesDeduplicated: [],
-        llm: 'not_configured',
-      },
+        llmDetail,
+      }),
     };
   }
 
@@ -1016,6 +1309,17 @@ export async function mediate(
       kind: 'constraint',
       blocking: true,
       message: '当前预算与限制下没有任何可行方案',
+    });
+  }
+
+  // 模型被拦下是「体验降级」，不是「无解」：只给非阻塞提示，绝不写成 blocking issue。
+  const rejected = llmDetail.filter((entry) => entry.status === 'rejected');
+  if (rejected.length > 0) {
+    hints.push({
+      level: 'info',
+      message: `模型方案未通过校验（${rejected
+        .map((entry) => `${entry.strategy}: ${entry.code ?? 'unknown'}`)
+        .join('、')}），已回退规则版生成；金额仍按真实试算`,
     });
   }
 
@@ -1029,17 +1333,15 @@ export async function mediate(
     plans: builtPlans.map((entry) => entry.plan),
     issues,
     hints,
-    meta: {
-      planner: 'rule-based-v2',
-      pricingVerified: builtPlans.length > 0,
+    meta: buildMeta({
+      provider,
       menuCapturedAt: menu.capturedAt,
       couponCount,
-      degraded: false,
-      reasoning: 'rules',
+      pricingVerified: builtPlans.length > 0,
       strategiesReturned,
       strategiesDeduplicated,
-      llm: 'not_configured',
-    },
+      llmDetail,
+    }),
   };
 }
 
