@@ -176,6 +176,8 @@
 | 工具清单固化 | ✅ 本文 + `mcp-tools.snapshot.json`（可用 `npm run mcp:probe -w @mcd/server` 重新生成） |
 | `data` 形状固化 | ✅ [`mcp-data-shapes.md`](./mcp-data-shapes.md) + `mcp-data-shapes.json`（`npm run mcp:shapes -w @mcd/server` 重新生成；8 个 MVP 只读工具实跑，脱敏后入库） |
 | 写链路形状固化 | ✅ [`mcp-order-shapes.md`](./mcp-order-shapes.md) + `mcp-order-shapes.json`（`npm run mcp:order -w @mcd/server -- --confirm`：真建一单 ¥5 不付款→抓形状→立即取消，已验证 `status 10→60`） |
+| 统一格式转换层 | ✅ [`normalize.ts`](../apps/server/src/mcp/normalize.ts)：门店/菜单/计价 → 前端统一格式；金额双写（`price` 元 + `priceFen` 分）；`isCombo` 带置信度溯源 |
+| 前端样例 fixtures | ✅ [`fixtures/`](../apps/server/fixtures/)：`raw/` 脱敏原始返回 + `normalized/` 统一格式 + `plan.sample.json` 方案结果样例（`npm run mcp:fixtures -w @mcd/server` 重新生成） |
 | HTTP 路由对接前端 | ⬜ 未做（按 CONTRIBUTING，需先定接口契约再实现） |
 
 ## 8. 仍未确认

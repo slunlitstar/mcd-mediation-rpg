@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1950059",
+    "name": "麦当劳北京新王府井餐厅",
+    "address": "王府井大街200号北京工艺美术世界",
+    "businessStatus": false,
+    "businessHours": "06:00-22:00",
+    "distance": 2
+  },
+  {
+    "id": "1950900",
+    "name": "麦当劳北京东长安街东方新天地餐厅",
+    "address": "东方广场B1层CC01A商铺",
+    "businessStatus": false,
+    "businessHours": "07:00-22:00",
+    "distance": 338
+  },
+  {
+    "id": "1950526",
+    "name": "麦当劳北京新东安二号餐厅",
+    "address": "王府井大街138号新东安广场地下一层",
+    "businessStatus": false,
+    "businessHours": "08:00-22:00",
+    "distance": 403
+  },
+  {
+    "id": "1950482",
+    "name": "麦当劳北京王府井东街(澳门中心)餐厅",
+    "address": "王府井大街东街8号",
+    "businessStatus": false,
+    "businessHours": "07:00-22:00",
+    "distance": 504
+  },
+  {
+    "id": "1951035",
+    "name": "麦当劳北京东单北大街餐厅",
+    "address": "东单北大街112、114号",
+    "businessStatus": false,
+    "businessHours": "06:30-22:30",
+    "distance": 556
+  }
+]

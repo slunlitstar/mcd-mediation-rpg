@@ -1,0 +1,76 @@
+{
+  "store": {
+    "id": "1950059",
+    "name": "麦当劳北京新王府井餐厅"
+  },
+  "currency": "CNY",
+  "priceUnit": "yuan",
+  "lines": [
+    {
+      "itemId": "9900005456",
+      "name": "麦辣鸡腿汉堡三件套",
+      "quantity": 1,
+      "unitPrice": 33.5,
+      "unitPriceFen": 3350,
+      "originalSubtotal": 33.5,
+      "originalSubtotalFen": 3350,
+      "subtotal": 33.5,
+      "subtotalFen": 3350
+    },
+    {
+      "itemId": "521966",
+      "name": "韩式烟熏芝士风味酱",
+      "quantity": 1,
+      "unitPrice": 3,
+      "unitPriceFen": 300,
+      "originalSubtotal": 3,
+      "originalSubtotalFen": 300,
+      "subtotal": 3,
+      "subtotalFen": 300
+    },
+    {
+      "itemId": "515837",
+      "name": "圆筒冰淇淋",
+      "quantity": 1,
+      "unitPrice": 5,
+      "unitPriceFen": 500,
+      "originalSubtotal": 5,
+      "originalSubtotalFen": 500,
+      "subtotal": 5,
+      "subtotalFen": 500
+    },
+    {
+      "itemId": "521951",
+      "name": "灰焰圆筒",
+      "quantity": 1,
+      "unitPrice": 5,
+      "unitPriceFen": 500,
+      "originalSubtotal": 5,
+      "originalSubtotalFen": 500,
+      "subtotal": 5,
+      "subtotalFen": 500
+    }
+  ],
+  "productOriginalPrice": 46.5,
+  "productOriginalPriceFen": 4650,
+  "productPrice": 46.5,
+  "productPriceFen": 4650,
+  "originalPrice": 46.5,
+  "originalPriceFen": 4650,
+  "discount": 0,
+  "discountFen": 0,
+  "payable": 46.5,
+  "payableFen": 4650,
+  "takeWayOptions": [
+    {
+      "code": "eat-in",
+      "title": "堂食",
+      "subtitle": "店内用餐"
+    },
+    {
+      "code": "take-in-store",
+      "title": "外带",
+      "subtitle": "店内自提"
+    }
+  ]
+}

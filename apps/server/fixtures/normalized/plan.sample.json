@@ -1,0 +1,243 @@
+{
+  "_note": "方案结果样例：前端第三页（每人分到什么）和第五页（结果/取舍说明）可直接用这份假数据铺版。价格是 2026-10-25 真实菜单价，合计已用 calculate-price 实跑校验（code=200，payable=94.00）。协商算法本身尚未实现，members/comparisons 里的偏好与取舍是人工构造的示例。",
+  "_source": {
+    "menu": "fixtures/normalized/menu.json",
+    "pricing": "fixtures/normalized/pricing.json",
+    "storeId": "1950059",
+    "capturedAt": "2026-10-25T03:11:00.000Z",
+    "priceCaveat": "取样在凌晨，所有价格为 reservationDate=2026-10-25 12:00 的预约报价；营业时段调用同一接口可能不同。"
+  },
+  "planId": "plan_demo_0001",
+  "createdAt": "2026-10-25T03:11:00.000Z",
+  "status": "awaiting_confirm",
+  "store": {
+    "id": "1950059",
+    "name": "麦当劳北京新王府井餐厅",
+    "businessHours": "06:00-22:00"
+  },
+  "orderType": 1,
+  "beType": 1,
+  "takeWay": {
+    "code": "eat-in",
+    "title": "堂食"
+  },
+  "strategy": {
+    "id": "balanced-budget",
+    "name": "预算优先 · 单人组餐",
+    "summary": "按每人的预算上限与忌口拆成 3 份独立组餐，不做份量共享；优先满足忌口与主食需求，饮料只保留 1 份以压低总额。",
+    "rationale": [
+      "3 人预算区间 30–40 元，主食单价 17–26 元，共享大份反而会拉高人均。",
+      "该门店当前无可用门店券（query-store-coupons 返回空数组），无法靠满减凑单省钱。",
+      "麦辣类套餐虽便宜 ¥2–3，但小王忌辣，全单排除辣味商品。"
+    ],
+    "rejectedAlternatives": [
+      {
+        "id": "combo-first",
+        "name": "套餐优先",
+        "reason": "最便宜的麦辣鸡腿汉堡三件套 ¥33.5 含辣，忌口成员无法食用；换非辣套餐后总额反而比单点高 ¥6。"
+      },
+      {
+        "id": "share-big-combo",
+        "name": "双人分享餐均摊",
+        "reason": "全明星双人分享餐八件套 ¥49.9 需 2 人共享，第 3 人仍需另点，人均拆分后不可控。"
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "m1",
+      "name": "小王",
+      "budget": 35,
+      "preferences": {
+        "spicy": false,
+        "proteinFocus": true,
+        "note": "忌辣，想吃肉，喝饮料"
+      },
+      "items": [
+        {
+          "itemId": "1100",
+          "name": "巨无霸",
+          "quantity": 1,
+          "unitPrice": 26,
+          "subtotal": 26,
+          "isCombo": false,
+          "category": "巨无霸·牛鱼肉堡"
+        },
+        {
+          "itemId": "9900008751",
+          "name": "可乐",
+          "quantity": 1,
+          "unitPrice": 9.5,
+          "subtotal": 9.5,
+          "isCombo": false,
+          "category": "饮品"
+        }
+      ],
+      "cost": 35.5,
+      "budgetOverBy": 0.5,
+      "preferenceMatch": {
+        "score": 0.8,
+        "matched": ["主食为牛肉汉堡，蛋白质充足", "全单无辣"],
+        "unmet": ["预算 35 元，实付 35.5 元，超 0.5 元"]
+      }
+    },
+    {
+      "id": "m2",
+      "name": "小李",
+      "budget": 30,
+      "preferences": {
+        "spicy": true,
+        "wantChicken": true,
+        "wantFries": true,
+        "note": "想吃鸡肉和薯条"
+      },
+      "items": [
+        {
+          "itemId": "1401",
+          "name": "麦乐鸡5块",
+          "quantity": 1,
+          "unitPrice": 14,
+          "subtotal": 14,
+          "isCombo": false,
+          "category": "炸鸡"
+        },
+        {
+          "itemId": "4810",
+          "name": "中薯条",
+          "quantity": 1,
+          "unitPrice": 14.5,
+          "subtotal": 14.5,
+          "isCombo": false,
+          "category": "小食甜品/其他"
+        }
+      ],
+      "cost": 28.5,
+      "budgetOverBy": 0,
+      "preferenceMatch": {
+        "score": 1,
+        "matched": ["鸡肉需求由麦乐鸡满足", "薯条单独成项", "在预算内"],
+        "unmet": []
+      }
+    },
+    {
+      "id": "m3",
+      "name": "小张",
+      "budget": 40,
+      "preferences": {
+        "spicy": false,
+        "lightEater": true,
+        "wantVegetable": true,
+        "note": "减脂，想要蔬菜，倾向低卡"
+      },
+      "items": [
+        {
+          "itemId": "1450",
+          "name": "麦香鸡",
+          "quantity": 1,
+          "unitPrice": 17,
+          "subtotal": 17,
+          "isCombo": false,
+          "category": "鸡肉汉堡/卷"
+        },
+        {
+          "itemId": "4437",
+          "name": "小杯玉米杯",
+          "quantity": 1,
+          "unitPrice": 13,
+          "subtotal": 13,
+          "isCombo": false,
+          "category": "小食甜品/其他"
+        }
+      ],
+      "cost": 30,
+      "budgetOverBy": 0,
+      "preferenceMatch": {
+        "score": 0.65,
+        "matched": ["玉米杯提供蔬菜类粗粮", "无辣", "在预算内"],
+        "unmet": ["菜单没有叶类蔬菜沙拉", "麦香鸡为油炸类，与减脂诉求部分冲突"]
+      }
+    }
+  ],
+  "totals": {
+    "currency": "CNY",
+    "itemCount": 6,
+    "productOriginalPrice": 94,
+    "discount": 0,
+    "payable": 94,
+    "perPersonAvg": 31.33,
+    "budgetTotal": 105,
+    "budgetRemaining": 11,
+    "verifiedBy": "calculate-price",
+    "takeWayOptions": [
+      { "code": "eat-in", "title": "堂食" },
+      { "code": "take-in-store", "title": "外带" }
+    ]
+  },
+  "coupons": {
+    "availableCount": 0,
+    "source": "query-store-coupons",
+    "applied": [],
+    "note": "该门店 + 到店自取场景下当前无可用券，折后价等于原价；换有券账号复跑后此段会变化。"
+  },
+  "preferenceMatch": {
+    "score": 0.82,
+    "dimensions": [
+      { "key": "budget", "label": "预算", "score": 0.95, "detail": "3 人中 2 人在预算内，1 人超 0.5 元" },
+      { "key": "taste", "label": "口味", "score": 0.9, "detail": "全单无辣，满足忌口；肉类/鸡肉各有对应" },
+      { "key": "health", "label": "健康", "score": 0.5, "detail": "只有玉米杯算低负担，缺少真正的蔬菜" },
+      { "key": "sharing", "label": "共享性", "score": 0.6, "detail": "3 份独立组餐，无可共享大份" }
+    ]
+  },
+  "tradeoffs": [
+    {
+      "id": "t1",
+      "issue": "小张想要蔬菜，菜单没有沙拉",
+      "chosen": "小杯玉米杯 ¥13",
+      "alternative": "无",
+      "reason": "该门店菜单 15 个分类里没有蔬菜沙拉类商品，玉米杯是唯一接近的选项。",
+      "costDelta": 0,
+      "affectedMembers": ["m3"]
+    },
+    {
+      "id": "t2",
+      "issue": "小王预算 35 元，实际 35.5 元",
+      "chosen": "保留可乐",
+      "alternative": "去掉可乐，总价降至 ¥26",
+      "reason": "小王明确要饮料；0.5 元差额小于替换成更便宜汉堡带来的口味损失。",
+      "costDelta": 0.5,
+      "affectedMembers": ["m1"]
+    },
+    {
+      "id": "t3",
+      "issue": "套餐比单点便宜，但最便宜的套餐含辣",
+      "chosen": "全部单点",
+      "alternative": "麦辣鸡腿汉堡三件套 ¥33.5",
+      "reason": "含辣商品与小王忌口冲突；非辣套餐最便宜为 ¥34，比当前单点组合更贵。",
+      "costDelta": 6,
+      "affectedMembers": ["m1", "m2"]
+    }
+  ],
+  "unsatisfiable": [
+    {
+      "id": "u1",
+      "memberId": "m3",
+      "request": "想要蔬菜沙拉",
+      "reason": "该门店 96 个在售商品中没有沙拉类目，最接近的只有玉米杯。",
+      "suggestion": "改点玉米杯，或换一家有沙拉的门店重新组单。",
+      "severity": "partial"
+    },
+    {
+      "id": "u2",
+      "memberIds": ["m1", "m2", "m3"],
+      "request": "用优惠券降低总价",
+      "reason": "query-store-coupons 在到店自取场景返回空数组，账号卡包中的券也不适用于当前门店与时段。",
+      "suggestion": "暂无。换门店或等有券账号复跑。",
+      "severity": "blocked"
+    }
+  ],
+  "nextActions": [
+    { "key": "confirm", "label": "确认下单", "enabled": true, "requiresSecondConfirm": true },
+    { "key": "adjust", "label": "调整份量/换品", "enabled": true },
+    { "key": "reselect_store", "label": "换一家门店", "enabled": true }
+  ]
+}

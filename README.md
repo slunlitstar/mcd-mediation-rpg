@@ -2,8 +2,13 @@
 
 一个结合轻 RPG 游戏化交互、多人点餐协商和麦当劳 MCP 的 AI Web 应用。
 
-**当前阶段：项目初始化。** 仅包含可以启动和构建的基础工程，不包含正式业务功能。
-尚未实现 RPG、房间、点餐协商、麦当劳 MCP、AI 推荐或任何真实外部接口调用。
+**当前阶段：服务端已打通真实麦当劳 MCP，前端待开发。**
+
+已完成：MCP 接入层（握手 / 错误映射 / 缓存）、35 个工具盘点、数据形状基线、写链路空跑验证、
+统一格式转换层、HTTP 接口（门店 / 菜单 / 方案生成）、前端样例 fixtures。
+
+未完成：前端页面（仍是占位）、下单链路（`create-order` + 支付）、多人房间与 RPG 玩法。
+方案生成目前是**确定性规则版**（`rule-based-v1`），未接入大模型 —— `.env` 里的 `AI_*` 仍为空。
 
 ## 技术结构
 
@@ -69,8 +74,8 @@ cp .env.example .env
 npm run dev
 ```
 
-前端地址为 `http://127.0.0.1:5173`，仅显示项目初始化占位文案。
-服务端默认监听 `http://127.0.0.1:3001`，所有路径返回 404，尚无业务接口。
+前端地址为 `http://127.0.0.1:5173`，当前仍是占位页面。
+服务端默认监听 `http://127.0.0.1:3001`，已提供真实业务接口（见下方「接口」）。
 Vite 已预留 `/api` 开发代理，目标随根目录 `.env` 中的服务端地址和端口调整。
 
 也可以分别运行：
@@ -78,6 +83,39 @@ Vite 已预留 `/api` 开发代理，目标随根目录 `.env` 中的服务端�
 ```sh
 npm run dev:web
 npm run dev:server
+```
+
+## 接口
+
+所有接口统一返回 `{ ok: true, data }` 或 `{ ok: false, error: { kind, message } }`，
+前端只判 `ok`。字段含义见 [`apps/server/fixtures/README.md`](apps/server/fixtures/README.md)。
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/health` | 健康检查，返回 MCP 是否已配置、当前规划器版本 |
+| GET | `/api/stores?city=北京&keyword=麦当劳` | 门店列表（真实 MCP `query-nearby-stores`） |
+| GET | `/api/menu?storeCode=1950059` | 门店菜单，96 个商品已归一化（真实 `query-meals`，5 分钟缓存） |
+| POST | `/api/plan` | 生成多人点餐方案（真实 `calculate-price` 校准金额） |
+
+`POST /api/plan` 请求示例：
+
+```json
+{
+  "storeCode": "1950059",
+  "members": [
+    { "name": "小王", "budget": 35, "spicy": false },
+    { "name": "小李", "budget": 30, "spicy": true, "wantChicken": true },
+    { "name": "小张", "budget": 40, "lightEater": true, "wantVegetable": true }
+  ]
+}
+```
+
+实测返回（2026-10-25 03:24，真实 MCP）：3 人、原价 ¥89.8、**优惠 ¥8.1**、应付 ¥81.7、人均 ¥27.23。
+
+重新抓取前端样例数据：
+
+```sh
+npm run mcp:fixtures --workspace=@mcd/server
 ```
 
 ## 检查与构建
@@ -97,12 +135,13 @@ npm run start --workspace=@mcd/server
 ```
 
 CI 在 `main` 的推送和面向 `main` 的 PR 上运行 `npm ci` 与 `npm run check`。
-当前没有业务实现，因此没有业务测试套件。
+当前尚无自动化测试套件，接口正确性靠实跑验证（`npm run mcp:fixtures --workspace=@mcd/server`）。
 
 ## 环境变量与凭据
 
 前端和服务端使用仓库根目录的 `.env`。Vite 仅向浏览器公开 `VITE_` 前缀变量，
-任何密钥都不得使用该前缀。服务端的 MCP / AI 配置当前仅预留名称，不读取或调用。
+任何密钥都不得使用该前缀。服务端会读取 `MCD_MCP_URL` / `MCD_MCP_TOKEN` 并**真实调用**麦当劳 MCP；
+`AI_*` 三项目前为空，代码尚未使用。
 `.gitignore` 忽略真实 `.env`、日志、依赖和构建产物，仅允许环境变量示例入库。
 提交前仍应检查暂存区，禁止提交 API Key、Token、密码或其他真实凭据。
 

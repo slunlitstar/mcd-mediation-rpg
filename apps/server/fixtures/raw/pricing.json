@@ -1,0 +1,78 @@
+{
+  "capturedAt": "2026-10-24T19:11:05.014Z",
+  "tool": "calculate-price",
+  "args": {
+    "storeCode": "1950059",
+    "orderType": 1,
+    "beType": 1,
+    "reservationDate": "2026-10-25 12:00",
+    "items": [
+      {
+        "productCode": "9900005456",
+        "quantity": 1
+      },
+      {
+        "productCode": "521966",
+        "quantity": 1
+      },
+      {
+        "productCode": "515837",
+        "quantity": 1
+      },
+      {
+        "productCode": "521951",
+        "quantity": 1
+      }
+    ]
+  },
+  "note": "金额单位是「分」：productPrice 2990 = ¥29.90。",
+  "data": {
+    "productOriginalPrice": 4650,
+    "productPrice": 4650,
+    "originalPrice": 4650,
+    "discount": 0,
+    "price": 4650,
+    "productList": [
+      {
+        "productCode": "9900005456",
+        "productName": "麦辣鸡腿汉堡三件套",
+        "quantity": 1,
+        "originalSubtotal": 3350,
+        "subtotal": 3350
+      },
+      {
+        "productCode": "521966",
+        "productName": "韩式烟熏芝士风味酱",
+        "quantity": 1,
+        "originalSubtotal": 300,
+        "subtotal": 300
+      },
+      {
+        "productCode": "515837",
+        "productName": "圆筒冰淇淋",
+        "quantity": 1,
+        "originalSubtotal": 500,
+        "subtotal": 500
+      },
+      {
+        "productCode": "521951",
+        "productName": "灰焰圆筒",
+        "quantity": 1,
+        "originalSubtotal": 500,
+        "subtotal": 500
+      }
+    ],
+    "takeWayList": [
+      {
+        "code": "eat-in",
+        "title": "堂食",
+        "subtitle": "店内用餐"
+      },
+      {
+        "code": "take-in-store",
+        "title": "外带",
+        "subtitle": "店内自提"
+      }
+    ]
+  }
+}
