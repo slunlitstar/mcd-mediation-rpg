@@ -1,0 +1,24 @@
+{
+  "name": "mcd-mediation-rpg",
+  "version": "0.1.0",
+  "private": true,
+  "description": "麦门饭局调解所：轻 RPG、多人点餐协商与麦当劳 MCP 的 AI Web 应用（初始化骨架）",
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": {
+    "node": ">=24.12.0 <25",
+    "npm": ">=11 <12"
+  },
+  "packageManager": "npm@11.6.2",
+  "scripts": {
+    "dev": "concurrently --kill-others --names web,server \"npm run dev:web\" \"npm run dev:server\"",
+    "dev:web": "npm run dev --workspace=@mcd/web",
+    "dev:server": "npm run dev --workspace=@mcd/server",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "check": "npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "typescript": "~5.9.0"
+  }
+}

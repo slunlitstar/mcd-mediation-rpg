@@ -1,0 +1,25 @@
+:root { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #25201b; background: #f7f3ed; line-height: 1.5; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+main { max-width: 920px; margin: 0 auto; padding: 48px 24px 72px; }
+.hero { padding: 40px; border-radius: 28px; color: #fff9f0; background: linear-gradient(135deg, #432318, #9e3c22); box-shadow: 0 18px 50px #63301f30; }
+.eyebrow { margin: 0 0 10px; font-size: 12px; letter-spacing: .14em; opacity: .75; }
+h1 { margin: 0 0 10px; font-size: clamp(34px, 7vw, 64px); line-height: 1.05; }
+.hero p:not(.eyebrow) { margin: 0 0 24px; color: #ffe8cc; }
+.status { display: inline-flex; padding: 8px 12px; border-radius: 999px; color: #7a2e1c; background: #ffe3d0; font-size: 14px; }
+.status.ok { color: #28573b; background: #d9f3dc; }
+.panel { margin-top: 24px; padding: 28px; border: 1px solid #eadfd2; border-radius: 22px; background: #fffdf9; box-shadow: 0 10px 30px #51341a0c; }
+h2 { margin: 0 0 18px; font-size: 22px; }
+.form-row { display: flex; gap: 12px; }
+input { flex: 1; min-width: 0; padding: 13px 15px; border: 1px solid #d8c8b9; border-radius: 12px; font: inherit; background: #fff; }
+button { border: 0; border-radius: 12px; padding: 12px 18px; color: #fff; background: #bd4b25; font: inherit; font-weight: 700; cursor: pointer; }
+button:disabled { cursor: wait; opacity: .55; }
+.room { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: #f5eee6; color: #68442e; }
+.section-title { display: flex; justify-content: space-between; align-items: baseline; }
+.section-title span { color: #8b7564; font-size: 13px; }
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.menu-card { display: grid; gap: 6px; text-align: left; padding: 18px; color: #432318; background: #fff1e2; transition: transform .15s, background .15s; }
+.menu-card:hover { transform: translateY(-2px); background: #ffe3c4; }
+.menu-card span { color: #a15d3c; font-size: 12px; font-weight: 500; }
+.menu-card b { color: #bd4b25; }
+@media (max-width: 520px) { main { padding: 20px 14px 48px; } .hero { padding: 28px 22px; } .panel { padding: 20px; } .form-row { flex-direction: column; } }
